@@ -56,6 +56,20 @@ SPACES['queue_mm'] = {
     'sweep_ratio': ('float', 0.8, 4.0, True),
     'thick_size': ('int', 100, 200, False),
 }
+# marek/robust_ladder: ladder core + kill switch + variance-ratio guard + depth-scaled cap.
+SPACES['robust_ladder'] = {
+    'size_top': ('int', 50, 300, False),
+    'cap': ('int', 20, 100, False),
+    'max_spread': ('int', 2, 12, False),
+    'topup': ('int', 0, 60, False),
+    'ks_dd': ('float', 300.0, 6000.0, True),
+    'ks_cap': ('int', 0, 50, False),
+    'ks_cool': ('float', 30.0, 900.0, True),
+    'ks_flatten': ('cat', [0, 1]),
+    'vr_max': ('cat', [0.0, 1.1, 1.3, 1.6, 2.0]),
+    'vr_cap': ('int', 0, 60, False),
+    'depth_k': ('float', 0.02, 0.4, True),
+}
 SPACE: dict[str, tuple] = {
     'inv_risk': ('float', 4.0, 128.0, True),
     'size_frac': ('float', 0.05, 0.6, False),

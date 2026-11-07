@@ -56,6 +56,22 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
   - Maximum order sizes and maximum 10 s moves match the fitted distributions.
 - **sample_v2** has mild momentum, a thinner book and wider spreads. **random_stress** and **sample** trend (variance ratio 1.6–2.4), and those are the tapes where the ladder loses. Expect the private and later tapes to look more like those than like round1.
 
+## S-tracking maker: `strategies/peter/s_mm.py` (+48% on the full tape)
+
+Uses the exact hidden fair price S (see "What round1 is") live in the strategy. Folds here are `data/splits_r1/wf` (745 s), where sig_ladder makes 30.2k/fold.
+
+| | wf01-10 mean | wf11-12 | synthetic seeds 101-112 | full tape |
+| --- | ---: | ---: | ---: | ---: |
+| sig_ladder | 30.2k | 32.1k | 34.7k | 489,589 |
+| **s_mm** | **45.7k** | **44.6k** | **47.9k** | **727,048** |
+
+For reference, the private leaderboard for round 1 was GammaStrike 793k, Olexa namichej 701k, and us 493k (sig_ladder).
+
+- **S online:** U from market taker fills; S0 bounded by market inserts at the touch (bid <= S - 0.05 <= S + 0.05 <= ask). Keep the relaxation tiny (2e-6 per observation).
+- **Rule:** post at floor(S - 0.30) / ceil(S + 0.30). Keep while edge >= 0.10 **and the next taker can reach the order** (bid >= round(S - 1)). Take quotes 0.15 or more through S with IOCs.
+- **Position room is the binding resource.** PnL is almost linear in the cap, so count every in-flight order towards it (an early version breached because same-pass cancels were not counted).
+- **Flat or worse (details in the docstring):** inventory skew, reduce-side takes, splitting size across levels, shrinking priority orders, and the EV-per-taker rule (`s_mm2.py`).
+
 ## How ladder_mm makes money
 
 Sources: `research/round1/inventory.md` and `research/round1/robustness.md`.
