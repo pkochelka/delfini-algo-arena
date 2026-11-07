@@ -84,9 +84,30 @@ Unlike `backtest-explorer`, this reads the raw tapes, not a simulator run. `anal
 | Liquidity & book | Depth profile, touch sizes, queue imbalance, order sizes, order lifetimes, where orders are placed |
 | Trades & flow | Aggressive order rate, inter-arrival times, sizes, sweep depth (k), fill intensity λ(δ) = A·e^(−kδ), net flow, sign ACF |
 | Predictability | Imbalance → future mid, the same with 5 ms latency, post-trade markouts (adverse selection), OFI regressions |
+| Queue fills | Historical passive-order partial/full fill rates by volume ahead in the FIFO queue, with horizon, side, size and placement filters |
+| Maker markouts | Volume-weighted maker markouts and outcome percentiles, conditional on pre-fill spread, maker-side imbalance, trailing volatility and aggressor size |
+| Latency & cancels | Adverse midpoint moves and stale quote marketability during a delay; fills before hypothetical cancel activation at a selected order age |
 | Compare tapes | Every loaded tape side by side |
 
 The same functions are importable for notebooks and fitting scripts: `from analysis import load_tape, features`.
+
+Execution diagnostics are also importable from `analysis.execution`. The new tabs use the
+selected timeline window and expose additional controls above the charts. Queue fills
+are observed outcomes of actual historical orders, including actual cancellations;
+they are not counterfactual fill forecasts for our own quotes. Maker conditions use
+the book before each specific taker event, and markouts are signed for the maker
+(positive is favorable), weighted by executed quantity. Outcome percentiles are not
+confidence intervals. Volatility regimes are descriptive cutoffs within the selected
+window, using trailing rather than future price changes.
+
+Orders/fills without enough follow-up before the window ends are excluded. Cancel
+experiments count subsequent actual maker fills strictly before a hypothetical
+cancel takes effect; a fill at exactly that time is excluded, matching simulator
+ordering. They preserve existing historical cancellations and are separate per-order
+experiments, not a simultaneous strategy backtest. Price-delay charts use the sampling
+selector (capped at 50,000 decision times), independently of order size/placement
+filters. Raw tapes do not contain our own cancel requests. Replay cache version 3
+adds starting queue volume and resting quantities; old caches rebuild automatically.
 
 ## How the exchange works
 

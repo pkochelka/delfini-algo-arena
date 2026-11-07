@@ -72,3 +72,10 @@ table.stats th { color: #898781; font-weight: 500; }
   --Dash-Shading-Strong: rgba(0, 0, 0, 0.5);
 }
 .control .dash-dropdown { min-width: 170px; }
+.execution-controls {
+  display: flex; flex-wrap: wrap; gap: 12px 18px;
+  background: #1a1a19; border: 1px solid #383835; border-radius: 8px;
+  padding: 12px; margin: 0 0 12px;
+}
+.execution-controls .control { flex-direction: column; align-items: flex-start; gap: 5px; }
+.execution-controls .dash-dropdown { min-width: 150px; }

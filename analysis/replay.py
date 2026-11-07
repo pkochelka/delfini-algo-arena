@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPLAY_VERSION = 2  # bump when the output changes, to invalidate caches
+REPLAY_VERSION = 3  # queue ahead / resting quantities added to order records
 DEPTH_LEVELS = 20
 DEPTH_GRID_US = 100_000
 
@@ -142,6 +142,8 @@ def replay_csv(path: Path, depth_grid_us: int = DEPTH_GRID_US, depth_levels: int
     o_end = np.zeros(n, dtype=np.int8)
     o_dist = np.full(n, np.nan)  # ticks inside (+) / behind (-) the same-side touch at insert
     o_cross = np.zeros(n, dtype=bool)
+    o_ahead = np.full(n, -1, dtype=np.int64)
+    o_resting = np.zeros(n, dtype=np.int64)
 
     # Depth snapshots
     d_t: list[int] = []
@@ -217,6 +219,8 @@ def replay_csv(path: Path, depth_grid_us: int = DEPTH_GRID_US, depth_levels: int
                 o_end_t[i] = t
             else:
                 lv = levels[s]
+                o_ahead[i] = level_qty[s].get(p, 0)
+                o_resting[i] = v
                 if p not in lv:
                     lv[p] = deque()
                     level_qty[s][p] = 0
@@ -304,6 +308,8 @@ def replay_csv(path: Path, depth_grid_us: int = DEPTH_GRID_US, depth_levels: int
             'ioc': np.array(ioc, dtype=bool)[ins],
             'dist': o_dist[ins],
             'crossed': o_cross[ins],
+            'queue_ahead': o_ahead[ins],
+            'resting_quantity': o_resting[ins],
             'filled': o_filled[ins],
             'end_t_us': o_end_t[ins],
             'end': pd.Categorical.from_codes(o_end[ins], categories=list(END_REASONS.values())),
