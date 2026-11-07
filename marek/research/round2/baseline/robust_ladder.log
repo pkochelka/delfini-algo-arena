@@ -1,0 +1,14 @@
+Simulation complete
+fills=12802
+traded_volume=472934
+inventory=0
+cash=24593.00
+mark_price=9689.00
+breach_penalty=0.00
+pnl=24593.00
+pnl_se=7838.75
+abs_inventory_q50=3
+abs_inventory_q68=15
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=marek/logs/r2_robust_ladder

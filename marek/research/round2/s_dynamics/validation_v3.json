@@ -1,0 +1,47 @@
+{
+ "calm": {
+  "n_makers": 908240,
+  "maker_gap_below_d0_pointS": 0,
+  "maker_gap_below_0_pointS": 0,
+  "maker_inconsistent_with_99CI": 0,
+  "maker_gap_min": 0.05008446917963738,
+  "n_takers": 41563,
+  "taker_in_band_pointS": 0.9469961263623896,
+  "taker_in_band_99CI": 0.9515674999398503,
+  "taker_passive_side": 0,
+  "taker_aggr_tail": 0.04843250006014965,
+  "post_sd_median": 0.05706964511428197,
+  "post_sd_p90": 0.08873400993531741,
+  "ci99_width_median": 0.25
+ },
+ "vol": {
+  "n_makers": 158381,
+  "maker_gap_below_d0_pointS": 18,
+  "maker_gap_below_0_pointS": 7,
+  "maker_inconsistent_with_99CI": 3,
+  "maker_gap_min": -0.7919468515701737,
+  "n_takers": 11162,
+  "taker_in_band_pointS": 0.9085289374664038,
+  "taker_in_band_99CI": 0.9228632861494356,
+  "taker_passive_side": 4,
+  "taker_aggr_tail": 0.07677835513348862,
+  "post_sd_median": 0.10399417873713379,
+  "post_sd_p90": 0.1626699264496461,
+  "ci99_width_median": 0.5
+ },
+ "shock_window": {
+  "n_makers": 3238,
+  "maker_gap_below_d0_pointS": 0,
+  "maker_gap_below_0_pointS": 0,
+  "maker_inconsistent_with_99CI": 0,
+  "maker_gap_min": 0.14964057716497337,
+  "n_takers": 698,
+  "taker_in_band_pointS": 0.5959885386819485,
+  "taker_in_band_99CI": 0.6289398280802292,
+  "taker_passive_side": 0,
+  "taker_aggr_tail": 0.37106017191977075,
+  "post_sd_median": 0.15046208444230885,
+  "post_sd_p90": 0.5569365984779693,
+  "ci99_width_median": 0.6499999999996362
+ }
+}

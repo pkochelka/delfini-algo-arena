@@ -1,0 +1,114 @@
+Replaying data/round2.csv ...
+  2,193,064 events, 197,588 trades in 7.1s
+arrivals ...
+sizes ...
+lifetimes ...
+hidden price ...
+cancel hazard ...
+book stats ...
+{
+  "source": "data/round2.csv",
+  "duration_s": 5999.995946,
+  "arrivals": {
+    "maker_rate": 178.30995381142546,
+    "taker_rate_per_side": 4.4519196746803935,
+    "maker_buy_share": 0.4999733609756052,
+    "taker_buy_share": 0.49871778073114575,
+    "checks": {
+      "maker": {
+        "gap_cv": 1.0228691454966428,
+        "dispersion_10s": 4.097765716190655
+      },
+      "taker_buy": {
+        "gap_cv": 1.0465722424029875,
+        "dispersion_10s": 3.1755494263288524
+      },
+      "taker_sell": {
+        "gap_cv": 1.0407030719340833,
+        "dispersion_10s": 3.2879566879378403
+      },
+      "taker_sign_acf1": 0.003550129248988126
+    }
+  },
+  "maker_size": {
+    "mu": 2.6568627151996917,
+    "sd": 1.8028021832466319
+  },
+  "taker_size": {
+    "mu": 4.104374979356112,
+    "sd": 1.4023651842791547
+  },
+  "lifetime": {
+    "life_a": 2.4701035902402944,
+    "life_b": 27.031814803030656,
+    "mean_s": 0.4418311675051553,
+    "ks_hypoexp": 0.01056900374248304,
+    "ks_gamma": 0.02924218789767341,
+    "share_of_makers_cancelled": 0.9999280278990035
+  },
+  "S": {
+    "c": 0.06049999999999918,
+    "s0": 9848.485107169316,
+    "s0_interval": [
+      10080.791475300055,
+      9616.178739038576
+    ],
+    "c_feasible": null,
+    "maker_violations": 534880,
+    "taker_violations": 53400,
+    "n_orders": 1123282
+  },
+  "maker_offset": {
+    "d_shift": -193.13965332993013,
+    "d_scale": 0.45,
+    "min_gap_S_minus_price": -214.59961481103346,
+    "at_clip_price_share": 0.45642265522667286,
+    "loglik_gain_vs_plain_exp_per_order": 0.0
+  },
+  "cancel": {
+    "hazard_by_mv": {
+      "(-9.0, 0.0001]": 1.778,
+      "(0.0001, 0.1]": 2.321,
+      "(0.1, 0.2]": 2.29,
+      "(0.2, 0.3]": 2.477,
+      "(0.3, 0.4]": 2.659,
+      "(0.4, 0.5]": 2.958,
+      "(0.5, 0.6]": 3.22,
+      "(0.6, 0.8]": 3.588,
+      "(0.8, 1.0]": 3.962,
+      "(1.0, 1.5]": 4.692,
+      "(1.5, 9.0]": 6.446
+    },
+    "hazard_by_insert_distance_when_mv<=0": {
+      "(-9.0, -2.0]": 1.841,
+      "(-2.0, -1.5]": 1.963,
+      "(-1.5, -1.0]": 1.446,
+      "(-1.0, -0.5]": 1.558,
+      "(-0.5, 0.0001]": 1.476
+    },
+    "measured_linear_fit_mv>0": {
+      "intercept": 1.994818289135776,
+      "slope": 2.2058617042029907
+    },
+    "hazard_age<50ms_mv<=0": 1.0230419391350658,
+    "cancel_alpha": 1.72,
+    "cancel_beta": 5.8,
+    "life_b": 40.0
+  },
+  "book": {
+    "spread_time_share": {
+      "1": 0.8392845967261094,
+      "2": 0.11624500449105439,
+      "3": 0.030991076714641286
+    },
+    "touch_qty_mean": 1121.8722019010604,
+    "touch_qty_median": 709.0,
+    "vol_1s_ticks": 3.7922633514193405,
+    "mid_minus_S_sd": 139.32220620903144,
+    "trades_per_s": 32.93135558395259,
+    "taker_fill_share_of_volume": 0.8094750750684074,
+    "takers_with_no_fill_share": 0.039065571008741556,
+    "cancels_of_filled_orders_share": 0.14066043362105551
+  }
+}
+-> marek/research/round2/r1_model_fit.json
