@@ -1,0 +1,115 @@
+{
+  "objective": {
+    "risk_k": 0.5,
+    "inv_pen": 0.0
+  },
+  "window": 0,
+  "trials": 20,
+  "steps": [
+    {
+      "fold": 6,
+      "fit": "1-5",
+      "fit_score": 26183.73969243184,
+      "default_pnl": 26673.0,
+      "tuned_pnl": 27091.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    },
+    {
+      "fold": 7,
+      "fit": "1-6",
+      "fit_score": 26288.101102101493,
+      "default_pnl": 28053.0,
+      "tuned_pnl": 26613.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    },
+    {
+      "fold": 8,
+      "fit": "1-7",
+      "fit_score": 26300.652573593186,
+      "default_pnl": 23519.0,
+      "tuned_pnl": 29123.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    },
+    {
+      "fold": 9,
+      "fit": "1-8",
+      "fit_score": 26470.59858294252,
+      "default_pnl": 29345.0,
+      "tuned_pnl": 26908.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    },
+    {
+      "fold": 10,
+      "fit": "1-9",
+      "fit_score": 26487.873473497802,
+      "default_pnl": 27733.0,
+      "tuned_pnl": 29694.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    },
+    {
+      "fold": 11,
+      "fit": "1-10",
+      "fit_score": 26644.775838394668,
+      "default_pnl": 26376.0,
+      "tuned_pnl": 27289.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    },
+    {
+      "fold": 12,
+      "fit": "1-11",
+      "fit_score": 26674.480618068905,
+      "default_pnl": 28573.0,
+      "tuned_pnl": 27650.0,
+      "params": {
+        "size_top": 111,
+        "topup": 32,
+        "levels": 2,
+        "size_deep": 6,
+        "tight_offset": 0,
+        "skew_lots": 100
+      }
+    }
+  ]
+}

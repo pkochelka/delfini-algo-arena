@@ -1,18 +1,20 @@
-"""ladder_mm: passive market maker that rests large orders at and behind the touch and keeps queue priority.
+"""queue_mm: ladder_mm's queue-seniority market maker, made to adapt to the market's price grid and book depth.
 
-Idea (from the sample_v2 first 120 s): the price barely moves and all trading comes from large,
-uninformed IOC orders, so the edge is being filled by them at the touch. Queue position matters
-more than price: an order whose price is still wanted is never re-sent.
+Round1 fill markouts (see queue_hypotheses.md): the edge is queue seniority. Fills of orders at the front
+of a queue / older than 0.5 s mark out about +0.35 ticks at 1 s, fresh back-of-queue ones about +0.1, and
+the first order in a brand-new level is toxic. So: rest at the touch (and one level behind), never
+re-send a still-wanted order, and avoid any action that resets queue position (pulls, stepping inside the spread).
 
-Per side, the wanted prices are the touch (`touch` = best market price, our own orders excluded)
-and `levels - 1` ticks behind it; `size_top` lots go to the first, `size_deep` to each of the rest.
-A guard keeps the worst case |position + every open order on a side| within `cap`, so the
-+-100 penalty can't trigger with cap <= 100.
+Per side, the wanted prices are the touch (best market price, our own orders excluded) and `levels - 1`
+grid steps behind it. The grid step is learned from the book (most common gap between occupied levels),
+so on a coarser tick grid the deep order joins a real level instead of founding a fresh one. When the
+market touch is thick relative to our cap (EWMA touch > deep_ratio * cap), or market sweeps are big
+relative to it (EWMA taker size > sweep_ratio * cap), a deep order only takes room from the touch:
+rest one level of `thick_size` lots instead. A guard keeps the worst case
+|position + every open order on a side| within `cap`, so the +-100 penalty can't trigger with cap <= 100.
 
-Tried and kept behind flags (all hurt on sample_v2, see the git history):
-    skew_lots        shift the adding side's ladder away by pos/skew_lots ticks
-    improve_reduce   step inside a 2-tick spread on the side that reduces inventory
-    flat_at/flat_to  IOC the position back to flat_to once |pos| >= flat_at
+Tried and kept behind flags (all hurt, see queue_hypotheses.md): imb_pull, vanish_qty, improve,
+improve_reduce, size_k, gate_share, keep_levels, topup_ahead_max, fill_room, tight_offset, flat_at/flat_to.
 """
 
 from __future__ import annotations
@@ -29,9 +31,9 @@ from simulator.models import (
 from simulator.strategy import BaseStrategy
 
 PARAMS = {
-    'size_top': 200,  # lots at the touch (clipped by the guard; 200 = cap + a full opposite position)
-    'size_deep': 0,  # lots at each level behind the touch
-    'levels': 1,  # price levels per side, touch included
+    'size_top': 99,  # lots at the touch (clipped by the guard; 200 = cap + a full opposite position)
+    'size_deep': 50,  # lots at each level behind the touch
+    'levels': 2,  # price levels per side, touch included
     'cap': 100,  # worst-case |position + open orders on a side|
     'max_spread': 8,  # ignore books wider than this (a side backed by stale far orders)
     'tight_offset': 0,  # 1: with a 1-tick spread, start the ladder one tick behind the touch
@@ -45,17 +47,29 @@ PARAMS = {
     'vanish_ratio': 10.0,
     # market price grid in ticks (levels behind the touch, skew and max_spread are in grid steps);
     # 0 = learn it from the first grid_learn snapshots (most common gap between occupied levels)
-    'grid_unit': 1,
+    'grid_unit': 0,
     # >0: touch size = clip(size_k * EWMA market taker size, size_top, size_top_max) (thick books want more)
     'size_k': 0.0,
     # >0: rest only at the touch (levels = 1) while the EWMA market touch qty exceeds deep_ratio * cap
-    'deep_ratio': 0.0,
+    'deep_ratio': 18.0,
     'touch_n': 20000,
+    'deep_min_n': 5000,  # book events before the thick-book switch may fire (EWMA warm-up)
+    # >0: the same one-level switch while the EWMA market taker size exceeds sweep_ratio * cap
+    # (big sweeps fill a whole 200-lot order at once; a deep order just takes room from it)
+    'sweep_ratio': 2.1,
+    'sweep_min_n': 200,
+    'thick_size': 200,  # >0: size_top while deep_ratio has switched to one level
     'size_top_max': 200,
     'size_n': 1000,
     'grid_learn': 5000,
-    'improve': 0,  # see on_order_book_change: 1 thick side, 2 thin side, 3 reducing side    # tried, off
-    'skew_lots': 0,
+    'gate_share': 0.0,  # >0: send no new touch order on a side whose market touch share is below this
+    'gate_all': 0,  # 1: the gate also blocks new deep orders
+    'keep_levels': 0,  # >0: don't cancel own orders up to this many grid steps behind the ladder
+    'topup_ahead_max': 0,  # >0: no top-up at the touch while its market qty exceeds this
+    'fill_room': 0,  # 1: the touch order grows to all free capacity (minus the deep order's share)
+    'improve': 0,  # see on_order_book_change: 1 thick side, 2 thin side, 3 reducing side
+    # tried, off
+    'skew_lots': 0,  # 100 was a no-op under the cap guard (|pos| <= 100), see queue_hypotheses.md #20
     'improve_reduce': 0,
     'flat_at': 0,
     'flat_to': 0,
@@ -66,7 +80,7 @@ PARAMS = {
 BUY, SELL = Side.BUY, Side.SELL
 
 
-class LadderMM(BaseStrategy):
+class QueueMM(BaseStrategy):
     """Rest a ladder of large orders at and behind the touch; never re-send a still-wanted order."""
 
     def __init__(self) -> None:
@@ -141,7 +155,7 @@ class LadderMM(BaseStrategy):
         p = self.p
         if not p['grid_unit'] and self.seen < p['grid_learn']:
             self._learn_unit(snapshot)
-        if trades and p['size_k']:
+        if trades and (p['size_k'] or p['sweep_ratio']):
             per: dict[str, int] = {}
             for tr in trades:
                 if tr.taker_owner == 'market':
@@ -157,9 +171,11 @@ class LadderMM(BaseStrategy):
             a = max(1.0 / self.n_touch, 1.0 / p['touch_n'])
             self.touch_q += a * ((qb + qa) / 2 - self.touch_q)
         levels = p['levels']
-        if p['deep_ratio'] and self.touch_q > p['deep_ratio'] * p['cap']:
+        thick = p['deep_ratio'] and self.n_touch >= p['deep_min_n'] and self.touch_q > p['deep_ratio'] * p['cap']
+        sweep = p['sweep_ratio'] and self.n_aggr >= p['sweep_min_n'] and self.aggr > p['sweep_ratio'] * p['cap']
+        if thick or sweep:
             levels = 1  # our capacity is a small slice of a thick queue: a deep order only takes room from the touch
-        size_top = p['size_top']
+        size_top = p['thick_size'] if (thick or sweep) and p['thick_size'] else p['size_top']
         if p['size_k'] and self.n_aggr >= 50:
             size_top = min(p['size_top_max'], max(size_top, round(p['size_k'] * self.aggr)))
         if bb is None or ba is None or ba - bb > p['max_spread'] * u or snapshot.timestamp_us < p['trade_start_us']:
@@ -212,12 +228,26 @@ class LadderMM(BaseStrategy):
                     continue
                 if o[1] in want and (p['topup'] or o[1] not in have):
                     have[o[1]] = have.get(o[1], 0) + o[2]
+                elif p['keep_levels'] and 0 < (start - o[1]) * (1 if side == BUY else -1) <= p['keep_levels'] * u:
+                    continue  # behind the ladder after a move away: keep its queue spot for when the price returns
                 else:
                     self.cancelling.add(oid)
                     self.cancel_order(oid)
+            # no new orders (existing ones keep their queue spot) on a side whose market touch share is thin:
+            # it is about to be run over, and a fresh order there joins at the back of a dying queue
+            gate = p['gate_share'] and share < p['gate_share']
             for price in want:
+                if gate and (price == start or p['gate_all']):
+                    continue
                 target = size_top if price == start else p['size_deep']
+                if price == start and p['fill_room']:
+                    # use idle capacity (mostly the reducing side) at the touch, keeping room for the deep order
+                    deep = start + step
+                    reserve = p['size_deep'] if levels > 1 and deep not in have else 0
+                    target = max(target, have.get(price, 0) + self._room(side) - reserve)
                 if price in have:
+                    if price == start and p['topup_ahead_max'] and mine > p['topup_ahead_max']:
+                        continue  # a top-up would join the back of a long queue: near-zero markout
                     short = target - have[price]
                     if not p['topup'] or short < p['topup']:
                         continue
