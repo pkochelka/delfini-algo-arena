@@ -9,7 +9,7 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
 | Strategy | Folds total | Full tape | Notes |
 | --- | ---: | ---: | --- |
 | `strategies/peter/ladder_mm.py` (committed HEAD, cap 100) | 425,118 | 425,639 | Baseline. `marek/impact_mm.py` with overlays off is identical. |
-| `strategies/marek/s_ladder.py` (defaults) | **706,865** | ~701k | Hidden-price S ladder, +215k vs sig_ladder. See section 0 |
+| `strategies/marek/s_ladder.py` (defaults) | **718,108** | — | Hidden-price S ladder, +215k vs sig_ladder. See section 0 |
 | `strategies/marek/sig_ladder.py` (defaults) | **489,114** | **489,589** | Depletion guard + 200 ms flow term: +64k, wins 10/10 folds |
 | `sig_ladder.py` with `flow2_k 0` (previous default) | 473,066 | 473,597 (verified independently) | Depletion guard: +48k, wins 10/10 folds, paired t ≈ 10 |
 | `strategies/marek/q_ladder2.py` (defaults) | 453,901 | — | 100 at the touch + 100 one tick behind, plus `improve_both` |
@@ -35,9 +35,14 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
   On 5 fresh synthetic generator tapes (`r1_synth.py --tag val`), the defaults beat sig_ladder by +101k (5/5, t 39).
 - **Lost:** the sig_ladder guard on top (−6k), a higher pull threshold (0.5: −18k), hysteresis, keep_flat 0 (−30k), no pre-join (−74k), and an inventory-scaled threshold (`s_pull_pos` > 0).
 - **Edge model:** a fill's edge ≈ dist − 0.026·√(taker volume before us). Most fills are at the front of the queue (`decompose.py`).
+- **Optuna** (`tune_s.py`, 70 trials, `tune_results.jsonl`): 718.5k. The rounded values are now the defaults: `s_pull` .33, `s_pull_flat` .13, `s_pull_pos` −.03, `s_take` .035, `s_improve` .2, `s_hyst` .035, `s_maxdepth` 2, `s_gap` .095, `s_take_max` 100, `topup` 30.
+  - Folds: +11.2k (8/10, t 1.4).
+  - Synth: +1.9k (3/5, within noise), so most of the gain is fit to the folds.
+- **Also lost:**
+  - A queue-aware threshold `s_qk` (dist < th + k·c·√ahead): −3k to −58k.
+  - A second order one tick behind the touch while the side is good (`s_deep`): −129k to −140k, because it takes room the touch order needs.
+- The exact-S oracle is now a research subclass, `marek/research/round1/s_ladder/s_ladder_oracle.py`, so the submission file has no numpy, `hasattr` or file reads.
 - **Open:**
-  - A queue-aware pull threshold: dist < th + c·√(lots ahead).
-  - Joint tuning (Optuna) checked on the synth tapes.
   - Robustness on sample_v2 and the stress tapes (untested; it relies on the round1 generator).
   - A sandbox upload to confirm it is accepted.
 
