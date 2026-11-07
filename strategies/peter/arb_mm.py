@@ -32,12 +32,12 @@ PARAMS = {
     'warmup': 400,
     'refit_every': 50,
     'pred_clip': 3.0,
-    'pred_weight': 1.0,
+    'pred_weight': 1.5,
     'kalman': 1,
     'kalman_span': 500,
     # Avellaneda-Stoikov
     'tau': 50.0,
-    'inv_risk': 8.0,
+    'inv_risk': 16.0,
     'vol_span': 200,
     'k_span': 500,
     'adapt': 3.0,
@@ -45,12 +45,23 @@ PARAMS = {
     'takes': 1,
     'take_frac': 0.2,
     'take_margin': 1.0,
+    'take_skew': 1,  # 1: inventory-adding takes must clear the skewed reservation price
     # latency buffer
     'post_k': 3.0,
     'post_adapt': 1,
     'post_target': 0.04,
     'post_k_min': 0.25,
     'post_k_max': 3.0,
+    'buf_time': 1,  # 1: buffer = floor(post_k*sigma over the real latency); 0: v11 ceil, >=1 event
+    # outlier filter: ignore a mid jump > max(jump_ticks, jump_k*sigma) unless it lasts jump_hold_us
+    'jump_filter': 0,
+    'jump_ticks': 5.0,
+    'jump_k': 4.0,
+    'jump_hold_us': 1_000,
+    # robust volatility: a squared mid change counts as at most vol_clip_k^2 * var (Huber-style),
+    # a trade distance as at most vol_clip_k * dist, so one outlier can't blow up spread and buffer
+    'vol_robust': 0,
+    'vol_clip_k': 4.0,
     # telemetry
     'markout_us': 1_000_000,
     # risk
@@ -195,6 +206,7 @@ class ArbMarketMaker(BaseStrategy):
         self.size_mult = 1.0
         self.kill_until = -1
         self.halted = False
+        self.jump_since: int | None = None
 
     # ------------------------------------------------------------ private feed
     def on_private_order_update(self, event: PrivateOrderEvent) -> None:
@@ -232,11 +244,21 @@ class ArbMarketMaker(BaseStrategy):
             return
         now = snapshot.timestamp_us
         p = self.p
-        self.t += 1
         bb, bq = bids[0]
         ba, aq = asks[0]
-        self.best_bid, self.best_ask = bb, ba
         mid = (bb + ba) / 2.0
+        if p['jump_filter'] and self.prev_mid is not None:
+            # a touch that jumps far for a moment (e.g. a side briefly backed only by stale orders
+            # far away) is ignored until it has lasted jump_hold_us
+            thr = max(p['jump_ticks'], p['jump_k'] * math.sqrt(max(self.var, 1e-3)))
+            if abs(mid - self.prev_mid) > thr:
+                if self.jump_since is None:
+                    self.jump_since = now
+                if now - self.jump_since < p['jump_hold_us']:
+                    return
+            self.jump_since = None
+        self.t += 1
+        self.best_bid, self.best_ask = bb, ba
         self.mid = mid
         micro = (bb * aq + ba * bq) / (aq + bq)
 
@@ -246,11 +268,18 @@ class ArbMarketMaker(BaseStrategy):
 
         prev_mid = self.prev_mid if self.prev_mid is not None else mid
         d = mid - prev_mid
-        self.var += 2.0 / (p['vol_span'] + 1) * (d * d - self.var)
+        d2 = d * d
+        ck = p['vol_clip_k']
+        if p['vol_robust']:
+            d2 = min(d2, ck * ck * max(self.var, 1e-3))
+        self.var += 2.0 / (p['vol_span'] + 1) * (d2 - self.var)
         ak = 2.0 / (p['k_span'] + 1)
         signed = 0
         for tr in trades:
-            self.dist += ak * (abs(tr.price - prev_mid) - self.dist)
+            td = abs(tr.price - prev_mid)
+            if p['vol_robust']:
+                td = min(td, ck * max(self.dist, 0.5))
+            self.dist += ak * (td - self.dist)
             signed += tr.quantity if tr.book_side == 'ask' else -tr.quantity
         k_as = 1.0 / max(self.dist, 0.5)
         self.prev_mid = mid
@@ -394,8 +423,12 @@ class ArbMarketMaker(BaseStrategy):
         if p['post_adapt']:
             self.post_k *= math.exp(0.01 * (self.cross_share / p['post_target'] - 1))
             self.post_k = max(p['post_k_min'], min(p['post_k_max'], self.post_k))
-        ev_per_lat = max(1.0, p['latency_us'] / max(self.dt_us, 1.0))
-        buf = math.ceil(self.post_k * math.sqrt(var * ev_per_lat))
+        if p['buf_time']:
+            ev_per_lat = p['latency_us'] / max(self.dt_us, 1.0)
+            buf = math.floor(self.post_k * math.sqrt(var * ev_per_lat))
+        else:
+            ev_per_lat = max(1.0, p['latency_us'] / max(self.dt_us, 1.0))
+            buf = math.ceil(self.post_k * math.sqrt(var * ev_per_lat))
 
         bid_px = min(math.floor(r - delta), self.best_ask - 1 - buf)
         ask_px = max(math.ceil(r + delta), self.best_bid + 1 + buf)
@@ -406,9 +439,11 @@ class ArbMarketMaker(BaseStrategy):
         if p['takes'] and not reduce_only and not self.ioc_in_flight:
             need = p['take_margin'] + p['adapt'] * max(0.0, -self.mk_take)
             qmax = max(1, round(p['take_frac'] * L * self.size_mult))
-            if fair - self.best_ask > need:
+            buy_ref = min(fair, r) if p['take_skew'] else fair
+            sell_ref = max(fair, r) if p['take_skew'] else fair
+            if buy_ref - self.best_ask > need:
                 take_side, bid_q = Side.BUY, 0
-            elif self.best_bid - fair > need:
+            elif self.best_bid - sell_ref > need:
                 take_side, ask_q = Side.SELL, 0
 
         self._sync(Side.BUY, bid_px if bid_q else None, bid_q)
