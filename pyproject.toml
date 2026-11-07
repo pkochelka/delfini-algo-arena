@@ -35,6 +35,7 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
+    "optuna>=5.0.0",
     "pytest>=9.2.0",
 ]
 

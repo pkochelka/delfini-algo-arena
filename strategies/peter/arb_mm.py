@@ -41,6 +41,7 @@ PARAMS = {
     'vol_span': 200,
     'k_span': 500,
     'adapt': 3.0,
+    'delta_mult': 1.0,  # scales the AS half-spread (<1 quotes nearer the touch; floor stays 1 tick)
     'size_frac': 0.2,  # v2 walk-forward pick (edge of the grid tested)
     'takes': 1,
     'take_frac': 0.2,
@@ -69,6 +70,8 @@ PARAMS = {
     'dd_ticks': 150.0,  # x limit
     'kill_cooldown_s': 60.0,
     'max_loss_ticks': 100.0,  # x limit
+    # walk-forward: learn from every event but only start trading at this backtest time (µs)
+    'trade_start_us': 0,
 }
 
 
@@ -350,7 +353,7 @@ class ArbMarketMaker(BaseStrategy):
             self.kill_until = -1
             self.size_mult *= 0.5
             self.peak = pnl
-        if self.t < p['warmup']:
+        if self.t < p['warmup'] or now < p['trade_start_us']:
             return
         self._quote(mid, k_as)
 
@@ -416,7 +419,8 @@ class ArbMarketMaker(BaseStrategy):
         risk = var * p['tau']
         fair = mid + p['pred_weight'] * self.pred
         r = fair - self.pos * g * risk
-        delta = max(1.0, g * risk / 2 + math.log(1 + g / k_as) / g + p['adapt'] * max(0.0, -self.mk))
+        delta = max(1.0, p['delta_mult'] * (g * risk / 2 + math.log(1 + g / k_as) / g)
+                    + p['adapt'] * max(0.0, -self.mk))
         q = max(1, round(p['size_frac'] * L * self.size_mult))
         reduce_only = self.kill_until >= 0
 
