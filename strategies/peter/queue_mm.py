@@ -19,6 +19,8 @@ improve_reduce, size_k, gate_share, keep_levels, topup_ahead_max, fill_room, tig
 
 from __future__ import annotations
 
+from collections import deque
+
 from simulator.models import (
     OrderBookSnapshot,
     OrderRequest,
@@ -73,6 +75,25 @@ PARAMS = {
     'improve_reduce': 0,
     'flat_at': 0,
     'flat_to': 0,
+    # kill switch on our own equity curve (from strategies/marek/robust_ladder.py; 0 = off).
+    # Equity E = cash + pos * mid, sampled each second. DEFENSIVE when, since the last switch, E falls ks_dd below
+    # its trailing ks_w1-second peak (ks_dd scaled up by sigma / ks_sigma_ref when the mid is more volatile than
+    # round1), or the PnL over the trailing ks_w2 s is below -ks_l2. DEFENSIVE caps |pos + orders| at
+    # ks_cap * ks_cap_decay^(streak-1) for ks_cool * ks_mult^(streak-1) s (<= ks_cool_max); the streak resets
+    # after ks_reset s in NORMAL. Orders over the defensive cap are cancelled, newest first.
+    'kill': 0,
+    'ks_w1': 60,
+    'ks_dd': 1500,
+    'ks_w2': 300,
+    'ks_l2': 0,
+    'ks_cap': 20,
+    'ks_cool': 120,
+    'ks_mult': 2.0,
+    'ks_cool_max': 1800,
+    'ks_cap_decay': 0.5,
+    'ks_reset': 900,
+    'ks_sigma_ref': 0.92,
+    'ks_sigma_hl': 300,
     # walk-forward (split_data --folds / tune.py): only start trading at this backtest time (µs)
     'trade_start_us': 0,
 }
@@ -97,6 +118,17 @@ class QueueMM(BaseStrategy):
         self.n_aggr = 0
         self.touch_q = 0.0  # EWMA of market touch qty per side
         self.n_touch = 0
+        # kill switch
+        self.cap = self.p['cap']  # effective cap (lower while DEFENSIVE)
+        self.cash = 0.0
+        self.next_sample_us = 0
+        self.eq: deque = deque()  # (t_s, equity) since the last mode switch
+        self.defensive_until = -1.0
+        self.streak = 0
+        self.def_cap = self.p['ks_cap']
+        self.var1 = -1.0
+        self.last_mid: float | None = None
+        self.triggers = 0
 
     def on_private_order_update(self, event: PrivateOrderEvent) -> None:
         o = self.orders.get(event.order_id)
@@ -104,7 +136,9 @@ class QueueMM(BaseStrategy):
             return
         st = event.status
         if st in (OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED):
-            self.pos += event.filled_quantity if o[0] == BUY else -event.filled_quantity
+            q = event.filled_quantity
+            self.pos += q if o[0] == BUY else -q
+            self.cash += -q * event.fill_price if o[0] == BUY else q * event.fill_price
             o[2] = event.remaining_quantity
         elif st == OrderStatus.MODIFIED:
             o[2] = event.remaining_quantity
@@ -131,8 +165,53 @@ class QueueMM(BaseStrategy):
     def _room(self, side: Side) -> int:
         rest = sum(o[2] for oid, o in self.orders.items() if o[0] == side and oid != self.ioc)
         if side == BUY:
-            return self.p['cap'] - (self.pos + rest)
-        return self.p['cap'] + self.pos - rest
+            return self.cap - (self.pos + rest)
+        return self.cap + self.pos - rest
+
+    def _kill_switch(self, t_s: float, mid: float) -> None:
+        """Once a second: update equity history and enter DEFENSIVE on a drawdown (see PARAMS 'kill')."""
+        p = self.p
+        eq = self.cash + self.pos * mid
+        self.eq.append((t_s, eq))
+        if self.last_mid is not None:
+            d2 = (mid - self.last_mid) ** 2
+            self.var1 = d2 if self.var1 < 0 else self.var1 + (1 - 0.5 ** (1 / p['ks_sigma_hl'])) * (d2 - self.var1)
+        self.last_mid = mid
+        keep = max(p['ks_w1'], p['ks_w2']) + 2
+        while self.eq and self.eq[0][0] < t_s - keep:
+            self.eq.popleft()
+        if t_s < self.defensive_until:
+            return
+        if self.streak and t_s - self.defensive_until > p['ks_reset']:
+            self.streak = 0
+        peak = max(e for t, e in self.eq if t >= t_s - p['ks_w1'])
+        dd = p['ks_dd']
+        if p['ks_sigma_ref'] and self.var1 > 0:
+            dd *= max(1.0, self.var1 ** 0.5 / p['ks_sigma_ref'])
+        hit = dd and eq < peak - dd
+        if not hit and p['ks_w2'] and self.eq[0][0] <= t_s - p['ks_w2']:
+            past = next(e for t, e in self.eq if t >= t_s - p['ks_w2'])
+            hit = eq - past < -p['ks_l2']
+        if hit:
+            self.streak += 1
+            self.triggers += 1
+            self.defensive_until = t_s + min(p['ks_cool'] * p['ks_mult'] ** (self.streak - 1), p['ks_cool_max'])
+            self.def_cap = int(p['ks_cap'] * p['ks_cap_decay'] ** (self.streak - 1))
+            self.eq.clear()
+            self.eq.append((t_s, eq))
+
+    def _shed(self, side: Side) -> None:
+        """Cancel this side's newest live orders until its worst case fits the (defensive) cap."""
+        live = [(oid, o) for oid, o in self.orders.items()
+                if o[0] == side and oid != self.ioc and oid not in self.cancelling]
+        rest = sum(o[2] for _, o in live)
+        over = (self.pos + rest - self.cap) if side == BUY else (rest - self.pos - self.cap)
+        for oid, o in reversed(live):
+            if over <= 0:
+                break
+            self.cancelling.add(oid)
+            self.cancel_order(oid)
+            over -= o[2]
 
     def _learn_unit(self, snapshot: OrderBookSnapshot) -> None:
         """Most common gap between adjacent occupied market price levels (both sides, top 4 each)."""
@@ -180,6 +259,15 @@ class QueueMM(BaseStrategy):
             size_top = min(p['size_top_max'], max(size_top, round(p['size_k'] * self.aggr)))
         if bb is None or ba is None or ba - bb > p['max_spread'] * u or snapshot.timestamp_us < p['trade_start_us']:
             return
+        if p['kill']:
+            ts = snapshot.timestamp_us
+            if ts >= self.next_sample_us:
+                self.next_sample_us = ts + 1_000_000
+                self._kill_switch(ts / 1e6, (bb + ba) / 2)
+            self.cap = min(p['cap'], self.def_cap) if ts / 1e6 < self.defensive_until else p['cap']
+            if self.cap < p['cap']:
+                self._shed(BUY)
+                self._shed(SELL)
 
         if p['flat_at'] and self.ioc is None and abs(self.pos) >= p['flat_at']:
             side, px = (SELL, bb) if self.pos > 0 else (BUY, ba)
