@@ -25,12 +25,13 @@ from array import array
 from bisect import insort
 from collections import deque
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-REPLAY_VERSION = 1  # bump when the output changes, to invalidate caches
+REPLAY_VERSION = 2  # bump when the output changes, to invalidate caches
 DEPTH_LEVELS = 20
 DEPTH_GRID_US = 100_000
 
@@ -54,8 +55,14 @@ class Tape:
     depth_ask_px: np.ndarray
     depth_ask_qty: np.ndarray
 
+    def __getstate__(self) -> dict:
+        state = dict(self.__dict__)
+        state.pop('quotes', None)  # derived; recomputed on demand
+        return state
+
     @property
     def start_us(self) -> int:
+        """The round clock's zero: the first event's timestamp. Every `t_s` column counts from it."""
         return int(self.events['t_us'].iloc[0])
 
     @property
@@ -66,6 +73,7 @@ class Tape:
     def duration_s(self) -> float:
         return (self.end_us - self.start_us) / 1e6
 
+    @cached_property
     def quotes(self) -> pd.DataFrame:
         """Top of book after each event, one row per distinct timestamp (the last state at it).
 
