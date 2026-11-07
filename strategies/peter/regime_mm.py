@@ -69,20 +69,20 @@ PARAMS = {
     'alert_max_s': 6.0,  # sniper stays armed this long after the alert starts
     'fl_on': 1,  # flatten on alert
     'fl_slip': 2,  # flatten IOC limit: this many ticks through the touch
-    'sn_on': 1,
+    'sn_on': 0,  # off: on dev it adds ~+1k (noise); the market's takers clear stale quotes before our 5 ms order lands
     'sn_jth': 4,  # trigger: ask/bid moved >= sn_jth from ref, or a market trade >= sn_jth from ref
     'sn_lim': 12,  # IOC limit = ref +- sn_lim
     'sn_qty': 100,
-    'sn_trade': 1,  # also trigger on a market trade >= sn_jth from ref
-    'sn_t0': 0.0,  # only trigger between sn_t0 and sn_t1 s after the alert (the jump lands ~2.7 s after it)
-    'sn_t1': 99.0,
+    'sn_trade': 0,  # also trigger on a market trade >= sn_jth from ref
+    'sn_t0': 2.0,  # only trigger between sn_t0 and sn_t1 s after the alert (the jump lands ~2.7 s after it)
+    'sn_t1': 4.5,
     'sn_shots': 3,
     'sn_gap_ms': 20,
     'hold_s': 1.0,  # hold the sniped position this long before unwinding
     'tb_on': 1,
     'tb_move': 5,  # mid range within tb_win_ms that starts / extends TURB
-    'tb_win_ms': 200,
-    'tb_quiet_s': 20.0,
+    'tb_win_ms': 500,
+    'tb_quiet_s': 10.0,
     'tb_cap': 0,  # >0: keep quoting the core during TURB with this cap
     'uw_ioc_s': 5.0,  # passive unwind for this long, then IOC
     'uw_slip': 3,

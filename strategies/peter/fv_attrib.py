@@ -41,13 +41,13 @@ def run(path: str, over: dict, trade_start_us: int) -> dict:
             if o is not None and e.status in (OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED):
                 f = self.f
                 self.fills.append((e.timestamp_us / 1e6, 1 if o[0] is fv_mm.BUY else -1, e.filled_quantity,
-                                   e.fill_price, self.kind.get(e.order_id, 0), int(f.exc > 0.05), f.mean))
+                                   e.fill_price, self.kind.get(e.order_id, 0), int(self.turb), f.mean))
             super().on_private_order_update(e)
 
         def on_order_book_change(self, s, tr):
             super().on_order_book_change(s, tr)
             if self.f is not None and self.now_t >= self.nxt:
-                self.path.append((self.now_t, self.f.mean, int(self.f.exc > 0.05)))
+                self.path.append((self.now_t, self.f.mean, int(self.turb)))
                 self.nxt = self.now_t + 0.1
 
     st = Probe()

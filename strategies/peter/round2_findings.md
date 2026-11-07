@@ -162,3 +162,140 @@ Out-of-sample R² of the mid change, leave-one-split-out:
 2. **Pull or shrink quotes when turbulence starts.** P(another jump within 10 s | a jump) is 0.70, so the first jump is the warning. In turbulent periods makers lose 1.3 ticks/lot.
 3. **Make thresholds relative.** The volatility-scaled kill threshold in `robust_ladder` already helps. Re-tune it on `data/splits_r2/wf`, and keep the holdout untouched.
 4. **Treat round-1 structural tricks as calm-only.** That covers exact S, queue seniority and pre-join: the round-1 generator still describes the calm parts reasonably well.
+
+## Arrivals: which point process
+
+The scripts are in the scratchpad and were not kept. The numbers below come from `regime_split.py` and the analysis described here.
+
+- **Calm periods are plain Poisson.**
+  - Maker inserts arrive at 179.8/s: gap CV 1.004, KS p 0.91, dispersion index 1.0–1.3.
+  - Takers arrive at **4.0/s per side**: CV 1.00, KS p 0.6–0.98. These are round 1's numbers.
+  - No self-excitation: after a calm taker, the taker rate is 0.91–1.0× the baseline.
+- **Turbulent periods bring extra takers.**
+  - Takers run at 12.4/s, and their gaps have CV 1.10.
+  - The rate is driven by recent price moves. After a 1 s mid move of 0–2 ticks it is 8.2/s, 4–8 ticks gives 12.4/s, 8–16 ticks 13.9/s, and above 16 ticks 30.8/s.
+  - A Hawkes fit to all takers gives a branching ratio of 0.52 with a 0.73 s half-life, but its residuals are only borderline (KS p 0.065).
+  - A 3-state Poisson hidden-Markov model fits better. Its states are 8.0/s for 84% of the time (mean stay 112 s), 12.1/s for 15% (21 s) and 36/s for 1% (2.2 s), and each state is Poisson inside (dispersion 0.97–1.04).
+  - Best description: **a regime-modulated Poisson process whose intensity reacts to price moves.**
+- **Maker outages.** 27 times on the tape, the maker insert rate drops from 180/s to **53/s, on both sides equally**, for **3.0 s**.
+  - Inside an outage, arrivals are Poisson again: KS p 0.19.
+  - The cancel rate falls to about 60/s, so all market events go from about 370/s to about 120/s.
+  - Outages come about every 200 s. The gaps between them have CV 0.40 (KS against exponential p < 0.001), so they are quasi-regular rather than Poisson.
+  - **Each outage announces a jump.** Makers return 2.95 ± 0.28 s after the onset, and the price jumps exactly then: 23 of 27 outages are followed by a jump of 5 ticks or more, and every big jump had one.
+  - The jump at the end of an outage is roughly Exp(mean 31): KS p 0.96, median 18.5. Up share 0.57. Its direction could not be read from anything during the outage.
+
+## Regime split and the regime strategy
+
+### Regime split
+
+`regime_split.py` writes `data/splits_r2/regime/`: one file per stretch, with a seeded book and a 30 s no-trade warmup. Dev is before 4500 s and test is from 4500 s on.
+
+| Regime | Dev | Test |
+| --- | --- | --- |
+| Calm | 23 stretches, 2,766 s | 6 stretches, 775 s |
+| Turbulent | 23 stretches, 1,539 s | 8 stretches, 526 s |
+
+- A turbulent stretch runs from 5 s before an outage or jump to 30 s after it, with neighbours merged if they are closer than 30 s.
+- Run any strategy on it with `regime_eval.py`.
+
+### The round-1 strategies, split by regime (dev)
+
+| Strategy | Calm | Turbulent |
+| --- | ---: | ---: |
+| `sig_ladder` | +78k | −262k |
+| `q_ladder` | +69k | −256k |
+| `queue_mm` | +62k | −204k |
+| `robust_ladder` | +70k | −87k |
+
+### `regime_mm.py`: `sig_ladder` plus a regime layer
+
+**How it detects the regime:**
+- **Outage alert.** It counts market events (callbacks) over the trailing 300 ms; 60 or fewer triggers the alert. The alert fires about 0.2–0.3 s after the outage starts, about 2.7 s before the jump.
+- **Turbulence.** A mid range of 5 ticks or more within 500 ms starts it, and it ends after 10 s without another.
+
+**What it does:** in an alert or in turbulence it cancels all quotes and unwinds the position passively, switching to an IOC after 5 s. Otherwise it quotes `sig_ladder` unchanged; `regime: 0` gives `sig_ladder` back bit for bit.
+
+| | Calm | Turbulent |
+| --- | ---: | ---: |
+| Dev | +88.9k (23/23 stretches won) | +11.8k |
+| Test, untouched | +29.0k (6/6, same as `sig_ladder`: no false alarms) | +5.0k (`sig_ladder` −89.7k, `robust_ladder` −33.2k) |
+
+- **Round-2 walk-forward, 12 folds:** **+108.9k, 12/12 folds won**, t 12.9, stitched drawdown 2.3k. Compare `sig_ladder` −174k and `robust_ladder` +12.7k.
+- **Full round-2 tape:** +149.4k, no breach.
+- **Round-1 regression:** costs 0.4% (301.2k vs 302.5k over wf01–10).
+
+### What the sweeps showed (dev, one parameter at a time)
+
+**What matters:**
+- **The turbulence filter.** Without it, turbulent stretches lose −240k.
+- **The outage alert.** It is worth about +15k in turbulent stretches: −12k without it.
+- **Staying out.** Quoting through turbulence loses, even at a small cap: −33k with cap 20, −106k with cap 50.
+
+**What doesn't:**
+- Flattening on the alert: ±0.
+- An event threshold of 45 instead of 60: ±0.
+- An event threshold of 75: costs 19k in calm stretches through false alarms.
+- A move threshold of 7: about −8k.
+- A move threshold of 10: −90k in turbulent stretches.
+
+### Market taking: tried, left off (`sn_on`)
+
+The sniper takes stale quotes by IOC once the book has moved at least `sn_jth` ticks from the price at the alert.
+
+- On dev it adds about +1k at best, which is noise; its worst stretch is −6.5k.
+- With the trade-based trigger on, it fires falsely inside outages, where the book is thin and normal takers sweep levels.
+- When it does fire correctly, the market's takers (IOCs at round(S ± 1), arriving at about 38/s after a jump) have already removed every stale quote before our order lands 5 ms later.
+- Winning that race would mean reading the jump from the first maker inserts at the new level within about 20 ms. That was not achieved: the inserts are clipped at the old touch, and for jumps above 20 ticks the new level is outside the visible depth.
+
+## Turbulence: what the other strategies do, and the shock sniper (`fvs_mm.py`)
+
+### All round-2 strategies on the regime split
+
+| Strategy | Calm, dev | Calm, test | Turbulent, dev | Turbulent, test |
+| --- | ---: | ---: | ---: | ---: |
+| `regime_mm` (sit out) | +89k | +29k | +12k | +5k |
+| `marek/round2/r2_ladder` | +92k | +22k | +176k | +57k |
+| `peter/r2_mm` | +85k | +24k | −169k | −56k |
+| `peter/fv_mm` (working tree, 20:40) | +162k | +42k | +273k | +57k |
+
+`r2_ladder` and `fv_mm` were developed on the whole tape, so their test columns are not fully clean. Their per-stretch turbulent PnL correlates 0.97: they earn from the same places.
+
+### Where turbulent PnL comes from
+
+- **Taking quotes that are stale against a fair-price estimate.** In the volatile regime makers never quote within 0.70 of S (Marek's generator fit, `marek/research/round2/round2_generator.md`), so S stays trackable while stale touches are frequent.
+- **`fv_mm` without taking:** turbulent dev drops from +176k to +9.5k.
+- **`r2_ladder` by mode:**
+
+  | Volatile mode | Turbulent dev |
+  | --- | ---: |
+  | Flat only | +14k |
+  | Wide quotes only | +41k |
+  | Snipe only | +44k |
+  | Both (the default) | +176k |
+
+- **Sitting out (`regime_mm`) leaves almost all of it on the table.**
+
+### What `fv_mm` misses: the shocks
+
+- Over 27 shocks `fv_mm` captured about 18k, against 79k for 100 lots × |jump|.
+- Its grid re-centres only on far maker inserts. For big jumps those are outside the 20-tick public depth.
+
+### The visible tell
+
+- The makers' no-cross clip gives the jump away: after an up-jump every new bid is clipped to stale ask − 1, several ticks above the old bid of the wide drought spread. A down-jump mirrors it.
+- The signal is common inside the drought itself, so it is usable only when time-locked: the jump lands at onset + 3.00 s.
+- Detection lags the onset by a jittery 0.27–0.41 s. A change-point MLE of the insert rate (180/s → 54/s) over the last 1.5 s of inserts gives the onset to within about 10 ms (2760.067 against 2760.07).
+- With a window of [onset + 2.99, onset + 3.10] s: 10 triggers, **10 of 10 in the right direction, all 3–65 ms after the jump**. The other shocks show no clipped insert in the window.
+
+### What it is worth
+
+- The sniper IOC-sweeps the stale side up to stale touch ± 8 ticks with the full room, then lets `fv_mm` manage the position after 0.3 s.
+- Turbulent test: +56.5k → **+75.0k**. Turbulent dev: +273.4k → +274.0k, since `fv_mm` already took those shocks. Calm: unchanged.
+- Walk-forward over 12 folds: 437.1k → 439.3k (12/12 folds won).
+- Full tape: **+591k**, no breach.
+
+### Notes
+
+- The gain is concentrated in a few big shocks (the +96 at 5396 s gives +18k), so expect noise.
+- An untimed version, triggering anywhere from 0.8 to 4 s after detection, fired 1–2 s before every jump and cost −21k on dev. The time-lock is the essential part.
+- `fvs_mm.py` is a snapshot of `fv_mm.py` (working tree at about 20:40) with the subclass `FVAShock` appended. Re-apply the layer if `fv_mm` changes: it is the block after "fvs_mm:" at the end of the file.

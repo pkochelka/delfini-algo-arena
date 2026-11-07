@@ -21,6 +21,14 @@ Each round-2 finding is a hypothesis behind a flag (round2_findings.md; results 
                cancel our quotes on the side whose market queue is being cancelled away
   H9 ks_*      equity kill switch (robust_ladder): drawdown -> defensive cap with escalating cooldown
   H10 inv_skew lean quotes against inventory (keeps room for the next snipe)
+  H11 w_k      quote a wide bracket with theta widened by its width
+  H12 pcap     lower cap for passive quotes, leaving room for takes
+  H13 imb_k    imbalance tilt of S        H14 take_red  looser inventory-reducing takes
+  H15 empty_*  quote into an empty side   H16 turb_spread  market spread >= k counts as turbulent
+  H17 turb_tk  taker-rate trigger         H18 c_turb  impact multiplier in turbulence
+  H19 mom_*    momentum tilt of S
+Defaults = the kept ones (H1, H2, H4 + turb_off, H11, H16): 12 r2 folds mean +16.7k, min +6.4k; holdout +27.6k;
+full round2_public +228k, no breach. Dominated by fv_mm.py (+36.4k / fold, holdout +122k); see r2_hypotheses.md.
 """
 
 from __future__ import annotations
@@ -48,8 +56,15 @@ PARAMS = {
     'gap': 0.05,
     'relax': 0.0,  # ticks/s the bracket widens by on each side
     'reset_w': 1.0,  # width of the bracket after a reset
-    'max_width': 0.6,  # quote only while hi - lo <= max_width
+    'max_width': 1.2,  # quote only while hi - lo <= max_width
     'unsure_cancel': 1,  # cancel resting quotes while the bracket is too wide
+    'w0': 0.3,  # H11: theta += w_k * max(0, (hi - lo) - w0): quote a wide bracket with a wider margin
+    'w_k': 1.0,
+    'imb_k': 0.0,  # H13: S += imb_k * (qb - qa) / (qb + qa) (market touch queues)
+    'c_turb': 1.0,  # H18: impact multiplier while turbulent
+    'mom_k': 0.0,  # H19: S += mom_k * (S - S mom_s seconds ago), 100 ms samples
+    'mom_s': 10.0,
+    'pcap': 100,  # H12: passive quotes keep the worst case within pcap (takes may use the full cap)
     # H1 quoting (s_mm core)
     'theta': 0.30,
     'theta_keep': 0.10,
@@ -62,17 +77,24 @@ PARAMS = {
     'take_lb': 0.0,  # buy when ask <= (U + lo) - take_lb; sell when bid >= (U + hi) + take_lb
     'take_mid': 0.15,  # also: buy when ask <= S - take_mid while the bracket is tight (s_mm rule), 0 = off
     'take_max': 100,
+    'take_red': 0.0,  # H14: inventory-reducing takes get this much looser limits (scaled by |pos| / cap)
+    'take_red_turb': 0,  # 1: only while turbulent
     # H3 jumps
     'jump_th': 2.0,
     'jump_cancel': 1,
     'jump_pause': 0.0,  # s without passive quotes after a jump
     # H4 turbulence
     'turb_hold': 0.0,  # s after a jump counted as turbulent (0 = off)
-    'turb_rv': 0.0,  # realised vol of S (ticks/sqrt s, 10 s EWMA) above which it is turbulent (0 = off)
-    'turb_cap': 100,
+    'turb_rv': 2.0,  # realised vol of S (ticks/sqrt s, 10 s EWMA) above which it is turbulent (0 = off)
+    'turb_cap': 0,
     'turb_reduce': 0,  # turbulent: passive quotes only on the side that reduces |pos|
     'turb_theta': 0.0,  # extra theta while turbulent
-    'turb_off': 0,  # turbulent: no passive quotes at all (taking only)
+    'turb_spread': 3,  # H16: market spread >= this counts as turbulent (0 = off)
+    'turb_spread_hold': 0.0,  # s a wide spread keeps the turbulent flag on
+    'turb_tk': 0.0,  # H17: market taker rate (EWMA, 1 s half-life, /s) above this is turbulent (0 = off)
+    'empty_quote': 0,  # H15: quote into an empty side (the missing touch is taken as S +- empty_off)
+    'empty_off': 3,
+    'turb_off': 1,  # turbulent: no passive quotes at all (taking only)
     # H6 volatility-scaled theta
     'vol_k': 0.0,
     'sig_ref': 1.0,
@@ -137,6 +159,11 @@ class R2MM(BaseStrategy):
         self.def_cap = p['ks_cap']
         self.stats = {'jumps': 0, 'takes': 0, 'take_qty': 0, 'ks': 0, 'bursts': 0}
         self.take_ids: set[str] = set()
+        self.tk_rate = 0.0
+        self.tk_t = 0
+        self.spread = 1
+        self.wide_until = -1
+        self.hist: deque = deque()
         self.fills: list = []  # p['log']: (t_us, +-1, price, qty, is_take, S, s since jump, turbulent)
 
     # ---------------------------------------------------------------- private feed
@@ -187,7 +214,12 @@ class R2MM(BaseStrategy):
                     sgn = 1 if tr.book_side == 'ask' else -1
                     tid = tr.taker_order_id
             if q:
-                self.U += sgn * p['c'] * math.sqrt(q)
+                if p['turb_tk']:
+                    dt = (ts - self.tk_t) * 1e-6
+                    self.tk_rate = self.tk_rate * 0.5 ** dt + math.log(2)  # 1 s half-life EWMA, in /s
+                    self.tk_t = ts
+                k = p['c_turb'] if p['c_turb'] != 1.0 and self._turbulent(ts) else 1.0
+                self.U += sgn * k * p['c'] * math.sqrt(q)
                 if self._newer(tid):
                     self.max_id = tid
         if p['relax'] and ts > self.t_relax:
@@ -245,14 +277,28 @@ class R2MM(BaseStrategy):
                     self.hi = v
         if self.hi > 1e17 or self.lo < -1e17:
             return
-        S = U + 0.5 * (self.lo + self.hi)
+        S = S_raw = U + 0.5 * (self.lo + self.hi)
+        if p['mom_k'] and self.hist:
+            S += p['mom_k'] * (S - self.hist[0])
+        if p['imb_k'] and qb + qa:
+            S += p['imb_k'] * (qb - qa) / (qb + qa)
         self.S = S
         if p['cburst_n']:
             self._bursts(ts, bids, asks, mbb, mba)
-        self._regime(ts, S, qb, qa, bb, ba)
-        if bb is None or ba is None or ts < p['trade_start_us']:
+        self._regime(ts, S_raw, qb, qa, bb, ba)
+        if ts < p['trade_start_us']:
             return
-        self._take(S, bb, ba, bids, asks)
+        if bb is None or ba is None:
+            if not p['empty_quote'] or (bb is None and ba is None):
+                return
+            if bb is None:
+                bb = min(ba - 1, math.floor(S - p['empty_off']))
+            else:
+                ba = max(bb + 1, math.ceil(S + p['empty_off']))
+        self.spread = (mba - mbb) if (mba is not None and mbb is not None) else 99
+        if p['turb_spread'] and self.spread >= p['turb_spread']:
+            self.wide_until = ts + int(p['turb_spread_hold'] * 1e6) + 1
+        self._take(ts, S, bb, ba, bids, asks)
         self._quote(ts, S, bb, ba)
 
     # ---------------------------------------------------------------- regime
@@ -265,6 +311,10 @@ class R2MM(BaseStrategy):
                 self.var_f += a * (d * d * 10 - self.var_f)  # per-second variance
             self.rv_S = S
             self.next_rv_us = ts + 100_000
+            if p['mom_k']:
+                self.hist.append(S)
+                if len(self.hist) > p['mom_s'] * 10:
+                    self.hist.popleft()
         if p['depth_k'] and ts >= self.next_depth_us and qb and qa:
             tq = 0.5 * (qb + qa)
             if self.depth < 0:
@@ -296,6 +346,10 @@ class R2MM(BaseStrategy):
 
     def _turbulent(self, ts: int) -> bool:
         p = self.p
+        if p['turb_spread'] and ts < self.wide_until:
+            return True
+        if p['turb_tk'] and self.tk_rate * 0.5 ** ((ts - self.tk_t) * 1e-6) > p['turb_tk']:
+            return True
         if p['turb_hold'] and ts - self.last_jump_us < p['turb_hold'] * 1e6:
             return True
         return bool(p['turb_rv']) and self.var_f > p['turb_rv'] ** 2
@@ -328,51 +382,46 @@ class R2MM(BaseStrategy):
     def _rest(self, side: Side) -> int:
         return sum(o[2] for o in self.orders.values() if o[0] is side)
 
-    def _take(self, S: float, bb: int, ba: int, bids, asks) -> None:
+    def _take(self, ts: int, S: float, bb: int, ba: int, bids, asks) -> None:
+        """IOC every market quote beyond the limit: buy asks <= lim_b, sell bids >= lim_a."""
         p = self.p
         if not p['take']:
             return
-        cap = p['cap']
         U = self.U
-        tight = self.hi - self.lo <= p['max_width']
         lim_b = U + self.lo - p['take_lb']
-        if tight and p['take_mid']:
-            lim_b = max(lim_b, S - p['take_mid'])
-        if ba <= lim_b:
-            lim = math.floor(lim_b)
-            q = 0
-            for o in asks:
-                if o.price > lim:
-                    break
-                if o.owner == 'market':
-                    q += o.quantity
-            q = min(q, cap - self.pos - self._rest(BUY), p['take_max'])
-            if q > 0:
-                oid = self.send_order(OrderRequest(side=BUY, price=lim, quantity=q, order_type=OrderType.IOC))
-                self.orders[oid] = [BUY, lim, q]
-                self.cancelling.add(oid)
-                self.take_ids.add(oid)
-                self.stats['takes'] += 1
-                self.stats['take_qty'] += q
         lim_a = U + self.hi + p['take_lb']
-        if tight and p['take_mid']:
+        if p['take_mid'] and self.hi - self.lo <= p['max_width']:
+            lim_b = max(lim_b, S - p['take_mid'])
             lim_a = min(lim_a, S + p['take_mid'])
+        pos = self.pos
+        if p['take_red'] and pos and (not p['take_red_turb'] or self._turbulent(ts)):
+            r = p['take_red'] * abs(pos) / p['cap']
+            if pos < 0:
+                lim_b += r
+            else:
+                lim_a -= r
+        if ba <= lim_b:
+            self._ioc(BUY, math.floor(lim_b), asks)
         if bb >= lim_a:
-            lim = math.ceil(lim_a)
-            q = 0
-            for o in bids:
-                if o.price < lim:
-                    break
-                if o.owner == 'market':
-                    q += o.quantity
-            q = min(q, cap + self.pos - self._rest(SELL), p['take_max'])
-            if q > 0:
-                oid = self.send_order(OrderRequest(side=SELL, price=lim, quantity=q, order_type=OrderType.IOC))
-                self.orders[oid] = [SELL, lim, q]
-                self.cancelling.add(oid)
-                self.take_ids.add(oid)
-                self.stats['takes'] += 1
-                self.stats['take_qty'] += q
+            self._ioc(SELL, math.ceil(lim_a), bids)
+
+    def _ioc(self, side: Side, lim: int, views) -> None:
+        buy = side is BUY
+        q = 0
+        for o in views:
+            if (o.price > lim) if buy else (o.price < lim):
+                break
+            if o.owner == 'market':
+                q += o.quantity
+        room = self.p['cap'] - self.pos if buy else self.p['cap'] + self.pos
+        q = min(q, room - self._rest(side), self.p['take_max'])
+        if q > 0:
+            oid = self.send_order(OrderRequest(side=side, price=lim, quantity=q, order_type=OrderType.IOC))
+            self.orders[oid] = [side, lim, q]
+            self.cancelling.add(oid)
+            self.take_ids.add(oid)
+            self.stats['takes'] += 1
+            self.stats['take_qty'] += q
 
     # ---------------------------------------------------------------- quoting
     def _cancel_side(self, side: Side) -> None:
@@ -388,13 +437,19 @@ class R2MM(BaseStrategy):
         since_jump = ts - self.last_jump_us
         if p['jump_cancel'] and since_jump == 0:
             self._cancel_side(SELL if self.last_jump_sign > 0 else BUY)
+        if p['log']:
+            w = self.hi - self.lo
+            k = 'wide' if w > p['max_width'] else ('turb' if self._turbulent(ts) else 'quote')
+            self.stats[k] = self.stats.get(k, 0) + 1
+            self.stats['w_sum'] = self.stats.get('w_sum', 0) + min(w, 5)
+            self.stats['pos_abs'] = self.stats.get('pos_abs', 0) + abs(self.pos)
         if self.hi - self.lo > p['max_width'] or since_jump < p['jump_pause'] * 1e6:
             if p['unsure_cancel']:
                 self._cancel_side(BUY)
                 self._cancel_side(SELL)
             return
         # passive cap for this event
-        pc = cap
+        pc = min(cap, p['pcap'])
         turb = self._turbulent(ts)
         if turb:
             pc = min(pc, p['turb_cap'])
@@ -403,6 +458,8 @@ class R2MM(BaseStrategy):
         if p['depth_k'] and self.depth >= 0:
             pc = min(pc, max(p['depth_min'], int(p['depth_k'] * self.depth)))
         th = p['theta'] + (p['turb_theta'] if turb else 0.0)
+        if p['w_k']:
+            th += p['w_k'] * max(0.0, self.hi - self.lo - p['w0'])
         if p['vol_k']:
             th += p['vol_k'] * max(0.0, math.sqrt(self.var_f) / p['sig_ref'] - 1)
         sk = p['inv_skew'] * pos / cap
