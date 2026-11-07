@@ -13,6 +13,8 @@ Deterministic transforms
     pscale k    p -> p0 + k*(p - p0), integer k (spreads and moves k times wider in ticks)
     tscale s    t -> t0 + s*(t - t0) (fewer or more events inside the 5 ms latency)
     vscale s    v -> max(1, round(s*v)) (thinner or thicker book)
+    drift r     inserted prices shifted by round(r * (t - t0) / 1000): a trend of r ticks per 1000 s
+                (orders resting from before a shift can now be crossed, as in a real trending market)
 
 Noise, strength set by the argument (seeded)
     vnoise σ    volumes times a mean-one lognormal(σ)
@@ -54,6 +56,10 @@ DETERMINISTIC: dict[str, list[tuple[str, float]]] = {
     'vscale0.3': [('vscale', 0.3)],
     'vscale3': [('vscale', 3)],
     'mirror_pscale2': [('mirror', 0), ('pscale', 2)],
+    'drift10': [('drift', 10)],
+    'drift30': [('drift', 30)],
+    'drift100': [('drift', 100)],
+    'drift-30': [('drift', -30)],
 }
 
 
@@ -108,6 +114,9 @@ def simple_step(rows: list[dict], name: str, arg: float, rng: random.Random) -> 
                 r['Price'] = str(p0 + k * (int(r['Price']) - p0))
         elif name == 'tscale':
             r['Time'] = f"{t0 + arg * (float(r['Time']) - t0):.6f}"
+        elif name == 'drift':
+            if r['Price']:
+                r['Price'] = str(int(r['Price']) + round(arg * (float(r['Time']) - t0) / 1000))
         elif name == 'vscale':
             if r['Volume']:
                 r['Volume'] = str(max(1, round(arg * int(r['Volume']))))
