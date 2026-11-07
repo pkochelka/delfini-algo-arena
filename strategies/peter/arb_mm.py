@@ -32,16 +32,16 @@ PARAMS = {
     'warmup': 400,
     'refit_every': 50,
     'pred_clip': 3.0,
-    'pred_weight': 1.5,
+    'pred_weight': 0.0,  # v2 walk-forward pick (1.5 was tuned on the trending sample)
     'kalman': 1,
     'kalman_span': 500,
     # Avellaneda-Stoikov
     'tau': 50.0,
-    'inv_risk': 16.0,
+    'inv_risk': 32.0,  # v2 walk-forward pick
     'vol_span': 200,
     'k_span': 500,
     'adapt': 3.0,
-    'size_frac': 0.1,
+    'size_frac': 0.2,  # v2 walk-forward pick (edge of the grid tested)
     'takes': 1,
     'take_frac': 0.2,
     'take_margin': 1.0,
@@ -54,13 +54,13 @@ PARAMS = {
     'post_k_max': 3.0,
     'buf_time': 1,  # 1: buffer = floor(post_k*sigma over the real latency); 0: v11 ceil, >=1 event
     # outlier filter: ignore a mid jump > max(jump_ticks, jump_k*sigma) unless it lasts jump_hold_us
-    'jump_filter': 0,
+    'jump_filter': 1,
     'jump_ticks': 5.0,
     'jump_k': 4.0,
     'jump_hold_us': 1_000,
     # robust volatility: a squared mid change counts as at most vol_clip_k^2 * var (Huber-style),
     # a trade distance as at most vol_clip_k * dist, so one outlier can't blow up spread and buffer
-    'vol_robust': 0,
+    'vol_robust': 1,
     'vol_clip_k': 4.0,
     # telemetry
     'markout_us': 1_000_000,
