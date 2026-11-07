@@ -1,7 +1,7 @@
 # Data explorer: sample_v2
 
 Data explorer export of `data/sample_v2.csv`, window 0.0–5,749.9 s (95.8 min), sampling selector 1 s (charts that use it: return histogram and ACF, rolling σ, variance ratio, OFI scatter).
-Generated 2026-11-07 12:41 by `uv run data-explorer --data … --export` (see data_explorer/export.py). Numbers are in ticks and seconds. The data behind each chart is in csv/, machine-readable headline stats in summary.json, interactive charts in report.html.
+Generated 2026-11-07 12:49 by `uv run data-explorer --data … --export` (see data_explorer/export.py). Numbers are in ticks and seconds. The data behind each chart is in csv/, machine-readable headline stats in summary.json, interactive charts in report.html.
 
 Contents: [Overview](#overview) · [Price & spread](#price--spread) · [Volatility](#volatility) · [Liquidity & book](#liquidity--book) · [Trades & flow](#trades--flow) · [Predictability](#predictability)
 
@@ -151,7 +151,7 @@ y: y
 
 #### Best bid / ask, microprice and aggressive orders
 
-data: [`csv/price/01-best-bid-ask-microprice-and-aggressive-orders.csv`](csv/price/01-best-bid-ask-microprice-and-aggressive-orders.csv)
+data: not saved (45,000 points; `--export --all-csv` writes it)
 
 | series | points | time (s) range | price (ticks) min | mean | median | max | last |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -165,7 +165,7 @@ data: [`csv/price/01-best-bid-ask-microprice-and-aggressive-orders.csv`](csv/pri
 
 #### Spread over time
 
-data: [`csv/price/02-spread-over-time.csv`](csv/price/02-spread-over-time.csv)
+data: not saved (5,000 points; `--export --all-csv` writes it)
 
 | series | points | time (s) range | ticks min | mean | median | max | last |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -188,7 +188,7 @@ y: share of time
 
 #### Resting depth by price (bids +, asks -)
 
-data: [`csv/price/04-resting-depth-by-price-bids-asks.csv`](csv/price/04-resting-depth-by-price-bids-asks.csv)
+data: not saved (3,523 points; `--export --all-csv` writes it)
 
 Heatmap, 3,523 non-zero cells (missing cells in the CSV are 0); x (time (s)) 0.07256..5748, y (price (ticks)) 9964..10026; z mean 3.108, max 2496.
 
@@ -198,7 +198,7 @@ Heatmap, 3,523 non-zero cells (missing cells in the CSV are 0); x (time (s)) 0.0
 
 #### Rolling σ over 100 s
 
-data: [`csv/vol/01-rolling-over-100-s.csv`](csv/vol/01-rolling-over-100-s.csv)
+data: not saved (5,750 points; `--export --all-csv` writes it)
 
 | series | points | time (s) range | ticks / √s min | mean | median | max | last |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -638,7 +638,7 @@ y: mean qty
 
 #### Quantity at the best price (share of time)
 
-data: [`csv/liq/02-quantity-at-the-best-price-share-of-time.csv`](csv/liq/02-quantity-at-the-best-price-share-of-time.csv)
+data: not saved (5,481 points; `--export --all-csv` writes it)
 
 | series | points | qty range | share of time min | mean | median | max | last |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -1154,7 +1154,7 @@ y: hits per second (log)
 
 #### Cumulative signed aggressive volume / Mid
 
-data: [`csv/flow/06-cumulative-signed-aggressive-volume-mid.csv`](csv/flow/06-cumulative-signed-aggressive-volume-mid.csv)
+data: not saved (35,719 points; `--export --all-csv` writes it)
 
 | series | points | x range | y min | mean | median | max | last |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -1297,7 +1297,7 @@ y: R²
 
 #### OFI vs Δmid, 1 s bins
 
-data: [`csv/predict/05-ofi-vs-mid-1-s-bins.csv`](csv/predict/05-ofi-vs-mid-1-s-bins.csv)
+data: not saved (5,002 points; `--export --all-csv` writes it)
 
 | OFI (lots) | fit |
 | --- | --- |

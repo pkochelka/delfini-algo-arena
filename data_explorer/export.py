@@ -10,7 +10,8 @@ so the export follows the tabs without any per-chart code. Per tape (or window) 
     README.md     every tile, fitted parameter, table and note, plus a numeric digest of
                   each chart (small charts in full, large ones summarised); the file to read
     summary.json  F.summary and fit_all for the window, machine-readable
-    csv/<tab>/    the data behind each chart: one row per point, `trace` names the series
+    csv/<tab>/    the data behind each chart: one row per point, `trace` names the series; charts over
+                  CSV_MAX_ROWS points (price paths, heatmaps, rolling series) are left out unless --all-csv
     report.html   the interactive charts (plotly.js from the CDN); git-ignored, regenerate it
     png/<tab>/    static images, only with --png (needs `kaleido` and Chrome); git-ignored
 """
@@ -18,6 +19,7 @@ so the export follows the tabs without any per-chart code. Per tape (or window) 
 from __future__ import annotations
 
 import argparse
+import shutil
 import html as html_lib
 import json
 import re
@@ -38,6 +40,7 @@ from data_explorer.tabs import compare
 
 ROOT = Path(__file__).resolve().parent  # reports go to data_explorer/<tape name>/
 INLINE_POINTS = 120  # series with at most this many points are written into README.md in full (100 ACF lags fit)
+CSV_MAX_ROWS = 2_000  # larger charts get no CSV (README still summarises them), to keep the exports small in git
 
 
 # ------------------------------------------------------------------ chart data
@@ -215,6 +218,7 @@ class Report:
 
     out_dir: Path
     png: bool = False
+    all_csv: bool = False
     md: list[str] = field(default_factory=list)
     html: list[str] = field(default_factory=list)
     tab_key: str = ''
@@ -253,11 +257,14 @@ class Report:
         slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')[:60] or 'chart'
         stem = f'{self.figures:02d}-{slug}'
         df = figure_frame(fig)
-        csv_path = self.out_dir / 'csv' / self.tab_key / f'{stem}.csv'
-        csv_path.parent.mkdir(parents=True, exist_ok=True)
-        df.to_csv(csv_path, index=False, float_format='%.6g')
-        rel_csv = csv_path.relative_to(self.out_dir).as_posix()
-        links = f'data: [`{rel_csv}`]({rel_csv})'
+        if self.all_csv or len(df) <= CSV_MAX_ROWS:
+            csv_path = self.out_dir / 'csv' / self.tab_key / f'{stem}.csv'
+            csv_path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_csv(csv_path, index=False, float_format='%.6g')
+            rel_csv = csv_path.relative_to(self.out_dir).as_posix()
+            links = f'data: [`{rel_csv}`]({rel_csv})'
+        else:
+            links = f'data: not saved ({len(df):,} points; `--export --all-csv` writes it)'
         if self.png:
             png_path = self.out_dir / 'png' / self.tab_key / f'{stem}.png'
             png_path.parent.mkdir(parents=True, exist_ok=True)
@@ -332,9 +339,10 @@ def out_dir_for(tape: Tape, window: F.Window, root: Path = ROOT) -> Path:
     return base if window is None else base / f'window-{window[0]:g}-{window[1]:g}s'
 
 
-def export_tape(tape: Tape, window: F.Window = None, dt: float = 1.0, *, root: Path = ROOT, png: bool = False, source: Path | None = None) -> Path:
+def export_tape(tape: Tape, window: F.Window = None, dt: float = 1.0, *, root: Path = ROOT, png: bool = False, all_csv: bool = False, source: Path | None = None) -> Path:
     out = out_dir_for(tape, window, root)
-    report = Report(out, png=png)
+    _clear(out)
+    report = Report(out, png=png, all_csv=all_csv)
     t0, t1 = F.bounds(tape, window)
     started = time.perf_counter()
     for key, label, render in _tabs():
@@ -364,14 +372,21 @@ def export_tape(tape: Tape, window: F.Window = None, dt: float = 1.0, *, root: P
     return out
 
 
-def export_compare(tapes: list[Tape], *, root: Path = ROOT, png: bool = False) -> Path:
+def export_compare(tapes: list[Tape], *, root: Path = ROOT, png: bool = False, all_csv: bool = False) -> Path:
     out = root / ('compare-' + '-'.join(t.name for t in tapes))
-    report = Report(out, png=png)
+    _clear(out)
+    report = Report(out, png=png, all_csv=all_csv)
     report.tab_key = 'compare'
     report.walk(compare.render(tapes))
     report.write('Data explorer: ' + ' vs '.join(t.name for t in tapes), [f'Whole tapes side by side, generated {time.strftime("%Y-%m-%d %H:%M")}.'])
     print(f'Wrote {out}', flush=True)
     return out
+
+
+def _clear(out: Path) -> None:
+    """Drop the previous export's chart files, so renamed or no-longer-saved charts do not linger."""
+    for sub in ('csv', 'png'):
+        shutil.rmtree(out / sub, ignore_errors=True)
 
 
 def _json_default(v):
@@ -382,14 +397,14 @@ def _json_default(v):
     return str(v)
 
 
-def run(paths: list[Path], window: F.Window, dt: float, *, refresh: bool = False, png: bool = False) -> None:
+def run(paths: list[Path], window: F.Window, dt: float, *, refresh: bool = False, png: bool = False, all_csv: bool = False) -> None:
     tapes = []
     for path in paths:
         tape = load_tape(path, refresh=refresh)
         tapes.append(tape)
-        export_tape(tape, window, dt, png=png, source=path)
+        export_tape(tape, window, dt, png=png, all_csv=all_csv, source=path)
     if len(tapes) > 1:
-        export_compare(tapes, png=png)
+        export_compare(tapes, png=png, all_csv=all_csv)
 
 
 def main() -> None:
@@ -398,9 +413,10 @@ def main() -> None:
     parser.add_argument('--window', type=float, nargs=2, metavar=('T0', 'T1'), help='seconds; default the whole tape')
     parser.add_argument('--dt', type=float, default=1.0, help='the sampling selector, s (default 1)')
     parser.add_argument('--png', action='store_true', help='also write PNGs (needs kaleido and Chrome)')
+    parser.add_argument('--all-csv', action='store_true', help=f'also write CSVs of charts over {CSV_MAX_ROWS:,} points')
     parser.add_argument('--refresh', action='store_true', help='rebuild the replay cache')
     args = parser.parse_args()
-    run(args.data, tuple(args.window) if args.window else None, args.dt, refresh=args.refresh, png=args.png)
+    run(args.data, tuple(args.window) if args.window else None, args.dt, refresh=args.refresh, png=args.png, all_csv=args.all_csv)
 
 
 if __name__ == '__main__':
