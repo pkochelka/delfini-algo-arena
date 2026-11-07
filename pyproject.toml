@@ -32,8 +32,13 @@ config-settings = { editable_mode = "compat" }
 requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
 [tool.setuptools.packages.find]
-include = ["simulator*", "explorer*"]
+include = ["simulator*", "explorer*", "analysis*", "data_explorer*"]
 
 [tool.setuptools.package-data]
 explorer = ["assets/*"]
