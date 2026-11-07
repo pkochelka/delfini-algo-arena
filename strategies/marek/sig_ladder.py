@@ -80,7 +80,7 @@ PARAMS = {
     # combination switches (all off = the defaults above, bit for bit)
     'size_deep': 0,  # >0: also rest this many lots one tick behind the touch while the side is safe (q_ladder levels 2)
     'pj_topup': 0,  # 1: while unsafe, top up an existing behind order with freed room (else only post if none)
-    'improve_both': 0,  # 1: with a spread >= 3 ticks quote one tick inside on both sides
+    'improve_both': 1,  # 1: with a spread >= 3 ticks quote one tick inside on both sides
     'flow2_k': 0.5,  # extra score term: taker flow against the side over the last flow2_ms / 1000 (0 = off)
     'flow2_ms': 200,
     'sev_share': 0.0,  # >0: severe state (score < sev_share and touch qty < sev_dep * peak) also pulls the flattening part
