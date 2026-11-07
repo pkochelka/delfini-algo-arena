@@ -54,6 +54,7 @@ PARAMS = {
     # fair price
     'c': 0.037,
     'gap': 0.05,
+    'gap_t': -1.0,  # H21: >= 0: gap while turbulent (volatile-regime makers quote at D = 0.70 + Exp(0.91))
     'relax': 0.0,  # ticks/s the bracket widens by on each side
     'reset_w': 1.0,  # width of the bracket after a reset
     'max_width': 1.2,  # quote only while hi - lo <= max_width
@@ -64,6 +65,13 @@ PARAMS = {
     'c_turb': 1.0,  # H18: impact multiplier while turbulent
     'mom_k': 0.0,  # H19: S += mom_k * (S - S mom_s seconds ago), 100 ms samples
     'mom_s': 10.0,
+    'take_mid_c': 0.0,  # >= 0: take_mid used while calm (the regime split says take_mid only pays in turbulence)
+    # H20 maker outage: fewer than out_thr market inserts in the trailing out_win s (normal ~90 per 0.5 s) ->
+    # turbulent for out_len s (the ~3 s outage ends in a jump, round2_findings.md "Maker outages")
+    'out_thr': 50,
+    'out_win': 0.5,
+    'out_len': 5.0,
+    'out_cool': 20.0,
     'pcap': 100,  # H12: passive quotes keep the worst case within pcap (takes may use the full cap)
     # H1 quoting (s_mm core)
     'theta': 0.30,
@@ -164,6 +172,10 @@ class R2MM(BaseStrategy):
         self.spread = 1
         self.wide_until = -1
         self.hist: deque = deque()
+        self.ins: deque = deque()  # times of new market inserts (outage detector)
+        self.t_first = None
+        self.alert_until = -1
+        self.alert_next = 0
         self.fills: list = []  # p['log']: (t_us, +-1, price, qty, is_take, S, s since jump, turbulent)
 
     # ---------------------------------------------------------------- private feed
@@ -230,6 +242,8 @@ class R2MM(BaseStrategy):
 
         U = self.U
         gap = p['gap']
+        if p['gap_t'] >= 0 and self._turbulent(ts):
+            gap = p['gap_t']
         jth = p['jump_th']
         rw = p['reset_w']
         bids, asks = snapshot.bids, snapshot.asks
@@ -248,6 +262,7 @@ class R2MM(BaseStrategy):
             oid = o.order_id
             if self._newer(oid):
                 self.max_id = oid
+                self.ins.append(ts)
                 v = px + gap - U
                 if v > self.hi:
                     if v - self.hi > jth:
@@ -268,6 +283,7 @@ class R2MM(BaseStrategy):
             oid = o.order_id
             if self._newer(oid):
                 self.max_id = oid
+                self.ins.append(ts)
                 v = px - gap - U
                 if v < self.lo:
                     if self.lo - v > jth:
@@ -304,6 +320,17 @@ class R2MM(BaseStrategy):
     # ---------------------------------------------------------------- regime
     def _regime(self, ts: int, S: float, qb: int, qa: int, bb, ba) -> None:
         p = self.p
+        if p['out_thr']:
+            if self.t_first is None:
+                self.t_first = ts
+            win = int(p['out_win'] * 1e6)
+            dq = self.ins
+            while dq and dq[0] < ts - win:
+                dq.popleft()
+            if ts - self.t_first > win and len(dq) < p['out_thr'] and ts >= self.alert_next:
+                self.alert_until = ts + int(p['out_len'] * 1e6)
+                self.alert_next = ts + int(p['out_cool'] * 1e6)
+                self.stats['outages'] = self.stats.get('outages', 0) + 1
         if ts >= self.next_rv_us:  # 100 ms samples of S
             if self.rv_S is not None:
                 d = S - self.rv_S
@@ -346,6 +373,8 @@ class R2MM(BaseStrategy):
 
     def _turbulent(self, ts: int) -> bool:
         p = self.p
+        if ts < self.alert_until:
+            return True
         if p['turb_spread'] and ts < self.wide_until:
             return True
         if p['turb_tk'] and self.tk_rate * 0.5 ** ((ts - self.tk_t) * 1e-6) > p['turb_tk']:
@@ -390,9 +419,12 @@ class R2MM(BaseStrategy):
         U = self.U
         lim_b = U + self.lo - p['take_lb']
         lim_a = U + self.hi + p['take_lb']
-        if p['take_mid'] and self.hi - self.lo <= p['max_width']:
-            lim_b = max(lim_b, S - p['take_mid'])
-            lim_a = min(lim_a, S + p['take_mid'])
+        tm = p['take_mid']
+        if p['take_mid_c'] >= 0 and not self._turbulent(ts):
+            tm = p['take_mid_c']
+        if tm and self.hi - self.lo <= p['max_width']:
+            lim_b = max(lim_b, S - tm)
+            lim_a = min(lim_a, S + tm)
         pos = self.pos
         if p['take_red'] and pos and (not p['take_red_turb'] or self._turbulent(ts)):
             r = p['take_red'] * abs(pos) / p['cap']

@@ -80,3 +80,64 @@ Each line shows the paired difference against the base at that time.
 1. **Passive quoting in turbulence loses at any distance and any cap.** Taking stale quotes in turbulence is where the money is: wf11 went from −70k to +36k. `fv_mm` and `regime_mm` found the same thing independently.
 2. **Do not cross the spread to unwind (H14).** Inventory carry has zero mean, while the crossing cost is certain.
 3. **Any bias added to the fair value hurts:** momentum, imbalance, a regime-dependent c. The take thresholds are very sensitive to bias in S.
+
+## Re-test on the regime split (`data/splits_r2/regime`, dev = before 4500 s)
+
+`r2_mm` switches regime causally:
+- Turbulent when the 10 s realised volatility of its S is above 2, when the market spread is at least 3, or during an outage alert (since H20).
+- When turbulent, it stops quoting passively and only takes.
+- Until this section it had only been scored on mixed 370 s folds.
+
+The regime split scores calm and turbulent stretches separately. Each turbulent stretch starts 5 s before its outage or jump, so the strategy has to detect the change itself.
+
+### Both strategies by regime
+
+Format: total PnL (stretches won).
+
+| | Calm dev (23) | Calm test (6) | Turbulent dev (23) | Turbulent test (8) |
+| --- | ---: | ---: | ---: | ---: |
+| `r2_mm` before this section | +108.0k (23) | +29.1k (6) | +88.6k (18) | −6.8k (3) |
+| `r2_mm` + H20 + take_mid_c 0 (new defaults) | +112.4k (23) | +29.1k (6) | +93.2k (16) | −7.1k (4) |
+| `fv_mm` | +168.6k (23) | +42.0k (6) | +273.7k (23) | +63.0k (7) |
+| `regime_mm` | +88.9k (23) | +29.0k (6) | +11.8k (18) | +5.0k (6) |
+
+- **`r2_mm` falls short of `fv_mm` mostly in turbulence:** −185k on dev, and it loses money on test.
+  - `fv_mm` is ahead on 20 of 23 turbulent dev stretches, with 1.5–2× the fills. Neither strategy quotes passively in turbulence, so the difference is the takes.
+  - Most of the gap comes from the three long multi-jump stretches: turb021 (+48k), turb012 (+36k) and turb020 (+34k).
+- **In calm, `r2_mm` makes 67% of `fv_mm`.**
+
+### Hypotheses paired per regime
+
+Dev, totals over 23 stretches each. "won" counts the stretches where the variant beat the base.
+
+| Variant | Calm Δ (won, t) | Turbulent Δ (won, t) | Reading |
+| --- | --- | --- | --- |
+| No regime layer at all | −10.4k (9, −1.2) | **−304k** (6, −2.5) | The regime layer is the strategy |
+| `turb_rv` off | −8.6k | −214k | Realised vol is the main detector |
+| `turb_spread` off (H16) | +0.3k | −22.3k (t −2.8) | **Pure turbulence value, no false alarms in calm** |
+| `turb_off` 0 (H4b) | −4.6k | −110k | No passive quotes in turbulence: confirmed |
+| far quotes in turbulence (`turb_theta` 4) | +0.2k | −46.8k | Rejected again |
+| `take` off (H2) | **−40.0k** (t −4.4) | −56.2k (t −1.4) | Takes pay in both regimes |
+| `take_mid` off | **+5.8k** (14, +2.1) | **−39.7k** | **Regime-specific: only pays in turbulence** |
+| `w_k` off (H11) | −19.4k (t −3.3) | −26.0k | Helps both |
+| `inv_skew` 0.2 (H10) | +4.5k (14, +1.7) | −11.1k | Calm-only. Not separable: turbulent stretches start in a calm-looking state |
+| `pcap` 80 (H12) | −11.7k (t −5.1) | +2.6k (t +1.6) | Going into a jump with less inventory helps a little, but costs more in calm |
+| `keep_depth` 0 (H5) | −3.5k | +0.8k | Flat |
+| `vol_k` 0.5 (H6) | −5.0k (t −2.1) | −5.0k | Rejected |
+| `cburst_n` 3 (H8) | −62.0k (t −8.0) | −8.3k | Rejected, mostly a calm cost |
+| `take_red` 0.3 (H14) | −28.9k | −89.3k | Rejected in both |
+| `mom_k` 0.05 (H19) | −16.8k | −95.0k | Rejected in both |
+| `take_lb` −0.2 | −23.4k | −124.7k | Rejected in both |
+| `imb_k`, `c_turb`, `ks_dd`, `depth_k`, `empty_quote`, `turb_tk`, `jump_pause`, `turb_hold` | within ±1k, or ≤ −8k in turbulence | | Rejected / flat |
+| **H20** outage alert (`out_thr` 50, `out_len` 5) | 0 | +5.4k (6 changed, t +0.6) | Kept. It costs nothing in calm. Threshold 60: +10.1k; 40: −3.7k |
+| `take_mid_c` 0 (take_mid only while turbulent) | +4.4k (14, +1.9) | −0.8k | Kept |
+| **H21** `gap_t` 0.7 (volatile-regime maker offset D = 0.70 + Exp(0.91)) | −175k | **−709k** (0/23) | Rejected. The 0.3 setting is a wash. A hard bracket with too large a gap goes invalid whenever the flag is wrong |
+
+**Conclusions:**
+1. **Most mixed-fold verdicts survive.** The regime split separates them cleanly.
+2. **Two verdicts change:**
+   - `take_mid` turns out to be turbulent-only. It is now off in calm.
+   - `inv_skew` is calm-only. A causal detector can't separate that.
+3. **The remaining gap to `fv_mm` is structural.** The exact-bound bracket can't take the volatile regime's wider maker offset (H21). `fv_mm`'s probabilistic grid filter, with a regime probability and an outlier share, can. Porting more flags into `r2_mm` won't close it.
+
+New defaults (H20 + take_mid_c 0) on the 12 mixed folds: mean +17.2k (was +16.7k), min +6.7k.

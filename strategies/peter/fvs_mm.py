@@ -66,7 +66,7 @@ FV_PARAMS = {
     'sigma': 0.3,  # extra diffusion, ticks / sqrt(s) (the generator has none; insurance against tapes that do)
     'rho0': 0.05,  # base rate of jumps flat over the grid (/s): robustness to unmodelled jumps
     'rho_shock': 30.0,  # the same inside an expected-shock window
-    'kick': 1.0,  # excitation added per detected jump (/s)
+    'kick': 0.0,  # excitation added per detected jump (/s); fvs_mm: 0 (ablation +15k dev, +3k test vs 1.0)
     'exc_hl': 1.5,  # s
     'exc_max': 3.0,
     'jump_sd': 0.5,  # a jump is detected only by a confident filter (sd below this) ...
