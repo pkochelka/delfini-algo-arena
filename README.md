@@ -63,6 +63,28 @@ uv run backtest-explorer --log-dir logs/sample     # http://127.0.0.1:8050, --po
 
 A Dash app over a full-logs run (not `--no-logs`): best bid/ask with your fills marked, your PnL over time, the reconstructed order book at any clicked time, and the event log.
 
+## Exploring the market data
+
+```bash
+uv run data-explorer --data data/round1.csv [data/round2.csv ...]   # http://127.0.0.1:8051, --port to change
+uv run python -m analysis.fit data/round1.csv [--window 0 1800]      # fitted strategy parameters, also written to data/.cache/
+uv run pytest                                                        # replay parity with the simulator
+```
+
+Unlike `backtest-explorer`, this reads the raw tapes, not a simulator run. `analysis/` replays a tape with the simulator's matching rules (inferring the trades, which the CSV doesn't contain) and caches the result in `data/.cache/`, so only the first load of a round is slow. Drag across the timeline to analyse a window; `?tab=<name>` links a tab.
+
+| Tab | What it answers |
+| --- | --- |
+| Overview | Headline stats, fitted A-S parameters ready to paste (`SIGMA_INIT`, `K_INIT`, A, OFI beta), activity per bin |
+| Price & spread | Bid/ask/microprice with aggressive orders, spread over time and distribution, depth heatmap |
+| Volatility | Rolling σ, volatility signature, return distribution, return ACF, variance ratio, mid-change timing |
+| Liquidity & book | Depth profile, touch sizes, queue imbalance, order sizes, order lifetimes, where orders are placed |
+| Trades & flow | Aggressive order rate, inter-arrival times, sizes, sweep depth (k), fill intensity λ(δ) = A·e^(−kδ), net flow, sign ACF |
+| Predictability | Imbalance → future mid, the same with 5 ms latency, post-trade markouts (adverse selection), OFI regressions |
+| Compare tapes | Every loaded tape side by side |
+
+The same functions are importable for notebooks and fitting scripts: `from analysis import load_tape, features`.
+
 ## How the exchange works
 
 **One instrument, replayed.** Each CSV row is a market participant's action:

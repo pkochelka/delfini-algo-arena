@@ -22,6 +22,7 @@ dependencies = [
 [project.scripts]
 exchange-simulator = "simulator.main:main"
 backtest-explorer = "explorer.main:main"
+data-explorer = "data_explorer.main:main"
 
 [tool.uv]
 package = true

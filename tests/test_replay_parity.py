@@ -54,7 +54,7 @@ def test_best_quotes_match_simulator(sample_run: tuple[Path, Path]) -> None:
     csv_path, logs = sample_run
     tape = replay_csv(csv_path)
     sim = build_best_quotes(pd.read_csv(logs / 'book_deltas.csv'))
-    ours = tape.quotes().set_index('t_us').loc[sim['timestamp_us']]
+    ours = tape.quotes.set_index('t_us').loc[sim['timestamp_us']]
 
     np.testing.assert_array_equal(ours['bid'].to_numpy(), sim['best_bid'].to_numpy(dtype='float64'))
     np.testing.assert_array_equal(ours['ask'].to_numpy(), sim['best_ask'].to_numpy(dtype='float64'))
@@ -98,6 +98,6 @@ def test_random_tape_parity(tmp_path: Path) -> None:
     np.testing.assert_array_equal(tape.trades['aggressor'], sim['taker_side'])
 
     best = build_best_quotes(pd.read_csv(tmp_path / 'deltas.csv'))
-    ours = tape.quotes().set_index('t_us').loc[best['timestamp_us']]
+    ours = tape.quotes.set_index('t_us').loc[best['timestamp_us']]
     np.testing.assert_array_equal(ours['bid'].to_numpy(), best['best_bid'].to_numpy(dtype='float64'))
     np.testing.assert_array_equal(ours['ask'].to_numpy(), best['best_ask'].to_numpy(dtype='float64'))
