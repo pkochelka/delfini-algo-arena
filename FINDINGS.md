@@ -9,6 +9,7 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
 | Strategy | Folds total | Full tape | Notes |
 | --- | ---: | ---: | --- |
 | `strategies/peter/ladder_mm.py` (committed HEAD, cap 100) | 425,118 | 425,639 | Baseline. `marek/impact_mm.py` with overlays off is identical. |
+| `strategies/marek/s_ladder.py` (defaults) | **706,865** | ~701k | Hidden-price S ladder, +215k vs sig_ladder. See section 0 |
 | `strategies/marek/sig_ladder.py` (defaults) | **489,114** | **489,589** | Depletion guard + 200 ms flow term: +64k, wins 10/10 folds |
 | `sig_ladder.py` with `flow2_k 0` (previous default) | 473,066 | 473,597 (verified independently) | Depletion guard: +48k, wins 10/10 folds, paired t ≈ 10 |
 | `strategies/marek/q_ladder2.py` (defaults) | 453,901 | — | 100 at the touch + 100 one tick behind, plus `improve_both` |
@@ -18,6 +19,27 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
 | `marek/acf_momentum_mm.py` / `peter/arb_mm.py` | — | 96k / 50k | Not competitive |
 
 **Warning:** the working-tree `strategies/peter/ladder_mm.py` was edited during this research and is not committed. At one point it had `cap: 1000`, which breaches the limit and gave about −10M on stress tapes and folds. Later it had `size_top: 400`. Always pin `cap=100` when you A/B, or use the frozen copies (`strategies/marek/q_ladder.py`, `research/round1/robustness/ref/ladder_mm_head.py`).
+
+## 0. s_ladder: trade on the hidden price S (biggest gain, `marek/research/round1/s_ladder/`)
+
+- **Live S:** S_raw += 0.026·√(taker's total fill) per market taker, corrected so every new market order at the touch has bid ≤ S−0.05 ≤ S+0.05 ≤ ask. The error sd is 0.12 tick against the tape's exact S. An oracle with the exact S (`s_oracle` flag, research only) gains just +22k, so the estimate is good enough.
+- **Deltas on the folds:**
+
+  | Step | Fold total | Δ |
+  | --- | ---: | ---: |
+  | `s_pull` 0.45 (pull the adding part when dist < th, pre-join behind) | 601.5k | +109k vs sig_ladder |
+  | `s_pull` 0.35 + IOC snipe (`s_take` 0.1) + inside quotes on 2+ tick spreads (`s_improve` 0.4) | 694.9k | +32k (snipe) and +33k (inside quotes) |
+  | `s_pull_flat` 0 (also pull the flattening part once S is through our price) | 700.6k | +5.6k |
+  | `s_gen` 1, `s_pull` 0.3 (each side quotes at the best price with dist ≥ th) = defaults | 706.9k | |
+
+  On 5 fresh synthetic generator tapes (`r1_synth.py --tag val`), the defaults beat sig_ladder by +101k (5/5, t 39).
+- **Lost:** the sig_ladder guard on top (−6k), a higher pull threshold (0.5: −18k), hysteresis, keep_flat 0 (−30k), no pre-join (−74k), and an inventory-scaled threshold (`s_pull_pos` > 0).
+- **Edge model:** a fill's edge ≈ dist − 0.026·√(taker volume before us). Most fills are at the front of the queue (`decompose.py`).
+- **Open:**
+  - A queue-aware pull threshold: dist < th + c·√(lots ahead).
+  - Joint tuning (Optuna) checked on the synth tapes.
+  - Robustness on sample_v2 and the stress tapes (untested; it relies on the round1 generator).
+  - A sandbox upload to confirm it is accepted.
 
 ## What round1 is
 
