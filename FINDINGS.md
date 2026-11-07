@@ -9,7 +9,8 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
 | Strategy | Folds total | Full tape | Notes |
 | --- | ---: | ---: | --- |
 | `strategies/peter/ladder_mm.py` (committed HEAD, cap 100) | 425,118 | 425,639 | Baseline. `marek/impact_mm.py` with overlays off is identical. |
-| `strategies/marek/sig_ladder.py` (defaults) | **473,066** | **473,597** (verified independently) | Depletion guard: +48k, wins 10/10 folds, paired t ≈ 10 |
+| `strategies/marek/sig_ladder.py` (defaults) | **489,114** | **489,589** | Depletion guard + 200 ms flow term: +64k, wins 10/10 folds |
+| `sig_ladder.py` with `flow2_k 0` (previous default) | 473,066 | 473,597 (verified independently) | Depletion guard: +48k, wins 10/10 folds, paired t ≈ 10 |
 | `strategies/marek/q_ladder2.py` (defaults) | 453,901 | — | 100 at the touch + 100 one tick behind, plus `improve_both` |
 | `strategies/marek/q_ladder.py` with `levels 2, size_top 100, size_deep 100` | 450,608 | 454,798 | +25.5k, paired t 3.6, wins 9/10. Loses 33k on sample_v2 |
 | `strategies/marek/robust_ladder.py` (defaults) | 416,746 | 425,613 | −2% on round1; turns losing stress tapes flat (see Robustness) |
@@ -48,6 +49,14 @@ Sources: `research/round1/inventory.md` and `research/round1/robustness.md`.
 - **The depletion condition does the work.** A plain imbalance guard also fires at fresh levels, where the ladder earns most; that is why `imb_pull` failed. Without the depletion condition, the guard gives −7k.
 - **Neighbouring parameters land at +29k to +36k for the guard alone** (before the flow term), so the result is a plateau rather than a lucky point. The flow term adds about +12k.
 - **Porting caveat:** keep the `mod_n` bookkeeping for rejected or overlapping modifies. One buggy version lost track of an order and breached, scoring −10M.
+
+### 1b. Short flow window in the guard score: `sig_ladder.py` `flow2_k 0.5, flow2_ms 200`, +16k (combo/)
+
+- Subtracts `flow2_k` × (taker flow against the side over the last 200 ms) / 1000 from the score, on top of the 1 s term. Matches the OLS in signals.md, where 100 ms flow carried signal on its own.
+- +16.0k on the folds (10/10, fold-delta sd 0.7k, t 6.9) and +16.0k on the full tape. It is a plateau: +12k to +16k over k 0.25–0.75 and windows of 200–500 ms. Dropping the 1 s term costs 5.5k, so both terms count. 50 ms is weaker (+4.9k), and k ≥ 2 loses.
+- Stress tapes: +0.5k to +2.5k on toxic, drift, makers, takers and mirror, −1.6k on bigtaker4, −2.4k on sample_v2 (−0.9%), and flat on random_stress and sample.
+- **Tested in the same sweep and left off:** the 100/100 touch/behind split (`size_deep`) does **not** stack with the guard (100/100 −6.5k, 150/50 −33k, 200/100 −81k), because pre-join already covers it. `improve_both` gives +3.3k on round1 (9/10) but −9k on pscale2 and −5k on random_stress, because its 3-tick threshold is absolute. A "severe" tier that also pulls the flattening part (`sev_share`) is noise.
+- Script: `marek/research/round1/combo/sweep_combo.py`. Raw runs are in `results.jsonl` and the stress runs in `matrix.csv`. Note that `run_matrix.py`'s ROOT is one level off since the move to `marek/`, so pass it absolute paths.
 
 ### 2. Split between the touch and one tick behind: `q_ladder.py` `levels 2`, +25k (queue.md)
 
@@ -108,7 +117,7 @@ All tested on the round1 folds; numbers are deltas against ladder unless noted.
 
 ## Next steps (open)
 
-1. **Combine the gains.** Nobody has tested `sig_ladder`'s guard together with `q_ladder`'s 100/100 split or with `robust_ladder`'s guards. pre-join and `levels 2` both place size one tick behind, so they may overlap; expect less than +73k. Build one strategy with all of them behind flags, A/B on the folds, and check it on sample_v2, random_stress and the thin-book tape (`research/round1/robustness/run_matrix.py`, generated tapes in `data/stress/`).
+1. **Combine the gains.** Done for the split and `improve_both` (see 1b): neither stacks robustly. Still untested: sig_ladder plus `robust_ladder`'s kill switch. Original note: Nobody had tested `sig_ladder`'s guard together with `q_ladder`'s 100/100 split or with `robust_ladder`'s guards. pre-join and `levels 2` both place size one tick behind, so they may overlap; expect less than +73k. Build one strategy with all of them behind flags, A/B on the folds, and check it on sample_v2, random_stress and the thin-book tape (`research/round1/robustness/run_matrix.py`, generated tapes in `data/stress/`).
 2. **Choose the round1 final.** One option is `sig_ladder` plus the robust guards, if the combination keeps most of the +48k. The 100/100 split is round1-specific (it loses on sample_v2), so include it only if the private tape is the same generator. Upload once to confirm the sandbox accepts it: these strategies import only the standard library and `simulator.models`.
 3. **Commit the ladder_mm decision.** Settle the uncommitted `ladder_mm.py` edits (`cap`/`size_top`) and keep `cap ≤ 100` everywhere.
 4. **Do this first in each new round:**
