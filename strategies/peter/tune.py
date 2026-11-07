@@ -35,7 +35,17 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 
-# name -> (kind, low, high, log). Edit freely; anything not listed keeps its PARAMS default.
+# name -> (kind, low, high, log) or ('cat', [choices]); kind is 'float' or 'int'. Edit freely; anything
+# not listed keeps its PARAMS default. One space per strategy file stem; SPACE is the one in use.
+SPACES: dict[str, dict[str, tuple]] = {}
+SPACES['ladder_mm'] = {
+    'size_top': ('int', 50, 200, False),
+    'topup': ('int', 0, 60, False),
+    'levels': ('cat', [1, 2]),
+    'size_deep': ('int', 0, 100, False),
+    'tight_offset': ('cat', [0, 1]),
+    'skew_lots': ('cat', [0, 25, 50, 100]),
+}
 SPACE: dict[str, tuple] = {
     'inv_risk': ('float', 4.0, 128.0, True),
     'size_frac': ('float', 0.05, 0.6, False),
@@ -49,6 +59,7 @@ SPACE: dict[str, tuple] = {
     'pred_weight': ('float', 0.0, 2.0, False),
     'takes': ('cat', [0, 1]),
 }
+SPACES['arb_mm'] = dict(SPACE)
 
 
 def parse_range(spec: str) -> list[int]:
@@ -103,6 +114,9 @@ def suggest(trial) -> dict:
     for name, spec in SPACE.items():
         if spec[0] == 'cat':
             out[name] = trial.suggest_categorical(name, spec[1])
+        elif spec[0] == 'int':
+            _, lo, hi, log = spec
+            out[name] = trial.suggest_int(name, lo, hi, log=log)
         else:
             _, lo, hi, log = spec
             out[name] = trial.suggest_float(name, lo, hi, log=log)
@@ -186,6 +200,9 @@ def main() -> None:
     out_dir = HERE / 'tuned'
     out_dir.mkdir(exist_ok=True)
     tag = Path(args.strategy).stem
+    if tag in SPACES:
+        SPACE.clear()
+        SPACE.update(SPACES[tag])
 
     if args.mode == 'eval':
         folds = load_folds(args.folds_dir, parse_range(args.fit))

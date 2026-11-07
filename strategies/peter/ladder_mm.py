@@ -41,6 +41,8 @@ PARAMS = {
     'improve_reduce': 0,
     'flat_at': 0,
     'flat_to': 0,
+    # walk-forward (split_data --folds / tune.py): only start trading at this backtest time (µs)
+    'trade_start_us': 0,
 }
 
 BUY, SELL = Side.BUY, Side.SELL
@@ -89,7 +91,7 @@ class LadderMM(BaseStrategy):
     def on_order_book_change(self, snapshot: OrderBookSnapshot, trades: list[Trade]) -> None:
         bb, ba = self._touch(snapshot.bids), self._touch(snapshot.asks)
         p = self.p
-        if bb is None or ba is None or ba - bb > p['max_spread']:
+        if bb is None or ba is None or ba - bb > p['max_spread'] or snapshot.timestamp_us < p['trade_start_us']:
             return
 
         if p['flat_at'] and self.ioc is None and abs(self.pos) >= p['flat_at']:
