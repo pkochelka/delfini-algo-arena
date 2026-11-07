@@ -1,0 +1,27 @@
+{
+  "label": "L2_o0_t0_s40",
+  "overrides": {
+    "cap": 80,
+    "size_top": 10,
+    "size_deep": 10,
+    "levels": 2,
+    "tight_offset": 0,
+    "topup": 0,
+    "skew_lots": 40,
+    "improve_reduce": 0,
+    "flat_at": 0,
+    "flat_to": 0
+  },
+  "locked_utc": "2026-11-07T14:42:40.912150+00:00",
+  "training_scores": {
+    "L2_o0_t5_s0": 10612.157541675208,
+    "L2_o0_t5_s40": 10407.792596644971,
+    "L2_o0_t0_s40": 10305.969681076649
+  },
+  "validation_scores": {
+    "L2_o0_t5_s0": 13365.25,
+    "L2_o0_t5_s40": 13253.75,
+    "L2_o0_t0_s40": 13492.25
+  },
+  "test_not_yet_evaluated": true
+}

@@ -1,0 +1,116 @@
+{
+  "created": "2026-11-07T15:22:36.113610",
+  "source": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies_a\\adaptive_spread.py",
+  "initial_strategy_sha256": "6009b39afc253b5954e7c4f423d574b02a08570290bef394e4954f815e404502",
+  "candidates": {
+    "m0.5_v5_t0": {
+      "spread_mult": 0.5,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 0.0
+    },
+    "m0.5_v5_t1": {
+      "spread_mult": 0.5,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 1.0
+    },
+    "m0.5_v30_t0": {
+      "spread_mult": 0.5,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 0.0
+    },
+    "m0.5_v30_t1": {
+      "spread_mult": 0.5,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 1.0
+    },
+    "m1_v5_t0": {
+      "spread_mult": 1.0,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 0.0
+    },
+    "m1_v5_t1": {
+      "spread_mult": 1.0,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 1.0
+    },
+    "m1_v30_t0": {
+      "spread_mult": 1.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 0.0
+    },
+    "m1_v30_t1": {
+      "spread_mult": 1.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 1.0
+    },
+    "m2_v5_t0": {
+      "spread_mult": 2.0,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 0.0
+    },
+    "m2_v5_t1": {
+      "spread_mult": 2.0,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 1.0
+    },
+    "m2_v30_t0": {
+      "spread_mult": 2.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 0.0
+    },
+    "m2_v30_t1": {
+      "spread_mult": 2.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 1.0
+    },
+    "m3_v5_t0": {
+      "spread_mult": 3.0,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 0.0
+    },
+    "m3_v5_t1": {
+      "spread_mult": 3.0,
+      "vol_halflife_s": 5.0,
+      "tox_weight": 1.0
+    },
+    "m3_v30_t0": {
+      "spread_mult": 3.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 0.0
+    },
+    "m3_v30_t1": {
+      "spread_mult": 3.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 1.0
+    }
+  },
+  "screen_folds": [
+    "wf01",
+    "wf03"
+  ],
+  "fit_folds": [
+    "wf01",
+    "wf02",
+    "wf03",
+    "wf04"
+  ],
+  "validation_folds": [
+    "wf05",
+    "wf06"
+  ],
+  "test": "test",
+  "objective": "mean(PnL) - 0.5 * population_std(PnL) - 5 * mean(q95_abs_inventory)",
+  "selection": "screen all candidates on wf01/wf03; top 3 on remaining fit folds; validation chooses among the 3; lock before test",
+  "risk_limit": 80,
+  "order_size": 10,
+  "baselines": {
+    "fixed_touch": {
+      "adaptive": false,
+      "fixed_half_spread": 0.5
+    },
+    "fixed_wide": {
+      "adaptive": false,
+      "fixed_half_spread": 1.5
+    }
+  }
+}

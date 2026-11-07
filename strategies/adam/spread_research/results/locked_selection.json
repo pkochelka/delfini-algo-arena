@@ -1,0 +1,20 @@
+{
+  "label": "m2_v30_t0",
+  "overrides": {
+    "spread_mult": 2.0,
+    "vol_halflife_s": 30.0,
+    "tox_weight": 0.0
+  },
+  "locked_at": "2026-11-07T15:24:28.390139",
+  "test_not_yet_evaluated": true,
+  "training_scores": {
+    "m2_v30_t0": 4088.4681914945095,
+    "m1_v30_t1": 3672.989294700703,
+    "m1_v5_t1": 3658.3998286960946
+  },
+  "validation_scores": {
+    "m2_v30_t0": 4420.25,
+    "m1_v30_t1": 4270.0,
+    "m1_v5_t1": 4314.5
+  }
+}

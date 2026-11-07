@@ -1,0 +1,9 @@
+Time,Operation,OrderId,Side,Volume,Price,Lifespan
+0,Insert,bid,B,1000,9999,G
+1e-06,Insert,ask,A,1000,10001,G
+2e-06,Insert,deep_bid,B,5000,9998,G
+3e-06,Insert,deep_ask,A,5000,10002,G
+1,Insert,aggressor,B,1200,10001,F
+2,Insert,clock2,B,1,9997,G
+3,Insert,clock3,B,1,9997,G
+4,Insert,clock4,B,1,9997,G

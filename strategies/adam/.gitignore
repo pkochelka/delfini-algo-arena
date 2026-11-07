@@ -1,0 +1,16 @@
+__pycache__/
+.pytest_cache/
+**/.cache/
+*.log
+*.pid
+*.html
+*.npz
+*.npy
+generated/
+spread_research/splits/*.csv
+**/full_logs_*/
+**/test_full_logs/
+**/standalone_reproduction/
+ladder_research/generalization/*.csv
+!ladder_research/generalization/comparison.csv
+market_reconstruction/results/synthetic_round1.csv

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "round1_test",
+    "duration_s": 2939.947591,
+    "mean_spread": 1.0705102040816326,
+    "one_tick_spread_fraction": 0.9307482993197279,
+    "mean_touch_quantity": 1335.6939455782313,
+    "sigma_1s_ticks": 0.9033789052263244,
+    "mid_change": -2.0,
+    "ioc_per_second": 7.985516500998061,
+    "mean_ioc_size": 157.72079056097456,
+    "ioc_size_q99": 1501.2400000000016
+  },
+  {
+    "name": "legacy_sample",
+    "duration_s": 3538.950003,
+    "mean_spread": 2.0,
+    "one_tick_spread_fraction": 0.0,
+    "mean_touch_quantity": 24.747033060186492,
+    "sigma_1s_ticks": 2.5540829096268696,
+    "mid_change": 72.0,
+    "ioc_per_second": 0.16671611622087107,
+    "mean_ioc_size": 12.764406779661018,
+    "ioc_size_q99": 26.0
+  }
+]

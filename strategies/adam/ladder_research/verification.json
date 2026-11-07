@@ -1,0 +1,19 @@
+{
+  "warmup_gate": true,
+  "one_sided_risk_cases": 4,
+  "stock_audited_exact_parity": true,
+  "sample_result": {
+    "fills": 322,
+    "traded_volume": 2893,
+    "inventory": -59,
+    "cash": 581913.0,
+    "mark_price": 10038.0,
+    "breach_penalty": 0.0,
+    "pnl": -10329.0,
+    "pnl_se": 7325.2951357617285,
+    "abs_inventory_q50": 42,
+    "abs_inventory_q68": 58,
+    "abs_inventory_q95": 80,
+    "abs_inventory_q997": 80
+  }
+}
