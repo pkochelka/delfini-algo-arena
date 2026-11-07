@@ -1,0 +1,19 @@
+{
+  "train_risk_quantiles": [
+    0.5,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+  ],
+  "thresholds": [
+    0.0015909114110653354,
+    0.004228913912615607,
+    0.03786034859000763,
+    0.3000159475418064,
+    0.6720488384024129
+  ],
+  "latency_ms": 5,
+  "horizon_s": 1,
+  "interpretation": "Historical fill selection conditioned on a prior risk state. Not a counterfactual cancel simulation or strategy PnL; no cohort threshold selected on validation/test."
+}

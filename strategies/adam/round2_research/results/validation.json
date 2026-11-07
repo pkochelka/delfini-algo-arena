@@ -1,0 +1,10 @@
+{
+  "sampled_decisions_checked": 100,
+  "latency_target_checks": 300,
+  "book_and_depth_asof_checks": true,
+  "features_exclude_absolute_price_clock_ids_and_submitted_IOC_sizes": true,
+  "label_purge_seconds": 10,
+  "max_price_label_seconds": 5.005,
+  "max_historical_order_label_seconds": 2,
+  "note": "Direct indexing audits of representative features/targets, not a full independent exchange/replay parity test."
+}

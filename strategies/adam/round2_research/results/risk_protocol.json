@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-11-07T18:36:15.993485+00:00",
+  "purpose": "Supplementary risk and regime analysis after initial directional study. Same chronological partitions. No retuning of the earlier price models.",
+  "quantile": 0.9,
+  "models": "constant training quantile, rolling Gaussian q90, HGB quantile 15 leaves/150 iterations",
+  "jump_thresholds": {
+    ".1s": 3,
+    "1s": 5,
+    "5s": 10
+  },
+  "jump_models": "training rate vs HGB classifier",
+  "regimes": "3-component Gaussian mixture on current log RMS, spread, depth and print activity; trained on fitting block only; descriptive clusters, not identified latent generator states."
+}

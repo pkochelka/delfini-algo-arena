@@ -1,0 +1,14 @@
+{
+  "block_s": 10,
+  "blocks": 119,
+  "replicates": 3000,
+  "mse_improvement_95": [
+    0.07096547872815122,
+    0.16554010363470634
+  ],
+  "moving_direction_accuracy_95": [
+    0.7424357304591142,
+    0.7863829298793564
+  ],
+  "caveat": "Conditional on this tape, fixed model and these partitions. Does not account for research/model-family selection or unseen market regimes."
+}

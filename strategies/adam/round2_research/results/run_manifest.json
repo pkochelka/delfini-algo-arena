@@ -1,0 +1,19 @@
+{
+  "source_code_sha256": {
+    "baselines.py": "86c1eeb40ce13f1a8114ff3993417e39ab17e61570a75badc658fa938ba248f9",
+    "diagnostics.py": "b8e53b4fbf8f523996ab93d1a58dd7aef4a3c8058a34b0e892925d5224edd57b",
+    "extract.py": "ec237511a7ba1040d329bd80b8c395d01771e35a5ce73013be1a374c909275ac",
+    "flow_models.py": "c9420c7479fab4653bf6854a78f0cb5fc05d1d325aff7d7b95de10283d23aa78",
+    "interpret.py": "3433bf1fc59bd10b6c0670ca875a1294203d9edc3385453b7e9fd406d3ea1176",
+    "models.py": "39d2c9962f78dda417346c48277e9d55c140baeb5aa264ef17eb9446bbcfd547",
+    "report.py": "a24ea0a2445e19eaefd334fdec55e8aaf9b1c388cebdcbec6c334395aab990ef",
+    "risk_structure.py": "ee7c33fb1731a4d6e7f1992ca3067821c022f26bc6ee222c2c34b014e97c4de4"
+  },
+  "versions": {
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "sklearn": "1.9.1"
+  },
+  "notes": "Final source hashes; model choices and initial dataset hash are in separate locked protocol files."
+}

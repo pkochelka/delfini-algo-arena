@@ -1,0 +1,36 @@
+{
+  "created_utc": "2026-11-07T18:34:50.717588+00:00",
+  "candidates": [
+    [
+      "ladder_native",
+      "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\round2_research\\generated\\snapshots\\ladder.py",
+      {}
+    ],
+    [
+      "ladder_tuned_round1",
+      "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\round2_research\\generated\\snapshots\\ladder.py",
+      {
+        "cap": 80,
+        "size_top": 10,
+        "size_deep": 10,
+        "levels": 2,
+        "tight_offset": 0,
+        "topup": 0,
+        "skew_lots": 40,
+        "improve_reduce": 0,
+        "flat_at": 0,
+        "flat_to": 0
+      }
+    ],
+    [
+      "adaptive_spread",
+      "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\round2_research\\generated\\snapshots\\adaptive_spread.py",
+      {}
+    ]
+  ],
+  "hashes": {
+    "ladder": "bb3afb9655f15579eb388f74fc3d97d0990c4706bde3775eea9a6ae403656516",
+    "adaptive_spread": "82fe90faffff9eaa155709ab403b6f799036e7dae394d7fb360e65788616c6b6"
+  },
+  "selection": "None; fixed Round1 settings for transfer diagnosis only. Model predictions not applied to these strategies."
+}
