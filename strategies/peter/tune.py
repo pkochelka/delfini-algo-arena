@@ -251,7 +251,7 @@ def main() -> None:
         fit = load_folds(args.folds_dir, list(range(lo, k)))
         test = load_folds(args.folds_dir, [k])
         name = (args.study or f'{tag}_wf') + f'_fit{lo}-{k - 1}'
-        study = run_study(runner, name, fit, args.trials, args.seed)
+        study = run_study(runner, name, fit, args.trials, args.seed + k)  # per-step seed: independent candidates
         best = best_params(study)
         d, b = runner.evaluate({}, test)[0], runner.evaluate(best, test)[0]
         rows.append({'fold': k, 'fit': f'{lo}-{k - 1}', 'fit_score': study.best_value,

@@ -60,6 +60,14 @@ DETERMINISTIC: dict[str, list[tuple[str, float]]] = {
     'drift30': [('drift', 30)],
     'drift100': [('drift', 100)],
     'drift-30': [('drift', -30)],
+    # intermediate book depths and combined shifts (queue_mm robustness, see queue_hypotheses.md)
+    'vscale0.6': [('vscale', 0.6)],
+    'vscale1.7': [('vscale', 1.7)],
+    'vscale2': [('vscale', 2)],
+    'pscale2_vscale0.3': [('pscale', 2), ('vscale', 0.3)],
+    'pscale2_vscale3': [('pscale', 2), ('vscale', 3)],
+    'vscale0.3_takers3': [('vscale', 0.3), ('takers', 0.3)],
+    'tscale4_vscale3_drift30': [('tscale', 4), ('vscale', 3), ('drift', 30)],
 }
 
 
