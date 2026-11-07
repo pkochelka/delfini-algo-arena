@@ -1,6 +1,7 @@
 """CLI entry point: replay one or more market data CSVs and serve the data explorer.
 
     uv run data-explorer --data data/round1.csv [data/round2.csv ...] [--port 8051]
+    uv run data-explorer --data data/round1.csv --export [--window T0 T1] [--dt 1]   # write data_explorer/round1/, no server
 
 Zoom the timeline at the top to pick the analysis window. Every tab recomputes
 for it, and double-clicking the timeline resets it to the whole tape.
@@ -39,6 +40,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--port', type=int, default=8051)
     parser.add_argument('--refresh', action='store_true', help='rebuild the replay cache')
     parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--export', action='store_true', help='write every tab to data_explorer/<tape>/ (README.md, csv/, report.html) and exit')
+    parser.add_argument('--window', type=float, nargs=2, metavar=('T0', 'T1'), help='with --export: window in seconds (default whole tape)')
+    parser.add_argument('--dt', type=float, default=1.0, help='with --export: the sampling selector, s (default 1)')
+    parser.add_argument('--png', action='store_true', help='with --export: also write PNGs (needs kaleido and Chrome)')
     return parser.parse_args()
 
 
@@ -149,6 +154,11 @@ def build_app(tapes: dict[str, Tape]) -> Dash:
 
 def main() -> None:
     args = parse_args()
+    if args.export:
+        from data_explorer.export import run
+
+        run(args.data, tuple(args.window) if args.window else None, args.dt, refresh=args.refresh, png=args.png)
+        return
     tapes: dict[str, Tape] = {}
     for path in args.data:
         tape = load_tape(path, refresh=args.refresh)

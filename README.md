@@ -67,9 +67,12 @@ A Dash app over a full-logs run (not `--no-logs`): best bid/ask with your fills 
 
 ```bash
 uv run data-explorer --data data/round1.csv [data/round2.csv ...]   # http://127.0.0.1:8051, --port to change
+uv run data-explorer --data data/round1.csv --export                 # every tab to data_explorer/round1/, no server
 uv run python -m analysis.fit data/round1.csv [--window 0 1800]      # fitted strategy parameters, also written to data/.cache/
 uv run pytest                                                        # replay parity with the simulator
 ```
+
+`--export` (optionally `--window T0 T1`, `--dt 0.1`) writes `data_explorer/<tape>/README.md` with every tile, fitted parameter, table, note and a numeric digest of each chart, `summary.json`, the data behind each chart in `csv/<tab>/`, and the interactive `report.html` (git-ignored); with several tapes also `data_explorer/compare-<a>-<b>/`. Re-run it after adding a chart or a round, and read the README there before re-deriving a statistic.
 
 Unlike `backtest-explorer`, this reads the raw tapes, not a simulator run. `analysis/` replays a tape with the simulator's matching rules (inferring the trades, which the CSV doesn't contain) and caches the result in `data/.cache/`, so only the first load of a round is slow. Drag across the timeline to analyse a window; `?tab=<name>` links a tab.
 

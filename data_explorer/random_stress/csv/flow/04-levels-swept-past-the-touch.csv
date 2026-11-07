@@ -1,0 +1,13 @@
+trace,x,y
+observed,0,0.951423
+observed,1,0.0407801
+observed,2,0.00635855
+observed,3,0.00121329
+observed,4,0.00013481
+observed,5,8.98735e-05
+"geometric, k = 2.90",0,0.945067
+"geometric, k = 2.90",1,0.0519151
+"geometric, k = 2.90",2,0.00285184
+"geometric, k = 2.90",3,0.000156659
+"geometric, k = 2.90",4,8.6057e-06
+"geometric, k = 2.90",5,4.72734e-07

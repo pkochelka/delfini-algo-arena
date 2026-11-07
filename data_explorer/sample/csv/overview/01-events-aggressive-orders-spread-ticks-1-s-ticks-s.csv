@@ -1,0 +1,481 @@
+trace,x,y,axis
+Events,0,363,
+Events,30,661,
+Events,60,358,
+Events,90,393,
+Events,120,233,
+Events,150,442,
+Events,180,583,
+Events,210,533,
+Events,240,424,
+Events,270,551,
+Events,300,534,
+Events,330,428,
+Events,360,279,
+Events,390,353,
+Events,420,528,
+Events,450,368,
+Events,480,441,
+Events,510,388,
+Events,540,360,
+Events,570,506,
+Events,600,449,
+Events,630,335,
+Events,660,571,
+Events,690,588,
+Events,720,642,
+Events,750,351,
+Events,780,364,
+Events,810,343,
+Events,840,339,
+Events,870,262,
+Events,900,348,
+Events,930,616,
+Events,960,440,
+Events,990,523,
+Events,1020,391,
+Events,1050,352,
+Events,1080,408,
+Events,1110,351,
+Events,1140,365,
+Events,1170,619,
+Events,1200,765,
+Events,1230,442,
+Events,1260,480,
+Events,1290,294,
+Events,1320,336,
+Events,1350,584,
+Events,1380,505,
+Events,1410,481,
+Events,1440,557,
+Events,1470,376,
+Events,1500,323,
+Events,1530,351,
+Events,1560,373,
+Events,1590,322,
+Events,1620,473,
+Events,1650,620,
+Events,1680,335,
+Events,1710,473,
+Events,1740,509,
+Events,1770,540,
+Events,1800,485,
+Events,1830,373,
+Events,1860,454,
+Events,1890,411,
+Events,1920,559,
+Events,1950,605,
+Events,1980,599,
+Events,2010,380,
+Events,2040,372,
+Events,2070,314,
+Events,2100,323,
+Events,2130,274,
+Events,2160,314,
+Events,2190,357,
+Events,2220,464,
+Events,2250,299,
+Events,2280,489,
+Events,2310,466,
+Events,2340,385,
+Events,2370,778,
+Events,2400,660,
+Events,2430,808,
+Events,2460,419,
+Events,2490,432,
+Events,2520,409,
+Events,2550,282,
+Events,2580,460,
+Events,2610,331,
+Events,2640,483,
+Events,2670,595,
+Events,2700,404,
+Events,2730,398,
+Events,2760,335,
+Events,2790,519,
+Events,2820,388,
+Events,2850,310,
+Events,2880,461,
+Events,2910,530,
+Events,2940,705,
+Events,2970,572,
+Events,3000,410,
+Events,3030,416,
+Events,3060,403,
+Events,3090,676,
+Events,3120,546,
+Events,3150,385,
+Events,3180,608,
+Events,3210,493,
+Events,3240,378,
+Events,3270,352,
+Events,3300,307,
+Events,3330,649,
+Events,3360,505,
+Events,3390,301,
+Events,3420,605,
+Events,3450,338,
+Events,3480,417,
+Events,3510,456,
+Events,3540,351,
+Events,3570,438,
+Aggressive orders,0,5,y2
+Aggressive orders,30,9,y2
+Aggressive orders,60,2,y2
+Aggressive orders,90,5,y2
+Aggressive orders,120,1,y2
+Aggressive orders,150,6,y2
+Aggressive orders,180,11,y2
+Aggressive orders,210,5,y2
+Aggressive orders,240,4,y2
+Aggressive orders,270,7,y2
+Aggressive orders,300,6,y2
+Aggressive orders,330,4,y2
+Aggressive orders,360,3,y2
+Aggressive orders,390,5,y2
+Aggressive orders,420,4,y2
+Aggressive orders,450,4,y2
+Aggressive orders,480,5,y2
+Aggressive orders,510,4,y2
+Aggressive orders,540,4,y2
+Aggressive orders,570,6,y2
+Aggressive orders,600,5,y2
+Aggressive orders,630,3,y2
+Aggressive orders,660,7,y2
+Aggressive orders,690,8,y2
+Aggressive orders,720,6,y2
+Aggressive orders,750,3,y2
+Aggressive orders,780,4,y2
+Aggressive orders,810,3,y2
+Aggressive orders,840,3,y2
+Aggressive orders,870,2,y2
+Aggressive orders,900,4,y2
+Aggressive orders,930,8,y2
+Aggressive orders,960,4,y2
+Aggressive orders,990,7,y2
+Aggressive orders,1020,3,y2
+Aggressive orders,1050,4,y2
+Aggressive orders,1080,4,y2
+Aggressive orders,1110,3,y2
+Aggressive orders,1140,5,y2
+Aggressive orders,1170,7,y2
+Aggressive orders,1200,9,y2
+Aggressive orders,1230,6,y2
+Aggressive orders,1260,4,y2
+Aggressive orders,1290,2,y2
+Aggressive orders,1320,4,y2
+Aggressive orders,1350,8,y2
+Aggressive orders,1380,5,y2
+Aggressive orders,1410,5,y2
+Aggressive orders,1440,9,y2
+Aggressive orders,1470,4,y2
+Aggressive orders,1500,3,y2
+Aggressive orders,1530,3,y2
+Aggressive orders,1560,5,y2
+Aggressive orders,1590,2,y2
+Aggressive orders,1620,5,y2
+Aggressive orders,1650,8,y2
+Aggressive orders,1680,3,y2
+Aggressive orders,1710,5,y2
+Aggressive orders,1740,5,y2
+Aggressive orders,1770,8,y2
+Aggressive orders,1800,5,y2
+Aggressive orders,1830,5,y2
+Aggressive orders,1860,6,y2
+Aggressive orders,1890,3,y2
+Aggressive orders,1920,11,y2
+Aggressive orders,1950,5,y2
+Aggressive orders,1980,7,y2
+Aggressive orders,2010,4,y2
+Aggressive orders,2040,4,y2
+Aggressive orders,2070,2,y2
+Aggressive orders,2100,3,y2
+Aggressive orders,2130,2,y2
+Aggressive orders,2160,2,y2
+Aggressive orders,2190,5,y2
+Aggressive orders,2220,4,y2
+Aggressive orders,2250,3,y2
+Aggressive orders,2280,5,y2
+Aggressive orders,2310,6,y2
+Aggressive orders,2340,5,y2
+Aggressive orders,2370,10,y2
+Aggressive orders,2400,8,y2
+Aggressive orders,2430,12,y2
+Aggressive orders,2460,3,y2
+Aggressive orders,2490,4,y2
+Aggressive orders,2520,5,y2
+Aggressive orders,2550,2,y2
+Aggressive orders,2580,4,y2
+Aggressive orders,2610,3,y2
+Aggressive orders,2640,7,y2
+Aggressive orders,2670,7,y2
+Aggressive orders,2700,4,y2
+Aggressive orders,2730,6,y2
+Aggressive orders,2760,3,y2
+Aggressive orders,2790,7,y2
+Aggressive orders,2820,4,y2
+Aggressive orders,2850,2,y2
+Aggressive orders,2880,5,y2
+Aggressive orders,2910,6,y2
+Aggressive orders,2940,13,y2
+Aggressive orders,2970,4,y2
+Aggressive orders,3000,6,y2
+Aggressive orders,3030,4,y2
+Aggressive orders,3060,7,y2
+Aggressive orders,3090,8,y2
+Aggressive orders,3120,6,y2
+Aggressive orders,3150,5,y2
+Aggressive orders,3180,8,y2
+Aggressive orders,3210,5,y2
+Aggressive orders,3240,2,y2
+Aggressive orders,3270,4,y2
+Aggressive orders,3300,3,y2
+Aggressive orders,3330,9,y2
+Aggressive orders,3360,5,y2
+Aggressive orders,3390,1,y2
+Aggressive orders,3420,9,y2
+Aggressive orders,3450,2,y2
+Aggressive orders,3480,5,y2
+Aggressive orders,3510,4,y2
+Aggressive orders,3540,3,y2
+Aggressive orders,3570,6,y2
+Spread (ticks),0,2,y3
+Spread (ticks),30,2,y3
+Spread (ticks),60,2,y3
+Spread (ticks),90,2,y3
+Spread (ticks),120,2,y3
+Spread (ticks),150,2,y3
+Spread (ticks),180,2,y3
+Spread (ticks),210,2,y3
+Spread (ticks),240,2,y3
+Spread (ticks),270,2,y3
+Spread (ticks),300,2,y3
+Spread (ticks),330,2,y3
+Spread (ticks),360,2,y3
+Spread (ticks),390,2,y3
+Spread (ticks),420,2,y3
+Spread (ticks),450,2,y3
+Spread (ticks),480,2,y3
+Spread (ticks),510,2,y3
+Spread (ticks),540,2,y3
+Spread (ticks),570,2,y3
+Spread (ticks),600,2,y3
+Spread (ticks),630,2,y3
+Spread (ticks),660,2,y3
+Spread (ticks),690,2,y3
+Spread (ticks),720,2,y3
+Spread (ticks),750,2,y3
+Spread (ticks),780,2,y3
+Spread (ticks),810,2,y3
+Spread (ticks),840,2,y3
+Spread (ticks),870,2,y3
+Spread (ticks),900,2,y3
+Spread (ticks),930,2,y3
+Spread (ticks),960,2,y3
+Spread (ticks),990,2,y3
+Spread (ticks),1020,2,y3
+Spread (ticks),1050,2,y3
+Spread (ticks),1080,2,y3
+Spread (ticks),1110,2,y3
+Spread (ticks),1140,2,y3
+Spread (ticks),1170,2,y3
+Spread (ticks),1200,2,y3
+Spread (ticks),1230,2,y3
+Spread (ticks),1260,2,y3
+Spread (ticks),1290,2,y3
+Spread (ticks),1320,2,y3
+Spread (ticks),1350,2,y3
+Spread (ticks),1380,2,y3
+Spread (ticks),1410,2,y3
+Spread (ticks),1440,2,y3
+Spread (ticks),1470,2,y3
+Spread (ticks),1500,2,y3
+Spread (ticks),1530,2,y3
+Spread (ticks),1560,2,y3
+Spread (ticks),1590,2,y3
+Spread (ticks),1620,2,y3
+Spread (ticks),1650,2,y3
+Spread (ticks),1680,2,y3
+Spread (ticks),1710,2,y3
+Spread (ticks),1740,2,y3
+Spread (ticks),1770,2,y3
+Spread (ticks),1800,2,y3
+Spread (ticks),1830,2,y3
+Spread (ticks),1860,2,y3
+Spread (ticks),1890,2,y3
+Spread (ticks),1920,2,y3
+Spread (ticks),1950,2,y3
+Spread (ticks),1980,2,y3
+Spread (ticks),2010,2,y3
+Spread (ticks),2040,2,y3
+Spread (ticks),2070,2,y3
+Spread (ticks),2100,2,y3
+Spread (ticks),2130,2,y3
+Spread (ticks),2160,2,y3
+Spread (ticks),2190,2,y3
+Spread (ticks),2220,2,y3
+Spread (ticks),2250,2,y3
+Spread (ticks),2280,2,y3
+Spread (ticks),2310,2,y3
+Spread (ticks),2340,2,y3
+Spread (ticks),2370,2,y3
+Spread (ticks),2400,2,y3
+Spread (ticks),2430,2,y3
+Spread (ticks),2460,2,y3
+Spread (ticks),2490,2,y3
+Spread (ticks),2520,2,y3
+Spread (ticks),2550,2,y3
+Spread (ticks),2580,2,y3
+Spread (ticks),2610,2,y3
+Spread (ticks),2640,2,y3
+Spread (ticks),2670,2,y3
+Spread (ticks),2700,2,y3
+Spread (ticks),2730,2,y3
+Spread (ticks),2760,2,y3
+Spread (ticks),2790,2,y3
+Spread (ticks),2820,2,y3
+Spread (ticks),2850,2,y3
+Spread (ticks),2880,2,y3
+Spread (ticks),2910,2,y3
+Spread (ticks),2940,2,y3
+Spread (ticks),2970,2,y3
+Spread (ticks),3000,2,y3
+Spread (ticks),3030,2,y3
+Spread (ticks),3060,2,y3
+Spread (ticks),3090,2,y3
+Spread (ticks),3120,2,y3
+Spread (ticks),3150,2,y3
+Spread (ticks),3180,2,y3
+Spread (ticks),3210,2,y3
+Spread (ticks),3240,2,y3
+Spread (ticks),3270,2,y3
+Spread (ticks),3300,2,y3
+Spread (ticks),3330,2,y3
+Spread (ticks),3360,2,y3
+Spread (ticks),3390,2,y3
+Spread (ticks),3420,2,y3
+Spread (ticks),3450,2,y3
+Spread (ticks),3480,2,y3
+Spread (ticks),3510,2,y3
+Spread (ticks),3540,2,y3
+Spread (ticks),3570,2,y3
+σ 1 s (ticks/√s),0,2.48567,y4
+σ 1 s (ticks/√s),30,3.76829,y4
+σ 1 s (ticks/√s),60,2.23607,y4
+σ 1 s (ticks/√s),90,1.96638,y4
+σ 1 s (ticks/√s),120,1.35401,y4
+σ 1 s (ticks/√s),150,1.97484,y4
+σ 1 s (ticks/√s),180,2.90402,y4
+σ 1 s (ticks/√s),210,2.79881,y4
+σ 1 s (ticks/√s),240,1.87083,y4
+σ 1 s (ticks/√s),270,3.08761,y4
+σ 1 s (ticks/√s),300,3.27109,y4
+σ 1 s (ticks/√s),330,2.07364,y4
+σ 1 s (ticks/√s),360,1.35401,y4
+σ 1 s (ticks/√s),390,1.83485,y4
+σ 1 s (ticks/√s),420,4.32435,y4
+σ 1 s (ticks/√s),450,1.7224,y4
+σ 1 s (ticks/√s),480,2.44268,y4
+σ 1 s (ticks/√s),510,2.28765,y4
+σ 1 s (ticks/√s),540,2.0166,y4
+σ 1 s (ticks/√s),570,2.12132,y4
+σ 1 s (ticks/√s),600,2.02485,y4
+σ 1 s (ticks/√s),630,1.69312,y4
+σ 1 s (ticks/√s),660,2.97769,y4
+σ 1 s (ticks/√s),690,4.08248,y4
+σ 1 s (ticks/√s),720,3.14113,y4
+σ 1 s (ticks/√s),750,1.94079,y4
+σ 1 s (ticks/√s),780,2.17562,y4
+σ 1 s (ticks/√s),810,2.09762,y4
+σ 1 s (ticks/√s),840,2.33095,y4
+σ 1 s (ticks/√s),870,1.30384,y4
+σ 1 s (ticks/√s),900,2.19089,y4
+σ 1 s (ticks/√s),930,3.81226,y4
+σ 1 s (ticks/√s),960,2.16025,y4
+σ 1 s (ticks/√s),990,2.3094,y4
+σ 1 s (ticks/√s),1020,1.94079,y4
+σ 1 s (ticks/√s),1050,1.93218,y4
+σ 1 s (ticks/√s),1080,2.00832,y4
+σ 1 s (ticks/√s),1110,2.67083,y4
+σ 1 s (ticks/√s),1140,1.32916,y4
+σ 1 s (ticks/√s),1170,3.21973,y4
+σ 1 s (ticks/√s),1200,3.95811,y4
+σ 1 s (ticks/√s),1230,1.97484,y4
+σ 1 s (ticks/√s),1260,2.94392,y4
+σ 1 s (ticks/√s),1290,1.50555,y4
+σ 1 s (ticks/√s),1320,1.76068,y4
+σ 1 s (ticks/√s),1350,2.67083,y4
+σ 1 s (ticks/√s),1380,2.84019,y4
+σ 1 s (ticks/√s),1410,2.75076,y4
+σ 1 s (ticks/√s),1440,3.53082,y4
+σ 1 s (ticks/√s),1470,1.81659,y4
+σ 1 s (ticks/√s),1500,1.93218,y4
+σ 1 s (ticks/√s),1530,1.75119,y4
+σ 1 s (ticks/√s),1560,2.28765,y4
+σ 1 s (ticks/√s),1590,1.99165,y4
+σ 1 s (ticks/√s),1620,2.73252,y4
+σ 1 s (ticks/√s),1650,2.86356,y4
+σ 1 s (ticks/√s),1680,2.19848,y4
+σ 1 s (ticks/√s),1710,2.96648,y4
+σ 1 s (ticks/√s),1740,2.91548,y4
+σ 1 s (ticks/√s),1770,2.85774,y4
+σ 1 s (ticks/√s),1800,2.95522,y4
+σ 1 s (ticks/√s),1830,2.52323,y4
+σ 1 s (ticks/√s),1860,3.10376,y4
+σ 1 s (ticks/√s),1890,2.22111,y4
+σ 1 s (ticks/√s),1920,3.01662,y4
+σ 1 s (ticks/√s),1950,2.87518,y4
+σ 1 s (ticks/√s),1980,3.19896,y4
+σ 1 s (ticks/√s),2010,2.24351,y4
+σ 1 s (ticks/√s),2040,2.78089,y4
+σ 1 s (ticks/√s),2070,1.92354,y4
+σ 1 s (ticks/√s),2100,2.16795,y4
+σ 1 s (ticks/√s),2130,1.44914,y4
+σ 1 s (ticks/√s),2160,1.79815,y4
+σ 1 s (ticks/√s),2190,1.87083,y4
+σ 1 s (ticks/√s),2220,2.8519,y4
+σ 1 s (ticks/√s),2250,1.58114,y4
+σ 1 s (ticks/√s),2280,2.99444,y4
+σ 1 s (ticks/√s),2310,2.61406,y4
+σ 1 s (ticks/√s),2340,2.52982,y4
+σ 1 s (ticks/√s),2370,4.33974,y4
+σ 1 s (ticks/√s),2400,2.32379,y4
+σ 1 s (ticks/√s),2430,4.46094,y4
+σ 1 s (ticks/√s),2460,2.92689,y4
+σ 1 s (ticks/√s),2490,2.49666,y4
+σ 1 s (ticks/√s),2520,2.78687,y4
+σ 1 s (ticks/√s),2550,1.49443,y4
+σ 1 s (ticks/√s),2580,2.3523,y4
+σ 1 s (ticks/√s),2610,2.61406,y4
+σ 1 s (ticks/√s),2640,2.54296,y4
+σ 1 s (ticks/√s),2670,3.21973,y4
+σ 1 s (ticks/√s),2700,1.70294,y4
+σ 1 s (ticks/√s),2730,1.82574,y4
+σ 1 s (ticks/√s),2760,2.40139,y4
+σ 1 s (ticks/√s),2790,2.83431,y4
+σ 1 s (ticks/√s),2820,1.91485,y4
+σ 1 s (ticks/√s),2850,1.90613,y4
+σ 1 s (ticks/√s),2880,2.10555,y4
+σ 1 s (ticks/√s),2910,2.10555,y4
+σ 1 s (ticks/√s),2940,3.18852,y4
+σ 1 s (ticks/√s),2970,2.26569,y4
+σ 1 s (ticks/√s),3000,2.97769,y4
+σ 1 s (ticks/√s),3030,2.20605,y4
+σ 1 s (ticks/√s),3060,1.82574,y4
+σ 1 s (ticks/√s),3090,2.81069,y4
+σ 1 s (ticks/√s),3120,2.76887,y4
+σ 1 s (ticks/√s),3150,2.93825,y4
+σ 1 s (ticks/√s),3180,3.54495,y4
+σ 1 s (ticks/√s),3210,2.74469,y4
+σ 1 s (ticks/√s),3240,3.26599,y4
+σ 1 s (ticks/√s),3270,1.95789,y4
+σ 1 s (ticks/√s),3300,1.84391,y4
+σ 1 s (ticks/√s),3330,2.78687,y4
+σ 1 s (ticks/√s),3360,2.66458,y4
+σ 1 s (ticks/√s),3390,1.8619,y4
+σ 1 s (ticks/√s),3420,3.11448,y4
+σ 1 s (ticks/√s),3450,1.58114,y4
+σ 1 s (ticks/√s),3480,2.68328,y4
+σ 1 s (ticks/√s),3510,2.89828,y4
+σ 1 s (ticks/√s),3540,1.93218,y4
+σ 1 s (ticks/√s),3570,2.8519,y4

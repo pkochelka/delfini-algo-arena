@@ -10,3 +10,6 @@ data/*
 # Simulator output
 logs/*
 !logs/.gitkeep
+# Data explorer exports: README.md, summary.json and csv/ are kept for later sessions; the heavy views are regenerated
+data_explorer/*/report.html
+data_explorer/*/png/

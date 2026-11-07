@@ -1,0 +1,72 @@
+{
+  "tape": "sample",
+  "window_s": [
+    0.0,
+    3599.000003
+  ],
+  "dt_s": 1.0,
+  "summary": {
+    "duration_s": 3599.000003,
+    "events": 53758,
+    "events_per_s": 14.936926911694698,
+    "inserts": 27182,
+    "cancels": 26576,
+    "ioc_inserts": 604,
+    "cancel_to_insert": 0.9777058347435803,
+    "trades": 604,
+    "taker_orders": 604,
+    "trades_per_min": 10.069463731534206,
+    "traded_volume": 7706,
+    "buy_volume_share": 0.5019465351674021,
+    "passive_fill_rate": 0.022575062081420724,
+    "price_min": 9867.0,
+    "price_max": 10072.0,
+    "mid_start": 9999.0,
+    "mid_end": 10037.0,
+    "spread_mean": 2.0,
+    "spread_median": 2.0,
+    "spread_1tick_share": 0.0,
+    "spread_min": 2.0,
+    "one_sided_share": 0.0,
+    "vol_100ms": 1.6374055703648012,
+    "vol_1s": 2.5651055605890725,
+    "vol_10s": 3.994374535889304,
+    "mean_touch_qty": 24.745190510915293,
+    "mean_order_size": 24.725112206607314,
+    "mean_trade_size": 12.758278145695364
+  },
+  "fit": {
+    "tape": "sample",
+    "window_s": [
+      0.0,
+      3599.000003
+    ],
+    "sigma_100ms": 1.6374055703648012,
+    "sigma_1s": 2.5651055605890725,
+    "spread_mean": 2.0,
+    "spread_median": 2.0,
+    "mean_sweep_depth": 0.0,
+    "k_depth": null,
+    "A": null,
+    "k_intensity": null,
+    "fit_points": 1,
+    "ofi_beta_1s": 0.01943938451828416,
+    "ofi_r2_1s": 0.9681198403466589,
+    "ofi_beta_next_1s": 0.011531191210211301,
+    "ofi_r2_next_1s": 0.34065470611816184,
+    "taker_pnl_1s": 2.056291390728477,
+    "taker_pnl_10s": 8.149006622516556,
+    "imbalance_dmid_1s": {
+      "0.09": -2.75,
+      "0.16": -3.5696,
+      "0.26": -0.1819,
+      "0.35": -0.0522,
+      "0.45": -0.0842,
+      "0.54": 0.0892,
+      "0.65": 0.0242,
+      "0.74": 0.3945,
+      "0.82": 1.5809,
+      "0.90": 1.0
+    }
+  }
+}

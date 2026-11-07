@@ -1,0 +1,7 @@
+trace,x,y
+observed,0,0.943888
+observed,1,0.0560531
+observed,2,5.93155e-05
+"geometric, k = 2.93",0,0.946816
+"geometric, k = 2.93",1,0.0503557
+"geometric, k = 2.93",2,0.00267814

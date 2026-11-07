@@ -1,0 +1,17 @@
+trace,x,y
+measured from now,0.162098,-0.227848
+measured from now,0.262276,-0.0167618
+measured from now,0.353046,-0.000356252
+measured from now,0.449315,-0.00711141
+measured from now,0.54439,0.00269811
+measured from now,0.647682,0.00718823
+measured from now,0.737802,0.0360866
+measured from now,0.821715,0.0588235
+measured from now + 5 ms,0.162098,-0.240506
+measured from now + 5 ms,0.262276,-0.014622
+measured from now + 5 ms,0.353046,-0.00178126
+measured from now + 5 ms,0.449315,-0.00688565
+measured from now + 5 ms,0.54439,0.00389727
+measured from now + 5 ms,0.647682,0.00551655
+measured from now + 5 ms,0.737802,0.0352847
+measured from now + 5 ms,0.821715,0.0661765

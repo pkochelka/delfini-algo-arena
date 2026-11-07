@@ -1,0 +1,11 @@
+trace,x,y
+same bin (impact),0.1,0.0570166
+same bin (impact),0.5,0.115245
+same bin (impact),1,0.173698
+same bin (impact),5,0.36889
+same bin (impact),30,0.59605
+next bin (prediction),0.1,0.00348434
+next bin (prediction),0.5,0.0337657
+next bin (prediction),1,0.0635746
+next bin (prediction),5,0.0790649
+next bin (prediction),30,0.0146315

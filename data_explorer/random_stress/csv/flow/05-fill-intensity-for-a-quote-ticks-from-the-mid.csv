@@ -1,0 +1,71 @@
+trace,x,y
+Ask side hit by buys,0,13.234
+Ask side hit by buys,0.5,13.234
+Ask side hit by buys,1,8.5398
+Ask side hit by buys,1.5,5.63587
+Ask side hit by buys,2,4.29234
+Ask side hit by buys,2.5,3.46877
+Ask side hit by buys,3,2.7788
+Ask side hit by buys,3.5,2.19702
+Ask side hit by buys,4,1.86649
+Ask side hit by buys,4.5,1.56239
+Ask side hit by buys,5,1.34603
+Ask side hit by buys,5.5,1.12169
+Ask side hit by buys,6,0.849992
+Ask side hit by buys,6.5,0.658058
+Ask side hit by buys,7,0.53891
+Ask side hit by buys,7.5,0.446682
+Ask side hit by buys,8,0.360437
+Ask side hit by buys,8.5,0.276684
+Ask side hit by buys,9,0.212872
+Ask side hit by buys,9.5,0.150556
+Ask side hit by buys,10,0.0977117
+Ask side hit by buys,10.5,0.0568323
+Ask side hit by buys,11,0.0199412
+Ask side hit by buys,11.5,0.000498529
+Bid side hit by sells,0,8.95408
+Bid side hit by sells,0.5,8.95408
+Bid side hit by sells,1,5.15679
+Bid side hit by sells,1.5,3.09886
+Bid side hit by sells,2,2.07538
+Bid side hit by sells,2.5,1.46169
+Bid side hit by sells,3,1.00254
+Bid side hit by sells,3.5,0.670023
+Bid side hit by sells,4,0.470113
+Bid side hit by sells,4.5,0.310584
+Bid side hit by sells,5,0.157535
+Bid side hit by sells,5.5,0.059325
+Bid side hit by sells,6,0.0279176
+Bid side hit by sells,6.5,0.0104691
+Bid side hit by sells,7,0.000498529
+"A·e^(−kδ): A=10.3, k=0.534",0,10.2799
+"A·e^(−kδ): A=10.3, k=0.534",0.5,7.87098
+"A·e^(−kδ): A=10.3, k=0.534",1,6.02657
+"A·e^(−kδ): A=10.3, k=0.534",1.5,4.61436
+"A·e^(−kδ): A=10.3, k=0.534",2,3.53307
+"A·e^(−kδ): A=10.3, k=0.534",2.5,2.70516
+"A·e^(−kδ): A=10.3, k=0.534",3,2.07126
+"A·e^(−kδ): A=10.3, k=0.534",3.5,1.5859
+"A·e^(−kδ): A=10.3, k=0.534",4,1.21427
+"A·e^(−kδ): A=10.3, k=0.534",4.5,0.929731
+"A·e^(−kδ): A=10.3, k=0.534",5,0.711867
+"A·e^(−kδ): A=10.3, k=0.534",5.5,0.545054
+"A·e^(−kδ): A=10.3, k=0.534",6,0.417331
+"A·e^(−kδ): A=10.3, k=0.534",6.5,0.319538
+"A·e^(−kδ): A=10.3, k=0.534",7,0.24466
+"A·e^(−kδ): A=10.3, k=0.534",7.5,0.187329
+"A·e^(−kδ): A=10.3, k=0.534",8,0.143432
+"A·e^(−kδ): A=10.3, k=0.534",8.5,0.109821
+"A·e^(−kδ): A=10.3, k=0.534",9,0.0840867
+"A·e^(−kδ): A=10.3, k=0.534",9.5,0.0643826
+"A·e^(−kδ): A=10.3, k=0.534",10,0.0492958
+"A·e^(−kδ): A=10.3, k=0.534",10.5,0.0377442
+"A·e^(−kδ): A=10.3, k=0.534",11,0.0288996
+"A·e^(−kδ): A=10.3, k=0.534",11.5,0.0221275
+"A·e^(−kδ): A=10.3, k=0.534",12,0.0169424
+"A·e^(−kδ): A=10.3, k=0.534",12.5,0.0129722
+"A·e^(−kδ): A=10.3, k=0.534",13,0.00993244
+"A·e^(−kδ): A=10.3, k=0.534",13.5,0.00760496
+"A·e^(−kδ): A=10.3, k=0.534",14,0.00582288
+"A·e^(−kδ): A=10.3, k=0.534",14.5,0.0044584
+"A·e^(−kδ): A=10.3, k=0.534",15,0.00341366

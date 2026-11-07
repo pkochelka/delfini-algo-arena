@@ -1,0 +1,25 @@
+trace,x,y,error_y
+price impact (vs pre-trade mid),0.005,0.0517559,0.00218778
+price impact (vs pre-trade mid),0.05,0.0695172,0.00301907
+price impact (vs pre-trade mid),0.1,0.089896,0.00376887
+price impact (vs pre-trade mid),0.25,0.145415,0.00498474
+price impact (vs pre-trade mid),0.5,0.236536,0.00664115
+price impact (vs pre-trade mid),1,0.396477,0.00889936
+price impact (vs pre-trade mid),2,0.660772,0.012758
+price impact (vs pre-trade mid),5,1.22714,0.0221374
+price impact (vs pre-trade mid),10,1.83522,0.0349661
+price impact (vs pre-trade mid),20,2.63569,0.0553906
+price impact (vs pre-trade mid),30,2.97217,0.0713134
+price impact (vs pre-trade mid),60,3.65044,0.106989
+taker PnL per lot (vs fill) = −maker PnL,0.005,-1.56931,
+taker PnL per lot (vs fill) = −maker PnL,0.05,-1.55155,
+taker PnL per lot (vs fill) = −maker PnL,0.1,-1.53117,
+taker PnL per lot (vs fill) = −maker PnL,0.25,-1.47565,
+taker PnL per lot (vs fill) = −maker PnL,0.5,-1.38453,
+taker PnL per lot (vs fill) = −maker PnL,1,-1.22459,
+taker PnL per lot (vs fill) = −maker PnL,2,-0.960294,
+taker PnL per lot (vs fill) = −maker PnL,5,-0.393923,
+taker PnL per lot (vs fill) = −maker PnL,10,0.21415,
+taker PnL per lot (vs fill) = −maker PnL,20,1.01462,
+taker PnL per lot (vs fill) = −maker PnL,30,1.35111,
+taker PnL per lot (vs fill) = −maker PnL,60,2.02937,

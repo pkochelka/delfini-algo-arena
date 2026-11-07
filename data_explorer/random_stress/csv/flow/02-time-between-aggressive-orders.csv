@@ -1,0 +1,101 @@
+trace,x,y
+observed,0.00274117,5884
+observed,0.00822351,5106
+observed,0.0137058,4395
+observed,0.0191882,3653
+observed,0.0246705,3190
+observed,0.0301529,2692
+observed,0.0356352,2400
+observed,0.0411175,2023
+observed,0.0465999,1700
+observed,0.0520822,1547
+observed,0.0575646,1383
+observed,0.0630469,1162
+observed,0.0685292,1037
+observed,0.0740116,839
+observed,0.0794939,762
+observed,0.0849763,669
+observed,0.0904586,594
+observed,0.0959409,497
+observed,0.101423,480
+observed,0.106906,418
+observed,0.112388,352
+observed,0.11787,349
+observed,0.123353,279
+observed,0.128835,281
+observed,0.134317,237
+observed,0.1398,220
+observed,0.145282,187
+observed,0.150764,168
+observed,0.156247,166
+observed,0.161729,140
+observed,0.167211,134
+observed,0.172694,121
+observed,0.178176,105
+observed,0.183658,98
+observed,0.189141,93
+observed,0.194623,82
+observed,0.200105,72
+observed,0.205588,73
+observed,0.21107,71
+observed,0.216552,53
+observed,0.222035,37
+observed,0.227517,46
+observed,0.232999,42
+observed,0.238482,44
+observed,0.243964,29
+observed,0.249446,21
+observed,0.254929,29
+observed,0.260411,39
+observed,0.265893,30
+observed,0.271376,31
+"Poisson, same rate",0.00274117,5097.79
+"Poisson, same rate",0.00822351,4513.88
+"Poisson, same rate",0.0137058,3996.85
+"Poisson, same rate",0.0191882,3539.05
+"Poisson, same rate",0.0246705,3133.68
+"Poisson, same rate",0.0301529,2774.74
+"Poisson, same rate",0.0356352,2456.92
+"Poisson, same rate",0.0411175,2175.5
+"Poisson, same rate",0.0465999,1926.31
+"Poisson, same rate",0.0520822,1705.67
+"Poisson, same rate",0.0575646,1510.3
+"Poisson, same rate",0.0630469,1337.31
+"Poisson, same rate",0.0685292,1184.13
+"Poisson, same rate",0.0740116,1048.5
+"Poisson, same rate",0.0794939,928.403
+"Poisson, same rate",0.0849763,822.062
+"Poisson, same rate",0.0904586,727.902
+"Poisson, same rate",0.0959409,644.527
+"Poisson, same rate",0.101423,570.702
+"Poisson, same rate",0.106906,505.333
+"Poisson, same rate",0.112388,447.451
+"Poisson, same rate",0.11787,396.199
+"Poisson, same rate",0.123353,350.818
+"Poisson, same rate",0.128835,310.635
+"Poisson, same rate",0.134317,275.054
+"Poisson, same rate",0.1398,243.549
+"Poisson, same rate",0.145282,215.653
+"Poisson, same rate",0.150764,190.951
+"Poisson, same rate",0.156247,169.08
+"Poisson, same rate",0.161729,149.713
+"Poisson, same rate",0.167211,132.565
+"Poisson, same rate",0.172694,117.38
+"Poisson, same rate",0.178176,103.935
+"Poisson, same rate",0.183658,92.0306
+"Poisson, same rate",0.189141,81.4892
+"Poisson, same rate",0.194623,72.1553
+"Poisson, same rate",0.200105,63.8906
+"Poisson, same rate",0.205588,56.5724
+"Poisson, same rate",0.21107,50.0925
+"Poisson, same rate",0.216552,44.3549
+"Poisson, same rate",0.222035,39.2744
+"Poisson, same rate",0.227517,34.7758
+"Poisson, same rate",0.232999,30.7926
+"Poisson, same rate",0.238482,27.2655
+"Poisson, same rate",0.243964,24.1425
+"Poisson, same rate",0.249446,21.3772
+"Poisson, same rate",0.254929,18.9286
+"Poisson, same rate",0.260411,16.7605
+"Poisson, same rate",0.265893,14.8407
+"Poisson, same rate",0.271376,13.1408
