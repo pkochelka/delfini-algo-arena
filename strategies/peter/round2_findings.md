@@ -323,3 +323,46 @@ Baseline: dev 435.6k, test 116.7k (calm + turbulent). Each row changes one thing
   - Walk-forward, 12 folds: 439.3k → **454.1k**. 11 of 12 folds improve; the worst is −0.1k.
   - Full tape: 591k → **607k**, no breach.
 - **Why it likely helps (not verified):** after a detected jump, the excitation flattens the prior over the whole grid for a few seconds. The filter then trusts single inserts too much and loses its quotes and takes to false re-centres. The real post-jump clustering is already carried by the volatile-regime HMM.
+
+## fvs_mm: where the PnL comes from, predictors, Optuna
+
+### Fill attribution
+
+Over the 12 walk-forward folds (454.1k in total), with markouts against the future mid:
+
+| Fills | Lots | At the fill | 1 s later | 10 s later | Share of the 10 s edge |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Takes, turbulent | 108k | −0.13 | +1.89 | +1.80 | 62% (all takes) |
+| Takes, calm | 115k | −0.35 | +0.73 | +0.71 | |
+| Passive quotes, calm | 500k | +0.42 | +0.25 | +0.31 | 35% |
+| Shock sniper | 804 | +13.6 | +15.9 | +13.9 | 2.5% |
+
+All values are edge per lot, in ticks.
+
+- **Yes, it profits from mispriced quotes.** Takes cross the spread and pay for it at the fill, but the quote was stale: a second later each one is worth about +0.7 (calm) or +1.9 (turbulent) per lot.
+- **That edge is permanent.** It holds out to 60 s.
+
+### Predictors of the mid
+
+Out-of-sample R² of the mid change, leave-one-fold-out, on a 100 ms grid:
+
+| Feature | 0.5 s, calm | 1 s, calm |
+| --- | ---: | ---: |
+| F − mid (the filter's fair price) | **0.253** | **0.134** |
+| Microprice − mid | 0.045 | 0.013 |
+| F + microprice | 0.254 | 0.139 |
+| Kalman (local-level) on the mid, slow or fast | ≤ 0 | ≤ 0 |
+
+- **The microprice is redundant given F.** Its joint slope is −0.2 to −0.3.
+- **A Gaussian Kalman filter is a strict special case of the grid filter.** It cannot handle clipped (censored) maker inserts, jumps or regimes.
+- **Nothing predicts out to 5 s.**
+- **Conclusion:** don't add microprice or Kalman terms.
+
+### Optuna
+
+An 11-parameter search through `tune.py`, with the space added by a wrapper script. One trial (8–12 folds in parallel) takes about 9 s.
+
+- **Search, fit folds 1–8, check folds 9–12, 50 trials in 7.5 min:** the defaults beat the tuned parameters out of sample. Mean per fold: 50.9k (defaults) against 49.0k (tuned).
+- **Walk-forward of the tuning procedure** (for each of folds 9–12, tune on the 4 folds before it, 12 trials, 11.5 min): **the tuned parameters beat the defaults on 0 of 4 folds** (47.7k against 50.9k mean). The picks are unstable: cv 0.3–0.9 for most parameters.
+- **Conclusion:** `fvs_mm`'s defaults sit on a plateau, and tuning on round-2 folds only overfits.
+- The studies are in `logs/optuna.db` and the results in `strategies/peter/tuned/fvs_search_r2_f1-8.json` and `fvs_wf_r2_walkforward.json`. Neither is adopted.

@@ -20,7 +20,7 @@ def main():
         for v, fs in zip(vs, futs):
             res = [x.result() for x in fs]; p = [r['pnl'] for r in res]
             sd = statistics.pstdev(p) if len(p) > 1 else 0
-            print(f"{json.dumps(v):70} mean {statistics.fmean(p):+9.0f} sd {sd:7.0f} min {min(p):+8.0f} breach {sum(r['breach'] for r in res):.0f} q95 {statistics.fmean(r['q95'] for r in res):.0f}")
+            print(f"{json.dumps(v):70} mean {statistics.fmean(p):+9.0f} sd {sd:7.0f} min {min(p):+8.0f} breach {sum(r['breach'] for r in res):.0f} q95 {statistics.fmean(r['q95'] for r in res):.0f} fills {sum(r['fills'] for r in res)}")
             print('    ' + ' '.join(f"{r['fold']}={r['pnl']:+.0f}" for r in res), flush=True)
 
 if __name__ == '__main__':

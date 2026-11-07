@@ -112,6 +112,7 @@ PARAMS = FV_PARAMS | {
     # quantile), instead of the mean rule (mean - take - take_sd * sd). Same keys in both regimes.
     'take_q': 0.0,
     'take_qm': 0.0,
+    'take_skew': 0.0,  # take thresholds shift by take_skew * pos / cap (ticks)
     # ---- unwind: with |pos| > unwind_pos, IOC back toward unwind_to at prices up to unwind_u (+ unwind_sd * sd)
     # worse than F. Frees the position limit for the next mispricing (the cap is the binding resource).
     'unwind_u': -1.0,  # < 0 disables
@@ -587,6 +588,10 @@ class FVMM(BaseStrategy):
         else:
             tk = take + take_sd * sd
             lo_b, hi_a = F - tk, F + tk
+        if p['take_skew']:  # long: buying needs more edge, selling less (and vice versa)
+            sh = p['take_skew'] * pos / p['cap']
+            lo_b -= sh
+            hi_a -= sh
         if take and ba <= lo_b:
             lim = math.floor(lo_b)
             q = 0
@@ -712,6 +717,7 @@ PARAMS.update({
     'ss_w1': 3.10,
     'ss_r1': 180.0,
     'ss_r2': 54.0,
+    'ss_pre': 1,  # 1: the trigger also sees the shock window that closed on this event
 })
 
 
@@ -761,11 +767,14 @@ class FVAShock(FVMM):
     def on_order_book_change(self, snapshot: OrderBookSnapshot, trades: list[Trade]) -> None:
         p = self.p
         pbb, pba, pmax = self.mbb, self.mba, self.max_id
+        sg_pre = self.sg_t
         super().on_order_book_change(snapshot, trades)
         if not p['ss_on'] or snapshot.timestamp_us < p['trade_start_us']:
             return
         t = self.now_t
         sg = self.sg_t
+        if sg is None and p['ss_pre']:  # the filter may close the shock window on the very insert that shows the jump
+            sg = sg_pre
         mi = self.my_ins
         if self.max_id != pmax:
             mi.append(t)
