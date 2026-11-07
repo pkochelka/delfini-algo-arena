@@ -55,6 +55,17 @@ uv run exchange-simulator --strategy strategies/trend_follower.py --backtest dat
 
 `logs/sample/result.json` holds the outcome (`pnl`, `cash`, `inventory`, `mark_price`, `breach_penalty`, `traded_volume`, `fills`, `pnl_se`, time-weighted quantiles of `|inventory|`) and `pnl.csv` the PnL sampled every second. Without `--no-logs` the directory also gets `run.jsonl`, `events.csv`, `book_deltas.csv` and `trades.csv`, several hundred MB per full round. Use `--no-logs` when you only need the result and the PnL curve; it is much faster. `--public-depth N` (default 20) sets how many ticks of the book you see.
 
+## Walk-forward evaluation
+
+```bash
+uv run walk-forward --strategy strategies/peter/arb_mm.py --backtest data/round1.csv --folds 10 --warmup-s 60
+uv run walk-forward-report --run-dir logs/wf/arb_mm-round1 --open    # rebuild / open the HTML report
+```
+
+The tape is cut into `--folds` consecutive eval windows (`--end-frac 0.75` keeps the last quarter held out). Each fold is a fresh, independent replay (in parallel, `--jobs`) of a file starting `--warmup-s` before its window, with the resting book seeded; fold files are cached in `data/.cache/walkforward/`. A fold scores the PnL earned inside its window. Strategies with a `trade_start_us` key in `PARAMS` are told not to trade during the warmup; others trade through it and carry that inventory in (shown as `warmup_pnl`). `--params tuned.json` applies `PARAMS` overrides (flat, or `tune.py`'s `{"params": ...}`).
+
+`logs/wf/<strategy>-<tape>/` (or `--out-dir`) gets `config.json`, `summary.json` (total/mean/median/std of fold PnL, fold Sharpe, t-stat, win rate, worst fold, PnL/hour, stitched max drawdown, breaches, inventory), `folds.csv`, `pnl/<fold>.csv` and `report.html`: KPI tiles, the stitched out-of-sample equity curve, PnL / drawdown / inventory quantiles / fills per fold, each fold's PnL curve, and the fold table.
+
 ## Exploring a backtest
 
 ```bash
