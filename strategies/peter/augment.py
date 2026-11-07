@@ -13,6 +13,8 @@ Deterministic transforms
     pscale k    p -> p0 + k*(p - p0), integer k (spreads and moves k times wider in ticks)
     tscale s    t -> t0 + s*(t - t0) (fewer or more events inside the 5 ms latency)
     vscale s    v -> max(1, round(s*v)) (thinner or thicker book)
+    iocscale s  the same for aggressive (F) orders only (bigger sweeps, same book)
+    cscale s    every cancel moves to insert + s*(cancel - insert) (slower / faster queue turnover)
     drift r     inserted prices shifted by round(r * (t - t0) / 1000): a trend of r ticks per 1000 s
                 (orders resting from before a shift can now be crossed, as in a real trending market)
 
@@ -68,6 +70,11 @@ DETERMINISTIC: dict[str, list[tuple[str, float]]] = {
     'pscale2_vscale3': [('pscale', 2), ('vscale', 3)],
     'vscale0.3_takers3': [('vscale', 0.3), ('takers', 0.3)],
     'tscale4_vscale3_drift30': [('tscale', 4), ('vscale', 3), ('drift', 30)],
+    'iocscale0.5': [('iocscale', 0.5)],
+    'iocscale2': [('iocscale', 2)],
+    'iocscale3': [('iocscale', 3)],
+    'cscale0.5': [('cscale', 0.5)],
+    'cscale2': [('cscale', 2)],
 }
 
 
@@ -98,7 +105,20 @@ def simple_step(rows: list[dict], name: str, arg: float, rng: random.Random) -> 
         dropped = {r['OrderId'] for r in rows
                    if r['Operation'] == 'Insert' and r['Lifespan'] == 'G' and rng.random() < arg}
         return [r for r in rows if r['OrderId'] not in dropped]
-    if name == 'tnoise':
+    if name == 'iocscale':  # aggressive (F) volumes only: bigger/smaller sweeps, same book
+        for r in rows:
+            if r['Operation'] == 'Insert' and r['Lifespan'] == 'F':
+                r['Volume'] = str(max(1, round(arg * int(r['Volume']))))
+        return rows
+    if name == 'cscale':  # resting orders live arg times as long before their cancel (queue turnover)
+        born = {r['OrderId']: float(r['Time']) for r in rows if r['Operation'] == 'Insert'}
+        for r in rows:
+            if r['Operation'] == 'Cancel' and r['OrderId'] in born:
+                tb = born[r['OrderId']]
+                r['Time'] = f"{tb + arg * (float(r['Time']) - tb):.6f}"
+        rows.sort(key=lambda r: float(r['Time']))  # stable: same-time rows keep their order
+        return rows
+
         times = [float(r['Time']) for r in rows]
         gaps = [b - a for a, b in zip(times, times[1:])]
         noisy = [g * math.exp(rng.gauss(0, arg) - arg * arg / 2) for g in gaps]

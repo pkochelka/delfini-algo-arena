@@ -71,6 +71,17 @@ Adverse selection eats about 2/3 of the half-spread.
 | 11 | Don't *send* new touch orders on the thin side (cancel nothing, so no seniority is lost) | `gate_share` 0.1 / 0.2 / 0.3, `gate_all` | MEAN 45.5k becomes 36.9k / 34.2k / 31.1k / 34.0k on orig/pscale2/vscale0.3/vscale3/takers3/pscale2_vscale3 | Rejected: a new order on a thin side is near the front of a short queue, so those fills are good |
 | 12 | Split the touch order into chunks so a partial fill keeps the senior remainder | (none) | Not run: price-time priority already keeps a partially filled order's remainder at the front, so splitting only adds messages | Dropped (no mechanism) |
 
+| 13 | Thick-book switch warm-up: the touch EWMA can fire early when trading from t=0 | `deep_min_n` 5000 / 20000, `touch_n` 5000 | 5000: orig back to 29,795 (from 29,716), vscale1.7 37.6k and vscale3 45.2k kept. 20000 loses ~0.5k at 1.7×/3× | **Adopted 5000** |
+| 14 | New shift: bigger / smaller sweeps with the same book (augment `iocscale` 0.5/2/3) | defaults vs one level × 200 | iocscale2: defaults 51.8k, one level **57.2k**. iocscale3: 69.0k vs **81.2k**. iocscale0.5: two levels 16.3k vs 10.5k. The book-depth switch doesn't see this (touch unchanged) | Finding: the regime variable is **sweep size relative to cap**, see #16 |
+| 15 | New shift: queue turnover (augment `cscale`: cancels at 0.5× / 2× the original order life) | defaults vs baseline vs one level | cscale0.5 (faster turnover): 58.8k. cscale2 (slower): 13.9k (baseline 11.9k, one level 13.9k) | Finding: seniority comes from the market cancelling ahead of us; turnover is the biggest single driver of PnL. Nothing to tune; the depth switch already helps at cscale2 (slow cancels pile up the touch) |
+| 16 | One-level switch on EWMA market taker size > ratio·cap (OR with the depth switch). Measured: orig 1.55·cap, vscale1.7 2.64, iocscale2 2.73, vscale3 4.66 | `sweep_ratio` 1.9 / 2.1 / 2.4; 2.1 with `deep_ratio` 0 | 1.9–2.4 all identical: iocscale2 **57.4k**, iocscale3 **81.1k**, rest unchanged; MEAN over 12 tags 45.5k vs 44.1k. Without the depth switch cscale2 drops to 12.0k | **Adopted 2.1** (flat plateau; keep both switches) |
+| 17 | Keep senior orders when the price moves away (don't cancel up to K grid steps behind the ladder) | `keep_levels` 1 / 3 | MEAN over 8 tags 43.1k becomes 35.7k / 19.3k. With 1 it's identical in two-level regimes, but in one-level regimes vscale3 drops 45.2k to 32.0k | Rejected: stale orders hold capacity the touch needs (capacity-bound, see Facts) |
+| 18 | Top up only into short queues: a top-up joins the back, where fills mark out ~0 | `topup_ahead_max` 300 / 800 | MEAN 38.8k / 41.0k vs 43.1k | Rejected: back-of-queue fills are low-edge but positive, and the capacity is otherwise idle |
+| 19 | Use idle capacity on the reducing side: the touch order grows to all free room minus the deep order's share | `fill_room` 1 | MEAN 41.7k vs 43.1k (orig 27.6k vs 29.8k) | Rejected |
+| 20 | Inventory skew re-check on the robustness set | `skew_lots` 0 / 50 / 100 / 200 | 0 = 100 = 200 exactly; 50 is −1.3k | **Default set to 0.** Under the cap guard \|pos\| ≤ 100, so int(pos/100) is nonzero only at ±100, where the adding side has no room anyway: 100 was a no-op |
+| 21 | Wide-spread freeze (`max_spread`, in grid steps): does the cutoff matter? | 3 / 8 / 30 | Within ±30 of each other | No effect (kept 8) |
+| 22 | `topup` re-check under the final switches (25 tags, 3 folds) | 6 / 10 / 20 | MEAN 37,412 / **37,426** / 37,382. 12 folds: 27,724 / 27,716 / 27,630 | **Adopted 10** (best on robustness; ties baseline on round1) |
+
 **Combined shifts** (new augments, defaults vs the baseline params):
 
 | Tag | Baseline | queue_mm |
@@ -86,21 +97,46 @@ The adaptations add up when shifts combine; nothing broke.
 In round1-like markets, fill quantity at senior queue positions beats fill selectivity. A new filter idea
 should only remove fills, never reset or block queue positions, and should be checked against that.
 
-## Current defaults (adopted: #6, #8b with `deep_ratio` 18, `topup` 20)
+## Current defaults
 
-**Validation on round1 itself:** this market keeps the same settings, so expect a tie.
+Adopted: #6 `grid_unit` 0, #8b/#9 `deep_ratio` 18 + `thick_size` 200, #13 `deep_min_n` 5000, #16 `sweep_ratio` 2.1, #20 `skew_lots` 0, #22 `topup` 10.
 
-| Run | Baseline | queue_mm |
+**Round1 itself** (neither switch fires here, so expect a tie):
+
+| Run | Baseline (ladder tuned) | queue_mm |
 | --- | --- | --- |
-| 12 walk-forward folds | mean +27,724 (sd 1,083) | mean +27,630 (sd 1,100) |
-| Held-out test 9000–12000 s (whole file, trade_start 9000 s) | +117,290 | +117,072 |
+| 12 walk-forward folds | mean +27,724 (sd 1,083) | mean +27,716 (sd 1,079) |
+| Held-out test 9000–12000 s | +117,290 | **+117,551** |
 
-The gains are on the attribute-shifted markets (pscale2 +14.5k, vscale3 +8k vs the baseline).
+**Full robustness scoreboard** (25 tags × wf03/07/11, mean PnL per tag): baseline = ladder tuned params, `topup` 20 run.
+
+| Tag | Baseline | queue_mm | | Tag | Baseline | queue_mm |
+| --- | --- | --- | --- | --- | --- | --- |
+| orig | 29,941 | 29,795 | | takers3 | 32,289 | 32,159 |
+| pscale2 | 45,182 | **59,525** | | makers3 | 29,639 | 29,480 |
+| tscale0.25 | 26,482 | 26,355 | | flicker3 | 29,917 | 29,762 |
+| tscale4 | 31,090 | 30,781 | | shocks3 | 30,921 | 30,815 |
+| vscale0.3 | 16,057 | 16,290 | | iocscale0.5 | 16,092 | 16,281 |
+| vscale0.6 | 25,165 | 25,147 | | iocscale2 | 51,920 | **57,410** |
+| vscale1.7 | 34,035 | **37,636** | | iocscale3 | 69,152 | **81,085** |
+| vscale2 | 35,094 | **40,203** | | cscale0.5 | 58,885 | 58,756 |
+| vscale3 | 37,198 | **45,191** | | cscale2 | 11,890 | **13,858** |
+| drift30 | 29,402 | 29,412 | | pscale2_vscale0.3 | 17,500 | **32,439** |
+| drift-30 | 29,291 | 29,206 | | pscale2_vscale3 | 62,438 | **90,262** |
+| noise1 | 30,578 | 30,428 | | vscale0.3_takers3 | 17,644 | 17,840 |
+| | | | | tscale4_vscale3_drift30 | 36,756 | **44,429** |
+| **MEAN** | **33,382** | **37,382** | | **WORST** | 11,890 | 13,858 |
+
+With the adopted `topup` 10 the MEAN is 37,426 and the WORST 13,936.
+The 0.3–0.5% dips on unswitched tags came from `topup` 20 (#22).
 
 ## Open
 
-- [ ] With `deep_ratio` 18, the 3 robustness folds traded from t=0 show orig 29,716 vs 29,795 at 25. The 12 real folds (traded after a 60 s warm-up) are identical. The touch EWMA may switch early while it is still warming up: require a minimum `n_touch` before switching?
-- [ ] Shifts not yet covered by any augment: different aggressive-size distributions (bigger sweeps without a thicker book), a different cancel rate (how fast queues turn over, which drives seniority), and wider spreads with the same tick grid.
+- [x] Thick-book switch warm-up: done as #13.
+- [x] Bigger sweeps and queue turnover: done as #14, #15 and #16.
+- [ ] Wider spreads on the same tick grid: no augment yet (needs a book-aware step that thins the touch).
+- [ ] The switch thresholds (`deep_ratio` 18, `sweep_ratio` 2.1) were placed from augmented round1 only. A real round2 tape is the first true out-of-sample check: log `aggr`/`touch_q` there before trusting them.
+- [ ] Queue turnover (#15) is the biggest PnL driver and nothing adapts to it yet. Is there a lever (e.g. size, or levels, vs the measured market cancel rate)?
 
 ## Tools
 
@@ -112,4 +148,4 @@ All in `strategies/peter/`, run from the repo root:
 | `fold_eval.py strategy.py '{...}' ...` | The 12 walk-forward folds with trade_start |
 | `test_eval.py [--strategy path] '{...}' ...` | Held-out test 9000–12000 s (default strategy queue_mm) |
 | `fill_probe.py strategy.py data.csv out.npz ['{...}']` + `fill_markout.py out.npz` | Per-fill markouts by queue position / age / share |
-| `augment.py ... --only <tags>` | New presets: vscale0.6/1.7/2 and the combined tags |
+| `augment.py ... --only <tags>` | New presets: vscale0.6/1.7/2, the combined tags, iocscale0.5/2/3 (aggressive volumes only), cscale0.5/2 (cancel delays) |
