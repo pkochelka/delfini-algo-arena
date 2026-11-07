@@ -16,3 +16,9 @@ data_explorer/*/png/
 data_explorer/**/*.json
 data_explorer/**/*.md
 data_explorer/**/*.csv
+
+# Large research caches / derived data (regenerable, too big for GitHub)
+marek/research/**/cache/
+marek/research/**/*.pkl
+marek/research/**/*.npz
+marek/research/**/*.parquet
