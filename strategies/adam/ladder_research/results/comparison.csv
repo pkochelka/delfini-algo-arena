@@ -1,0 +1,6 @@
+strategy,pnl,traded_volume,max_abs_inventory,abs_inventory_q95,inventory_cap,max_order_size,breach_penalty
+Adaptive spread,8999.0,35892,43,17,80,10,0.0
+Fixed half-spread 1 tick (post-selection diagnostic),9692.0,42845,44,18,80,10,0.0
+"Peter default logic, matched sizing",9560.0,86272,80,80,80,10,0.0
+"Peter tuned ladder, matched sizing",22254.0,99558,78,49,80,10,0.0
+Peter original defaults,107532.0,648516,100,100,100,200,0.0

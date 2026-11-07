@@ -1,0 +1,51 @@
+{
+  "source": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\data\\round1.csv",
+  "train_window_s": [
+    30,
+    7200.0
+  ],
+  "dev_window_s": [
+    7200.0,
+    9600.0
+  ],
+  "test_window_s": [
+    9600.0,
+    12000.0
+  ],
+  "duration_s": 12000.0,
+  "lambda_G": 179.80278940027895,
+  "lambda_IOC": 8.01673640167364,
+  "p_buy_G": 0.5000295219464597,
+  "p_buy_IOC": 0.5004611021210698,
+  "ioc_mu": 4.106583660575679,
+  "ioc_sigma": 1.3968776929321196,
+  "initial_mid": 10000,
+  "training_limit_orders": 1287178,
+  "training_ioc_orders": 57471,
+  "limit_size_mean": 71.9947816075166,
+  "life_mean_s": 0.4673134420732796,
+  "limit_offset_quantiles": [
+    -2.0,
+    0.0,
+    0.0,
+    1.0,
+    2.0,
+    7.0
+  ],
+  "ioc_offset_quantiles": [
+    -2.0,
+    0.0,
+    0.0,
+    1.0,
+    2.0,
+    3.0
+  ],
+  "life_quantiles_s": [
+    0.0007920000000183336,
+    0.07902040000007135,
+    0.3364999999998872,
+    1.0159222999998296,
+    2.1299256400004185,
+    7.203505000000007
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505
+  ],
+  "selected_conditioned": true,
+  "selection_uses": "original 7200-9600s only",
+  "calibration_uses": "30-7200s; complete order lifetimes only",
+  "validation_uses": "original 9600-12000s",
+  "full_seed": 20261107,
+  "caveat": "Earlier descriptive analyses inspected the whole tape; this is held out from current fitting, not a pristine blind dataset."
+}

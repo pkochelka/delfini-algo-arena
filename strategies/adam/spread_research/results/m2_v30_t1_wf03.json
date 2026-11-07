@@ -1,0 +1,29 @@
+{
+  "label": "m2_v30_t1",
+  "window": "wf03",
+  "overrides": {
+    "spread_mult": 2.0,
+    "vol_halflife_s": 30.0,
+    "tox_weight": 1.0,
+    "trade_start_us": 3040006252
+  },
+  "seconds": 4.647,
+  "max_abs_inventory": 32,
+  "order_rejections": 0,
+  "cancel_race_rejections": 7,
+  "half_spread_mean": 1.5852431814954357,
+  "half_spread_min": 1.2621162009436846,
+  "half_spread_max": 2.1545091718987184,
+  "fills": 564,
+  "traded_volume": 5456,
+  "inventory": 0,
+  "cash": 2409.0,
+  "mark_price": 10070.0,
+  "breach_penalty": 0.0,
+  "pnl": 2409.0,
+  "pnl_se": 529.7978247804713,
+  "abs_inventory_q50": 9,
+  "abs_inventory_q68": 13,
+  "abs_inventory_q95": 22,
+  "abs_inventory_q997": 32
+}

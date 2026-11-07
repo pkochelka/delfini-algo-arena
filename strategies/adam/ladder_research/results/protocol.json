@@ -1,0 +1,230 @@
+{
+  "created_utc": "2026-11-07T14:40:13.644750+00:00",
+  "strategy": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\peter\\ladder_mm.py",
+  "source_sha256": "8a36671a8c94c4da1d65a2085ea51ef22c68ddf7a84389dd6daf122c5d995566",
+  "candidates": {
+    "L1_o0_t0_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 0,
+      "topup": 0,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o0_t0_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 0,
+      "topup": 0,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o0_t5_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 0,
+      "topup": 5,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o0_t5_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 0,
+      "topup": 5,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o1_t0_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 1,
+      "topup": 0,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o1_t0_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 1,
+      "topup": 0,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o1_t5_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 1,
+      "topup": 5,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L1_o1_t5_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 0,
+      "levels": 1,
+      "tight_offset": 1,
+      "topup": 5,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o0_t0_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 0,
+      "topup": 0,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o0_t0_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 0,
+      "topup": 0,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o0_t5_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 0,
+      "topup": 5,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o0_t5_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 0,
+      "topup": 5,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o1_t0_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 1,
+      "topup": 0,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o1_t0_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 1,
+      "topup": 0,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o1_t5_s0": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 1,
+      "topup": 5,
+      "skew_lots": 0,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    },
+    "L2_o1_t5_s40": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 1,
+      "topup": 5,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    }
+  },
+  "screen_folds": [
+    "wf01",
+    "wf03"
+  ],
+  "fit_folds": [
+    "wf01",
+    "wf02",
+    "wf03",
+    "wf04"
+  ],
+  "validation_folds": [
+    "wf05",
+    "wf06"
+  ],
+  "objective": "mean(PnL) - 0.5 * population_std(PnL) - 5 * mean(q95_abs_inventory)",
+  "selection": "screen all candidates on wf01/wf03; top 3 on remaining fit folds; validation chooses among the 3; lock before test",
+  "test": "test",
+  "matched_cap": 80,
+  "matched_max_order_size": 10,
+  "original_default_test": true,
+  "other_benchmark": "same source defaults with cap=80,size_top=10,size_deep=0",
+  "test_already_seen": "This is the identical test previously evaluated for adaptive_spread; excluded from ladder tuning, not a fresh blind dataset.",
+  "split_sha256": {
+    "wf01": "35b5d4582378e92899177d8c5ad9041371eb4d26936250eacff5c2745998d78e",
+    "wf02": "1d85d15c06ae7e592f7cd54ed29dfe98dd56fbbf5a92377a5e0fe6a17dcc12ed",
+    "wf03": "32fe02403300d1781931572bfd633ec0f3f9da7084652ed3a729a4c35e62e532",
+    "wf04": "9347da8bfc75e5dea2229c2c2933f2128b55da6876be9e96fa8ad787bea5d53f",
+    "wf05": "dfe38875c253a8ab6bdddd431b93bf320c1b98e4566d605e789a605487345e8c",
+    "wf06": "b33d450b13a786f06305daee77f95cdb97efcca0f96c94cdf3129d4221153860",
+    "test": "df19ef502410862d259ce3d4856e6cc6d4490bcfa6987e38353440c1705ea789"
+  }
+}

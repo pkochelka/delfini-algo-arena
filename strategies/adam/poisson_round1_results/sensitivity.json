@@ -1,0 +1,109 @@
+{
+  "edge_and_block_sensitivity": {
+    "All events": {
+      "trimmed_rate": 367.61161616161615,
+      "trimmed_fano_1s": 1.7862374510973198,
+      "rate_checks": [
+        {
+          "bin_s": 300,
+          "block_s": 10,
+          "simulations": 499,
+          "p": 0.09,
+          "min_rate": 363.1333333333333,
+          "max_rate": 372.55,
+          "mean_rate": 367.61133333333333,
+          "relative_rate_sd": 0.004863304268335432
+        },
+        {
+          "bin_s": 300,
+          "block_s": 30,
+          "simulations": 499,
+          "p": 0.096,
+          "min_rate": 363.1333333333333,
+          "max_rate": 372.55,
+          "mean_rate": 367.61133333333333,
+          "relative_rate_sd": 0.004863304268335432
+        }
+      ]
+    },
+    "Limit inserts": {
+      "trimmed_rate": 179.80277777777778,
+      "trimmed_fano_1s": 0.9928178038939507,
+      "rate_checks": [
+        {
+          "bin_s": 300,
+          "block_s": 10,
+          "simulations": 499,
+          "p": 0.082,
+          "min_rate": 177.62333333333333,
+          "max_rate": 182.33,
+          "mean_rate": 179.80475,
+          "relative_rate_sd": 0.004973133392077793
+        },
+        {
+          "bin_s": 300,
+          "block_s": 30,
+          "simulations": 499,
+          "p": 0.068,
+          "min_rate": 177.62333333333333,
+          "max_rate": 182.33,
+          "mean_rate": 179.80475,
+          "relative_rate_sd": 0.004973133392077793
+        }
+      ]
+    },
+    "IOC inserts": {
+      "trimmed_rate": 8.006313131313131,
+      "trimmed_fano_1s": 0.9943593299407251,
+      "rate_checks": [
+        {
+          "bin_s": 300,
+          "block_s": 10,
+          "simulations": 499,
+          "p": 0.846,
+          "min_rate": 7.676666666666667,
+          "max_rate": 8.346666666666666,
+          "mean_rate": 8.007333333333333,
+          "relative_rate_sd": 0.018471918287553027
+        },
+        {
+          "bin_s": 300,
+          "block_s": 30,
+          "simulations": 499,
+          "p": 0.774,
+          "min_rate": 7.676666666666667,
+          "max_rate": 8.346666666666666,
+          "mean_rate": 8.007333333333333,
+          "relative_rate_sd": 0.018471918287553027
+        }
+      ]
+    },
+    "Cancellations": {
+      "trimmed_rate": 179.80252525252524,
+      "trimmed_fano_1s": 1.3440233173079308,
+      "rate_checks": [
+        {
+          "bin_s": 300,
+          "block_s": 10,
+          "simulations": 499,
+          "p": 0.088,
+          "min_rate": 177.61333333333334,
+          "max_rate": 182.32333333333332,
+          "mean_rate": 179.79925,
+          "relative_rate_sd": 0.005051938648523842
+        },
+        {
+          "bin_s": 300,
+          "block_s": 30,
+          "simulations": 499,
+          "p": 0.096,
+          "min_rate": 177.61333333333334,
+          "max_rate": 182.32333333333332,
+          "mean_rate": 179.79925,
+          "relative_rate_sd": 0.005051938648523842
+        }
+      ]
+    }
+  },
+  "unique_cancel_ids": 2157591
+}

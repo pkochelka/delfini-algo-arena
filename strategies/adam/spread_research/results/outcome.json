@@ -1,0 +1,829 @@
+{
+  "protocol": {
+    "created": "2026-11-07T15:22:36.113610",
+    "source": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies_a\\adaptive_spread.py",
+    "initial_strategy_sha256": "6009b39afc253b5954e7c4f423d574b02a08570290bef394e4954f815e404502",
+    "candidates": {
+      "m0.5_v5_t0": {
+        "spread_mult": 0.5,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 0.0
+      },
+      "m0.5_v5_t1": {
+        "spread_mult": 0.5,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 1.0
+      },
+      "m0.5_v30_t0": {
+        "spread_mult": 0.5,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 0.0
+      },
+      "m0.5_v30_t1": {
+        "spread_mult": 0.5,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 1.0
+      },
+      "m1_v5_t0": {
+        "spread_mult": 1.0,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 0.0
+      },
+      "m1_v5_t1": {
+        "spread_mult": 1.0,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 1.0
+      },
+      "m1_v30_t0": {
+        "spread_mult": 1.0,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 0.0
+      },
+      "m1_v30_t1": {
+        "spread_mult": 1.0,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 1.0
+      },
+      "m2_v5_t0": {
+        "spread_mult": 2.0,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 0.0
+      },
+      "m2_v5_t1": {
+        "spread_mult": 2.0,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 1.0
+      },
+      "m2_v30_t0": {
+        "spread_mult": 2.0,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 0.0
+      },
+      "m2_v30_t1": {
+        "spread_mult": 2.0,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 1.0
+      },
+      "m3_v5_t0": {
+        "spread_mult": 3.0,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 0.0
+      },
+      "m3_v5_t1": {
+        "spread_mult": 3.0,
+        "vol_halflife_s": 5.0,
+        "tox_weight": 1.0
+      },
+      "m3_v30_t0": {
+        "spread_mult": 3.0,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 0.0
+      },
+      "m3_v30_t1": {
+        "spread_mult": 3.0,
+        "vol_halflife_s": 30.0,
+        "tox_weight": 1.0
+      }
+    },
+    "screen_folds": [
+      "wf01",
+      "wf03"
+    ],
+    "fit_folds": [
+      "wf01",
+      "wf02",
+      "wf03",
+      "wf04"
+    ],
+    "validation_folds": [
+      "wf05",
+      "wf06"
+    ],
+    "test": "test",
+    "objective": "mean(PnL) - 0.5 * population_std(PnL) - 5 * mean(q95_abs_inventory)",
+    "selection": "screen all candidates on wf01/wf03; top 3 on remaining fit folds; validation chooses among the 3; lock before test",
+    "risk_limit": 80,
+    "order_size": 10,
+    "baselines": {
+      "fixed_touch": {
+        "adaptive": false,
+        "fixed_half_spread": 0.5
+      },
+      "fixed_wide": {
+        "adaptive": false,
+        "fixed_half_spread": 1.5
+      }
+    }
+  },
+  "screen_ranking": [
+    [
+      3948.75,
+      "m2_v30_t0"
+    ],
+    [
+      3562.75,
+      "m1_v30_t1"
+    ],
+    [
+      3534.25,
+      "m1_v5_t1"
+    ],
+    [
+      3530.0,
+      "m2_v5_t0"
+    ],
+    [
+      2181.5,
+      "m1_v5_t0"
+    ],
+    [
+      2143.0,
+      "m2_v30_t1"
+    ],
+    [
+      2111.0,
+      "m1_v30_t0"
+    ],
+    [
+      2057.75,
+      "m3_v30_t0"
+    ],
+    [
+      2045.5,
+      "m0.5_v5_t0"
+    ],
+    [
+      2045.5,
+      "m0.5_v30_t0"
+    ],
+    [
+      2039.75,
+      "m2_v5_t1"
+    ],
+    [
+      1992.75,
+      "m0.5_v5_t1"
+    ],
+    [
+      1990.25,
+      "m0.5_v30_t1"
+    ],
+    [
+      1708.0,
+      "m3_v5_t0"
+    ],
+    [
+      16.75,
+      "m3_v5_t1"
+    ],
+    [
+      -135.75,
+      "m3_v30_t1"
+    ]
+  ],
+  "locked": {
+    "label": "m2_v30_t0",
+    "overrides": {
+      "spread_mult": 2.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 0.0
+    },
+    "locked_at": "2026-11-07T15:24:28.390139",
+    "test_not_yet_evaluated": true,
+    "training_scores": {
+      "m2_v30_t0": 4088.4681914945095,
+      "m1_v30_t1": 3672.989294700703,
+      "m1_v5_t1": 3658.3998286960946
+    },
+    "validation_scores": {
+      "m2_v30_t0": 4420.25,
+      "m1_v30_t1": 4270.0,
+      "m1_v5_t1": 4314.5
+    }
+  },
+  "training": {
+    "m2_v30_t0": [
+      {
+        "label": "m2_v30_t0",
+        "window": "wf01",
+        "overrides": {
+          "spread_mult": 2.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 0.0,
+          "trade_start_us": 60008661
+        },
+        "seconds": 4.724,
+        "max_abs_inventory": 40,
+        "order_rejections": 0,
+        "cancel_race_rejections": 8,
+        "half_spread_mean": 1.042527293715641,
+        "half_spread_min": 0.8676146819309066,
+        "half_spread_max": 1.277408579619612,
+        "fills": 1799,
+        "traded_volume": 17564,
+        "inventory": 4,
+        "cash": -36211.0,
+        "mark_price": 10044.0,
+        "breach_penalty": 0.0,
+        "pnl": 3965.0,
+        "pnl_se": 385.01674348638124,
+        "abs_inventory_q50": 5,
+        "abs_inventory_q68": 7,
+        "abs_inventory_q95": 17,
+        "abs_inventory_q997": 31
+      },
+      {
+        "label": "m2_v30_t0",
+        "window": "wf02",
+        "overrides": {
+          "spread_mult": 2.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 0.0,
+          "trade_start_us": 1550007456
+        },
+        "seconds": 6.08,
+        "max_abs_inventory": 44,
+        "order_rejections": 0,
+        "cancel_race_rejections": 14,
+        "half_spread_mean": 1.0839671704617042,
+        "half_spread_min": 0.887390113346243,
+        "half_spread_max": 1.3362664798561323,
+        "fills": 1666,
+        "traded_volume": 16242,
+        "inventory": -18,
+        "cash": 185392.0,
+        "mark_price": 10057.0,
+        "breach_penalty": 0.0,
+        "pnl": 4366.0,
+        "pnl_se": 360.07661401242984,
+        "abs_inventory_q50": 4,
+        "abs_inventory_q68": 7,
+        "abs_inventory_q95": 18,
+        "abs_inventory_q997": 32
+      },
+      {
+        "label": "m2_v30_t0",
+        "window": "wf03",
+        "overrides": {
+          "spread_mult": 2.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 0.0,
+          "trade_start_us": 3040006252
+        },
+        "seconds": 4.773,
+        "max_abs_inventory": 44,
+        "order_rejections": 0,
+        "cancel_race_rejections": 23,
+        "half_spread_mean": 1.0168661038005893,
+        "half_spread_min": 0.8455388565621755,
+        "half_spread_max": 1.2663521285500354,
+        "fills": 1959,
+        "traded_volume": 19218,
+        "inventory": 0,
+        "cash": 4230.0,
+        "mark_price": 10070.0,
+        "breach_penalty": 0.0,
+        "pnl": 4230.0,
+        "pnl_se": 337.41782998185516,
+        "abs_inventory_q50": 5,
+        "abs_inventory_q68": 7,
+        "abs_inventory_q95": 16,
+        "abs_inventory_q997": 30
+      },
+      {
+        "label": "m2_v30_t0",
+        "window": "wf04",
+        "overrides": {
+          "spread_mult": 2.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 0.0,
+          "trade_start_us": 4530005048
+        },
+        "seconds": 6.056,
+        "max_abs_inventory": 39,
+        "order_rejections": 0,
+        "cancel_race_rejections": 8,
+        "half_spread_mean": 1.063397246805295,
+        "half_spread_min": 0.7950481923818493,
+        "half_spread_max": 1.2434121152425335,
+        "fills": 1816,
+        "traded_volume": 17771,
+        "inventory": 17,
+        "cash": -166817.0,
+        "mark_price": 10082.0,
+        "breach_penalty": 0.0,
+        "pnl": 4577.0,
+        "pnl_se": 350.9477864828461,
+        "abs_inventory_q50": 4,
+        "abs_inventory_q68": 7,
+        "abs_inventory_q95": 17,
+        "abs_inventory_q997": 30
+      }
+    ],
+    "m1_v30_t1": [
+      {
+        "label": "m1_v30_t1",
+        "window": "wf01",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 60008661
+        },
+        "seconds": 4.722,
+        "max_abs_inventory": 52,
+        "order_rejections": 0,
+        "cancel_race_rejections": 16,
+        "half_spread_mean": 0.8109217708882356,
+        "half_spread_min": 0.5393068380004833,
+        "half_spread_max": 1.1564231140814523,
+        "fills": 2971,
+        "traded_volume": 29232,
+        "inventory": 2,
+        "cash": -16625.0,
+        "mark_price": 10044.0,
+        "breach_penalty": 0.0,
+        "pnl": 3463.0,
+        "pnl_se": 553.164537156856,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 11,
+        "abs_inventory_q95": 22,
+        "abs_inventory_q997": 39
+      },
+      {
+        "label": "m1_v30_t1",
+        "window": "wf02",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 1550007456
+        },
+        "seconds": 6.478,
+        "max_abs_inventory": 49,
+        "order_rejections": 0,
+        "cancel_race_rejections": 18,
+        "half_spread_mean": 0.8398714109356902,
+        "half_spread_min": 0.6191038015135798,
+        "half_spread_max": 1.1053824876818765,
+        "fills": 3004,
+        "traded_volume": 29627,
+        "inventory": -23,
+        "cash": 235070.0,
+        "mark_price": 10057.0,
+        "breach_penalty": 0.0,
+        "pnl": 3759.0,
+        "pnl_se": 502.5890963218384,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 20,
+        "abs_inventory_q997": 33
+      },
+      {
+        "label": "m1_v30_t1",
+        "window": "wf03",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 3040006252
+        },
+        "seconds": 4.802,
+        "max_abs_inventory": 50,
+        "order_rejections": 0,
+        "cancel_race_rejections": 23,
+        "half_spread_mean": 0.7857055427498242,
+        "half_spread_min": 0.6211302604734542,
+        "half_spread_max": 1.0771187269265623,
+        "fills": 3150,
+        "traded_volume": 31056,
+        "inventory": 16,
+        "cash": -156838.0,
+        "mark_price": 10070.0,
+        "breach_penalty": 0.0,
+        "pnl": 4282.0,
+        "pnl_se": 474.94403859116045,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 20,
+        "abs_inventory_q997": 35
+      },
+      {
+        "label": "m1_v30_t1",
+        "window": "wf04",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 4530005048
+        },
+        "seconds": 6.456,
+        "max_abs_inventory": 43,
+        "order_rejections": 0,
+        "cancel_race_rejections": 18,
+        "half_spread_mean": 0.8093435600066247,
+        "half_spread_min": 0.5676175060365307,
+        "half_spread_max": 1.0467665170901594,
+        "fills": 3211,
+        "traded_volume": 31547,
+        "inventory": 11,
+        "cash": -106583.0,
+        "mark_price": 10082.0,
+        "breach_penalty": 0.0,
+        "pnl": 4319.0,
+        "pnl_se": 493.70598878196034,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 20,
+        "abs_inventory_q997": 33
+      }
+    ],
+    "m1_v5_t1": [
+      {
+        "label": "m1_v5_t1",
+        "window": "wf01",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 5.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 60008661
+        },
+        "seconds": 4.654,
+        "max_abs_inventory": 48,
+        "order_rejections": 0,
+        "cancel_race_rejections": 18,
+        "half_spread_mean": 0.8077252849455822,
+        "half_spread_min": 0.5,
+        "half_spread_max": 1.181797542519858,
+        "fills": 2990,
+        "traded_volume": 29365,
+        "inventory": 3,
+        "cash": -26708.0,
+        "mark_price": 10044.0,
+        "breach_penalty": 0.0,
+        "pnl": 3424.0,
+        "pnl_se": 553.1244609042761,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 11,
+        "abs_inventory_q95": 21,
+        "abs_inventory_q997": 38
+      },
+      {
+        "label": "m1_v5_t1",
+        "window": "wf02",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 5.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 1550007456
+        },
+        "seconds": 5.082,
+        "max_abs_inventory": 54,
+        "order_rejections": 0,
+        "cancel_race_rejections": 24,
+        "half_spread_mean": 0.839271073068695,
+        "half_spread_min": 0.5950955296900389,
+        "half_spread_max": 1.1632014423804682,
+        "fills": 2985,
+        "traded_volume": 29376,
+        "inventory": -20,
+        "cash": 204926.0,
+        "mark_price": 10057.0,
+        "breach_penalty": 0.0,
+        "pnl": 3786.0,
+        "pnl_se": 504.7791263595086,
+        "abs_inventory_q50": 6,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 20,
+        "abs_inventory_q997": 34
+      },
+      {
+        "label": "m1_v5_t1",
+        "window": "wf03",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 5.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 3040006252
+        },
+        "seconds": 4.685,
+        "max_abs_inventory": 50,
+        "order_rejections": 0,
+        "cancel_race_rejections": 25,
+        "half_spread_mean": 0.7862038160537878,
+        "half_spread_min": 0.5813347774628375,
+        "half_spread_max": 1.0986624989160128,
+        "fills": 3146,
+        "traded_volume": 31022,
+        "inventory": 16,
+        "cash": -156835.0,
+        "mark_price": 10070.0,
+        "breach_penalty": 0.0,
+        "pnl": 4285.0,
+        "pnl_se": 482.70185693379983,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 11,
+        "abs_inventory_q95": 21,
+        "abs_inventory_q997": 33
+      },
+      {
+        "label": "m1_v5_t1",
+        "window": "wf04",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 5.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 4530005048
+        },
+        "seconds": 5.121,
+        "max_abs_inventory": 43,
+        "order_rejections": 0,
+        "cancel_race_rejections": 18,
+        "half_spread_mean": 0.8109530040550795,
+        "half_spread_min": 0.5076299800631316,
+        "half_spread_max": 1.161552314172979,
+        "fills": 3162,
+        "traded_volume": 31120,
+        "inventory": 2,
+        "cash": -15888.0,
+        "mark_price": 10082.0,
+        "breach_penalty": 0.0,
+        "pnl": 4276.0,
+        "pnl_se": 487.50047505442967,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 21,
+        "abs_inventory_q997": 33
+      }
+    ]
+  },
+  "validation": {
+    "m2_v30_t0": [
+      {
+        "label": "m2_v30_t0",
+        "window": "wf05",
+        "overrides": {
+          "spread_mult": 2.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 0.0,
+          "trade_start_us": 6020003843
+        },
+        "seconds": 6.148,
+        "max_abs_inventory": 43,
+        "order_rejections": 0,
+        "cancel_race_rejections": 10,
+        "half_spread_mean": 1.0474253389025714,
+        "half_spread_min": 0.8397035838301571,
+        "half_spread_max": 1.236205127458895,
+        "fills": 1819,
+        "traded_volume": 17933,
+        "inventory": 3,
+        "cash": -25676.0,
+        "mark_price": 10057.0,
+        "breach_penalty": 0.0,
+        "pnl": 4495.0,
+        "pnl_se": 378.3843543782471,
+        "abs_inventory_q50": 4,
+        "abs_inventory_q68": 7,
+        "abs_inventory_q95": 17,
+        "abs_inventory_q997": 31
+      },
+      {
+        "label": "m2_v30_t0",
+        "window": "wf06",
+        "overrides": {
+          "spread_mult": 2.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 0.0,
+          "trade_start_us": 7510002638
+        },
+        "seconds": 6.196,
+        "max_abs_inventory": 36,
+        "order_rejections": 0,
+        "cancel_race_rejections": 6,
+        "half_spread_mean": 1.04733253584092,
+        "half_spread_min": 0.8398690027362155,
+        "half_spread_max": 1.2522779517826172,
+        "fills": 1800,
+        "traded_volume": 17574,
+        "inventory": 2,
+        "cash": -15536.0,
+        "mark_price": 10036.0,
+        "breach_penalty": 0.0,
+        "pnl": 4536.0,
+        "pnl_se": 358.04721405638685,
+        "abs_inventory_q50": 4,
+        "abs_inventory_q68": 7,
+        "abs_inventory_q95": 17,
+        "abs_inventory_q997": 28
+      }
+    ],
+    "m1_v30_t1": [
+      {
+        "label": "m1_v30_t1",
+        "window": "wf05",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 6020003843
+        },
+        "seconds": 6.999,
+        "max_abs_inventory": 49,
+        "order_rejections": 0,
+        "cancel_race_rejections": 12,
+        "half_spread_mean": 0.7978141897656468,
+        "half_spread_min": 0.5858504509966107,
+        "half_spread_max": 1.0582081066944307,
+        "fills": 3097,
+        "traded_volume": 30558,
+        "inventory": 10,
+        "cash": -96237.0,
+        "mark_price": 10057.0,
+        "breach_penalty": 0.0,
+        "pnl": 4333.0,
+        "pnl_se": 530.9389943885021,
+        "abs_inventory_q50": 8,
+        "abs_inventory_q68": 11,
+        "abs_inventory_q95": 21,
+        "abs_inventory_q997": 35
+      },
+      {
+        "label": "m1_v30_t1",
+        "window": "wf06",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 30.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 7510002638
+        },
+        "seconds": 6.991,
+        "max_abs_inventory": 41,
+        "order_rejections": 0,
+        "cancel_race_rejections": 19,
+        "half_spread_mean": 0.7862242332567343,
+        "half_spread_min": 0.5889668699689571,
+        "half_spread_max": 1.0825959434806958,
+        "fills": 3199,
+        "traded_volume": 31466,
+        "inventory": -6,
+        "cash": 64713.0,
+        "mark_price": 10037.0,
+        "breach_penalty": 0.0,
+        "pnl": 4491.0,
+        "pnl_se": 477.7602230715258,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 20,
+        "abs_inventory_q997": 31
+      }
+    ],
+    "m1_v5_t1": [
+      {
+        "label": "m1_v5_t1",
+        "window": "wf05",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 5.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 6020003843
+        },
+        "seconds": 4.764,
+        "max_abs_inventory": 50,
+        "order_rejections": 0,
+        "cancel_race_rejections": 11,
+        "half_spread_mean": 0.7971966570116719,
+        "half_spread_min": 0.5651952475594524,
+        "half_spread_max": 1.0896742435283127,
+        "fills": 3090,
+        "traded_volume": 30505,
+        "inventory": 7,
+        "cash": -65987.0,
+        "mark_price": 10057.0,
+        "breach_penalty": 0.0,
+        "pnl": 4412.0,
+        "pnl_se": 544.0564468073709,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 11,
+        "abs_inventory_q95": 21,
+        "abs_inventory_q997": 37
+      },
+      {
+        "label": "m1_v5_t1",
+        "window": "wf06",
+        "overrides": {
+          "spread_mult": 1.0,
+          "vol_halflife_s": 5.0,
+          "tox_weight": 1.0,
+          "trade_start_us": 7510002638
+        },
+        "seconds": 4.855,
+        "max_abs_inventory": 41,
+        "order_rejections": 0,
+        "cancel_race_rejections": 21,
+        "half_spread_mean": 0.7837235759624115,
+        "half_spread_min": 0.560242787533584,
+        "half_spread_max": 1.1275007721297805,
+        "fills": 3240,
+        "traded_volume": 31802,
+        "inventory": -6,
+        "cash": 64654.0,
+        "mark_price": 10037.0,
+        "breach_penalty": 0.0,
+        "pnl": 4432.0,
+        "pnl_se": 484.6054163551245,
+        "abs_inventory_q50": 7,
+        "abs_inventory_q68": 10,
+        "abs_inventory_q95": 20,
+        "abs_inventory_q997": 31
+      }
+    ]
+  },
+  "test": {
+    "label": "m2_v30_t0",
+    "window": "test",
+    "overrides": {
+      "spread_mult": 2.0,
+      "vol_halflife_s": 30.0,
+      "tox_weight": 0.0,
+      "trade_start_us": 9060001434
+    },
+    "seconds": 13.615,
+    "max_abs_inventory": 43,
+    "order_rejections": 0,
+    "cancel_race_rejections": 27,
+    "half_spread_mean": 1.0442609771632814,
+    "half_spread_min": 0.8517948686524983,
+    "half_spread_max": 1.3105822942369318,
+    "fills": 3650,
+    "traded_volume": 35892,
+    "inventory": 4,
+    "cash": -31117.0,
+    "mark_price": 10029.0,
+    "breach_penalty": 0.0,
+    "pnl": 8999.0,
+    "pnl_se": 504.74243790182663,
+    "abs_inventory_q50": 5,
+    "abs_inventory_q68": 7,
+    "abs_inventory_q95": 17,
+    "abs_inventory_q997": 31
+  },
+  "baselines": {
+    "fixed_touch": {
+      "label": "fixed_touch",
+      "window": "test",
+      "overrides": {
+        "adaptive": false,
+        "fixed_half_spread": 0.5,
+        "trade_start_us": 9060001434
+      },
+      "seconds": 12.01,
+      "max_abs_inventory": 56,
+      "order_rejections": 0,
+      "cancel_race_rejections": 31,
+      "half_spread_mean": 0.5,
+      "half_spread_min": 0.5,
+      "half_spread_max": 0.5,
+      "fills": 8003,
+      "traded_volume": 79257,
+      "inventory": 29,
+      "cash": -283766.0,
+      "mark_price": 10029.0,
+      "breach_penalty": 0.0,
+      "pnl": 7075.0,
+      "pnl_se": 974.8714141787051,
+      "abs_inventory_q50": 10,
+      "abs_inventory_q68": 16,
+      "abs_inventory_q95": 29,
+      "abs_inventory_q997": 41
+    },
+    "fixed_wide": {
+      "label": "fixed_wide",
+      "window": "test",
+      "overrides": {
+        "adaptive": false,
+        "fixed_half_spread": 1.5,
+        "trade_start_us": 9060001434
+      },
+      "seconds": 9.074,
+      "max_abs_inventory": 30,
+      "order_rejections": 0,
+      "cancel_race_rejections": 17,
+      "half_spread_mean": 1.5,
+      "half_spread_min": 1.5,
+      "half_spread_max": 1.5,
+      "fills": 1439,
+      "traded_volume": 14023,
+      "inventory": -5,
+      "cash": 56478.0,
+      "mark_price": 10030.0,
+      "breach_penalty": 0.0,
+      "pnl": 6328.0,
+      "pnl_se": 713.4685862851593,
+      "abs_inventory_q50": 10,
+      "abs_inventory_q68": 13,
+      "abs_inventory_q95": 21,
+      "abs_inventory_q997": 29
+    }
+  }
+}

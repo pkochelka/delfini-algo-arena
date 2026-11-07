@@ -1,0 +1,17 @@
+{
+  "exact_result_match": true,
+  "result": {
+    "fills": 10069,
+    "traded_volume": 99558,
+    "inventory": 18,
+    "cash": -158268.0,
+    "mark_price": 10029.0,
+    "breach_penalty": 0.0,
+    "pnl": 22254.0,
+    "pnl_se": 1701.7170038446804,
+    "abs_inventory_q50": 24,
+    "abs_inventory_q68": 33,
+    "abs_inventory_q95": 49,
+    "abs_inventory_q997": 63
+  }
+}

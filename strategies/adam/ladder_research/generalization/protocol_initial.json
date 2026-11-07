@@ -1,0 +1,145 @@
+{
+  "created_utc": "2026-11-07T15:55:44.704540+00:00",
+  "source": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\peter\\ladder_mm.py",
+  "source_sha256": "bb3afb9655f15579eb388f74fc3d97d0990c4706bde3775eea9a6ae403656516",
+  "frozen_source": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\ladder_research\\generalization\\ladder_frozen.py",
+  "temporal_windows": [
+    {
+      "name": "wf01",
+      "start_s": 0.008661,
+      "eval_start_s": 60.008661,
+      "end_s": 1550.0074565,
+      "seeded": 0,
+      "rows": 569085,
+      "trade_start_us": 60008661,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\wf01.csv"
+    },
+    {
+      "name": "wf02",
+      "start_s": 1490.0074565,
+      "eval_start_s": 1550.0074565,
+      "end_s": 3040.0062519999997,
+      "seeded": 65,
+      "rows": 570839,
+      "trade_start_us": 1550007456,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\wf02.csv"
+    },
+    {
+      "name": "wf03",
+      "start_s": 2980.0062519999997,
+      "eval_start_s": 3040.0062519999997,
+      "end_s": 4530.0050475,
+      "seeded": 62,
+      "rows": 569270,
+      "trade_start_us": 3040006252,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\wf03.csv"
+    },
+    {
+      "name": "wf04",
+      "start_s": 4470.0050475,
+      "eval_start_s": 4530.0050475,
+      "end_s": 6020.0038429999995,
+      "seeded": 65,
+      "rows": 569727,
+      "trade_start_us": 4530005048,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\wf04.csv"
+    },
+    {
+      "name": "wf05",
+      "start_s": 5960.0038429999995,
+      "eval_start_s": 6020.0038429999995,
+      "end_s": 7510.002638499999,
+      "seeded": 56,
+      "rows": 568236,
+      "trade_start_us": 6020003843,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\wf05.csv"
+    },
+    {
+      "name": "wf06",
+      "start_s": 7450.002638499999,
+      "eval_start_s": 7510.002638499999,
+      "end_s": 9000.001434,
+      "seeded": 74,
+      "rows": 570675,
+      "trade_start_us": 7510002638,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\wf06.csv"
+    },
+    {
+      "name": "test",
+      "start_s": 9000.001434,
+      "eval_start_s": 9060.001434,
+      "end_s": 11999.999026,
+      "seeded": 59,
+      "rows": 1103469,
+      "trade_start_us": 9060001434,
+      "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\strategies\\adam\\spread_research\\splits\\test.csv"
+    }
+  ],
+  "legacy_sample": {
+    "name": "legacy_sample",
+    "file": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\data\\sample.csv",
+    "trade_start_us": 60000000,
+    "end_s": 3599.000003
+  },
+  "models": {
+    "native": {},
+    "tuned": {
+      "cap": 80,
+      "size_top": 10,
+      "size_deep": 10,
+      "levels": 2,
+      "tight_offset": 0,
+      "topup": 0,
+      "skew_lots": 40,
+      "improve_reduce": 0,
+      "flat_at": 0,
+      "flat_to": 0
+    }
+  },
+  "neighbors": {
+    "size100": {
+      "size_top": 100
+    },
+    "size150": {
+      "size_top": 150
+    },
+    "size200": {
+      "size_top": 200
+    },
+    "topup0": {
+      "topup": 0
+    },
+    "topup5": {
+      "topup": 5
+    },
+    "topup20": {
+      "topup": 20
+    },
+    "topup40": {
+      "topup": 40
+    }
+  },
+  "neighbor_windows": [
+    "wf05",
+    "wf06"
+  ],
+  "synthetic_seeds": [
+    7101,
+    7102,
+    7103,
+    7104,
+    7105
+  ],
+  "synthetic_duration_s": 1260,
+  "warmup_s": 60,
+  "stresses": [
+    "halve IOC sizes",
+    "double IOC sizes",
+    "cap IOC sizes at 500",
+    "drop half buy IOC messages",
+    "drop half sell IOC messages"
+  ],
+  "stress_base": "previously evaluated test slice",
+  "retuning": false,
+  "interpretation": "All real tapes previously available/partly inspected. Synthetic generator calibrated to round1 has known optimistic markouts and too-low volatility. Stress tapes reuse source limit messages and prices and are counterfactuals, not independent samples. No strategy selected on these results."
+}
