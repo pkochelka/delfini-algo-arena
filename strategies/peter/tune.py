@@ -46,6 +46,16 @@ SPACES['ladder_mm'] = {
     'tight_offset': ('cat', [0, 1]),
     'skew_lots': ('cat', [0, 25, 50, 100]),
 }
+# queue_mm's adopted parameters (queue_hypotheses.md). grid_unit and deep_min_n are left out: on round1 folds
+# the grid is 1 and the 60 s warm-up is past deep_min_n, so neither can change a fold's PnL.
+SPACES['queue_mm'] = {
+    'size_top': ('int', 50, 150, False),
+    'size_deep': ('int', 0, 100, False),
+    'topup': ('int', 0, 40, False),
+    'deep_ratio': ('float', 5.0, 40.0, True),
+    'sweep_ratio': ('float', 0.8, 4.0, True),
+    'thick_size': ('int', 100, 200, False),
+}
 SPACE: dict[str, tuple] = {
     'inv_risk': ('float', 4.0, 128.0, True),
     'size_frac': ('float', 0.05, 0.6, False),
