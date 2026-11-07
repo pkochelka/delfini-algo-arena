@@ -11,6 +11,8 @@ from analysis import features as F
 from analysis.replay import Tape
 from data_explorer import theme as T
 
+FINE_DT_S = 0.01  # base step of the fine autocorrelation chart
+
 
 def render(tape: Tape, window: F.Window, dt: float) -> html.Div:
     t0, t1 = F.bounds(tape, window)
@@ -48,6 +50,31 @@ def render(tape: Tape, window: F.Window, dt: float) -> html.Div:
     acff.add_hrect(y0=-band, y1=band, fillcolor=T.AXIS, opacity=0.6, line_width=0, layer='below')
     acff.add_trace(go.Bar(x=np.arange(1, nlags + 1), y=ac, marker=dict(color=np.where(ac >= 0, T.BLUE, T.ORANGE)), hovertemplate='lag %{x}: %{y:.3f}<extra></extra>'))
 
+    fine = F.acf_by_lag(tape, FINE_DT_S, window=window)
+    finef = T.figure(f'Autocorrelation of {FINE_DT_S * 1000:g} ms returns by lag', x='lag (s, log)', y='correlation', showlegend=False, hovermode='x unified')
+    if len(fine):
+        fb = float(fine['band'].iloc[0])
+        finef.add_hrect(y0=-fb, y1=fb, fillcolor=T.AXIS, opacity=0.6, line_width=0, layer='below')
+        finef.add_hline(y=0, line=dict(color=T.MUTED, width=1))
+        finef.add_trace(
+            go.Scatter(
+                x=fine['lag_s'], y=fine['acf'], name='ACF', mode='lines+markers',
+                line=dict(color=T.BLUE, width=2), marker=dict(size=8, color=np.where(fine['acf'] >= 0, T.BLUE, T.ORANGE), line=dict(color=T.SURFACE, width=2)),
+                hovertemplate='lag %{x:.3g}s: %{y:.4f}<extra></extra>',
+            )
+        )
+        finef.add_vline(x=0.005 if FINE_DT_S <= 0.005 else FINE_DT_S, line=dict(color=T.MUTED, dash='dash'))
+        finef.update_xaxes(type='log')
+    else:
+        T.empty(finef, 'Window too short')
+
+    nl_ev = 50
+    ev_ac, n_changes = F.mid_change_acf(tape, nl_ev, window)
+    ev_band = 1.96 / np.sqrt(max(n_changes, 1))
+    evf = T.figure('Autocorrelation of consecutive mid changes (tick by tick)', x='lag (mid changes)', y='correlation', showlegend=False)
+    evf.add_hrect(y0=-ev_band, y1=ev_band, fillcolor=T.AXIS, opacity=0.6, line_width=0, layer='below')
+    evf.add_trace(go.Bar(x=np.arange(1, nl_ev + 1), y=ev_ac, marker=dict(color=np.where(ev_ac >= 0, T.BLUE, T.ORANGE)), hovertemplate='lag %{x}: %{y:.3f}<extra></extra>'))
+
     vr = F.variance_ratio(tape, dt_s=max(dt, 0.1), window=window)
     vrf = T.figure('Variance ratio', x='horizon (s)', y='VR(q)', showlegend=False)
     vrf.add_hline(y=1, line=dict(color=T.MUTED, dash='dot'))
@@ -68,6 +95,14 @@ def render(tape: Tape, window: F.Window, dt: float) -> html.Div:
         T.panel(T.graph(rf), sub),
         T.panel(T.graph(acff), 'Bars outside the gray band are significant. Positive at short lags: trends (take); negative: reversion (make).'),
         T.panel(T.graph(vrf), 'Above 1: moves persist over that horizon. Below 1: they revert.'),
+        T.panel(
+            T.graph(finef),
+            'One axis from 10 ms to 60 s, so it does not depend on the sampling selector. Negative at the shortest lags: '
+            'bid-ask bounce or quote flicker. Positive at second-scale lags: momentum. Dashed line: our 5 ms latency. '
+            'Values look small because most 10 ms returns are zero: compare them with the gray band, not with 1.',
+            wide=True,
+        ),
+        T.panel(T.graph(evf), f'{n_changes:,} mid changes. Lag 1 strongly negative: moves get undone (fade them). Positive: moves continue (follow them).'),
         T.panel(T.graph(waitf), f'{len(mc):,} mid changes. Changes are the events a quoting strategy has to react to.'),
         T.panel(T.graph(jumpf), 'Mostly ±0.5 / ±1 means the price moves tick by tick; large jumps mean gaps in the book.'),
     )

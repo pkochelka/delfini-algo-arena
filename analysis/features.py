@@ -250,11 +250,46 @@ def acf(x: pd.Series | np.ndarray, nlags: int = 30) -> np.ndarray:
     return np.array([(v[:-k] * v[k:]).sum() / denom for k in range(1, nlags + 1)])
 
 
+def acf_by_lag(
+    tape: Tape,
+    base_dt_s: float = 0.01,
+    max_lag_s: float = 60.0,
+    n_lags: int = 40,
+    window: Window = None,
+) -> pd.DataFrame:
+    """Autocorrelation of fine-grained mid returns at log-spaced lags in seconds.
+
+    Returns are mid changes over consecutive `base_dt_s` steps (10 ms by default),
+    so the lags run from 10 ms to `max_lag_s` on one axis. Bid-ask bounce
+    shows up as negative values at the shortest lags, momentum as positive
+    values at second-scale lags. `band` is the 95% white-noise band, +-1.96/sqrt(n).
+    """
+    r = np.diff(mid_on_grid(tape, base_dt_s, window).to_numpy())
+    r = r[~np.isnan(r)]
+    max_steps = min(int(round(max_lag_s / base_dt_s)), len(r) // 4)
+    if max_steps < 1:
+        return pd.DataFrame(columns=['lag_s', 'lag_steps', 'acf', 'band'])
+    steps = np.unique(np.round(np.logspace(0, np.log10(max_steps), n_lags)).astype(int))
+    r = r - r.mean()
+    denom = (r * r).sum()
+    values = [(r[:-k] * r[k:]).sum() / denom if denom > 0 else np.nan for k in steps]
+    return pd.DataFrame({'lag_s': steps * base_dt_s, 'lag_steps': steps, 'acf': values, 'band': 1.96 / np.sqrt(len(r))})
+
+
+def mid_change_acf(tape: Tape, nlags: int = 50, window: Window = None) -> tuple[np.ndarray, int]:
+    """Autocorrelation of consecutive mid changes (event time, not clock time), and how many changes it used.
+
+    Lag 1 near -1 means every move is undone by the next (bounce); positive means moves repeat.
+    """
+    sizes = mid_changes(tape, window)['size'].to_numpy(dtype='float64')
+    return acf(sizes, nlags), len(sizes)
+
+
 def variance_ratio(tape: Tape, dt_s: float = 1.0, qs: tuple[int, ...] = (2, 5, 10, 30, 60), window: Window = None) -> pd.DataFrame:
     """VR(q) = Var(q-step return) / (q * Var(1-step return)): >1 trending, <1 mean-reverting."""
     mid = mid_on_grid(tape, dt_s, window).dropna().to_numpy()
     r1 = np.diff(mid)
-    base = (r1**2).mean()
+    base = (r1**2).mean() if len(r1) else np.nan
     rows = []
     for q in qs:
         rq = mid[q:] - mid[:-q]
