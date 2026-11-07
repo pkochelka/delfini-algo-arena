@@ -23,6 +23,36 @@ Last updated 2026-11-07 (round 1). All numbers are round1 PnL unless stated othe
 - **Round1 is very friendly to a large passive maker.** The mid is a pure random walk (variance ratio ≈ 1.0 at every horizon) and the spread is 1 tick 93% of the time. The touch is deep (about 1,316 lots per side), and takers lose 0.31 ticks on average, permanently. The tape behaves the same from start to end. See `data_explorer/round1/README.md`.
 - **Book imbalance predicts the mid 1 s ahead.** A side share of 0.04 means −0.38 ticks; 0.96 means +0.37.
 - **Large aggressive orders have a delayed impact.** Roughly half of the impact arrives after our 5 ms latency, and it does not revert within 5 s. Trading on it does not pay (see the `impact_mm.py` docstring).
+- **Round1 is synthetic, and a hidden fair price S is the right model.** S = 10000 + 0.026 · Σ sign · √filled over taker orders, and nothing else moves it. The generator is in `strategies/peter/round1_generator.md`. The mid is S plus a gap that closes by itself: sd 0.41 tick, AR(1) 0.73 per 100 ms, half-life about 220 ms. Regressing the 1 s mid change on S − mid gives slope 1.03, so the gap closes completely.
+- **S − mid beats every public feature at predicting the mid** (`strategies/peter/r1_structure.py`). Out-of-sample R², leave-one-split-out:
+
+  | Horizon | Past returns | Imbalance | Maker insert aggressiveness | All public | S − mid | S − mid + public |
+  | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+  | 0.5 s | 0.00 | 0.11 | 0.18 | 0.21 | **0.32** | 0.32 |
+  | 1 s | 0.00 | 0.06 | 0.13 | 0.14 | **0.21** | 0.21 |
+  | 5 s | 0.00 | 0.01 | 0.02 | 0.02 | **0.04** | 0.04 |
+
+  S − mid wins in every one of the 16 splits. Its worst split (0.29 at 0.5 s) is above the best split for all public features (0.23). Adding the public features on top of S − mid gains less than 0.005.
+- **No periodicity, trend or volatility regime** (`r1_structure.py`, sections B and C):
+  - Periodogram of 1 s counts and squared returns (Fisher's g): p ≥ 0.09.
+  - Timestamp phase within 1 s / 0.1 s / 10 ms / 1 ms is uniform: KS p ≥ 0.26.
+  - Return and taker-side autocorrelation is inside the noise band.
+  - The trend in arrival rates is not significant (p ≥ 0.36).
+  - S drifts +29.5 ticks over the tape (z = 0.29), and takers buy 50.02% of the time.
+  - Squared returns at lag 300 give Ljung-Box p ≈ 0.02–0.05. That is borderline once you account for multiple testing, so there is no usable volatility clustering.
+- **Every split looks the same.** These are the 12 walk-forward eval windows plus the 9000–12000 s holdout cut into 4.
+  - Rates, sizes, lifetimes, spread, touch depth, gap sd and half-life, 1 s volatility and impact c (0.024–0.026) have a cross-split CV of 0.3–3.5%.
+  - Homogeneity tests pass: taker counts p = 0.80, maker counts p = 0.46, buy share p = 0.35.
+  - Per-split S drift is within |z| ≤ 1.34, which is noise. Fold-to-fold PnL differences are luck, not regime.
+- **Anomaly: one side of the book empties for a few ms**, 140 times across the whole tape (the last at t = 11,919 s), not only at warm-up.
+  - 131 episodes start with one large IOC clearing the whole side: median size 709 lots, against a median taker order of 61. The other 9 are cancels.
+  - The side stays empty for a median of 9 ms and at most 83 ms.
+  - **Consequence for code:** a mid built from raw `bid`/`ask` columns jumps by about 5,000 ticks, so skip or forward-fill one-sided moments. All current strategies (`ladder_mm`, `queue_mm`, `sig_ladder`, `q_ladder2`, `robust_ladder`) return early when either touch is `None`. They neither requote nor cancel then, which is safe. Keep that guard in new strategies.
+  - **Not an edge:** with 4 takers/s per side and a window of about 9 ms (minus 5 ms latency), quoting into the empty side would catch roughly 5 taker orders on the whole tape.
+- **Other ms-scale irregularities have mechanical causes.**
+  - The busiest 100 ms window has 78 events against a mean of 37 (p ≈ 3e-4). This is most likely makers cancelling together after a jump in S.
+  - 125 maker quotes sit more than 5 ticks from S, against about 36 expected from the offset distribution. The likely cause is the no-cross clip when the opposite touch has moved past S.
+  - Maximum order sizes and maximum 10 s moves match the fitted distributions.
 - **sample_v2** has mild momentum, a thinner book and wider spreads. **random_stress** and **sample** trend (variance ratio 1.6–2.4), and those are the tapes where the ladder loses. Expect the private and later tapes to look more like those than like round1.
 
 ## How ladder_mm makes money
@@ -127,4 +157,6 @@ All tested on the round1 folds; numbers are deltas against ladder unless noted.
 | `research/round1/queue.md`, `queue/` | Level-transition instrumentation, spread episodes, A/B `ab.py` (pins cap=100) |
 | `research/round1/robustness.md`, `robustness/` | Stress-tape generator `stress_tapes.py`, `run_matrix.py`, `decompose.py`, results CSVs |
 | `strategies/marek/{sig_ladder,q_ladder,q_ladder2,robust_ladder,inv_mm}.py` | Variants; every new mechanic sits behind a PARAMS flag |
+| `strategies/peter/round1_generator.md`, `r1_model.py`, `r1_synth.py` | The reverse-engineered generator: fit it on any tape, then generate synthetic tapes |
+| `strategies/peter/r1_structure.py` | Structure audit: anomalies, periodicity, trends, per-split stability, predictive-model comparison. Run it first on each new round |
 | `strategies/peter/tune.py` | `load_folds` / `run_fold` and the Optuna search; `marek/sweep_impact.py` shows a minimal fold A/B |
