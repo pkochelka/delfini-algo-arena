@@ -46,28 +46,25 @@ PARAMS = {
     'size_top': 200,
     'cap': 100,
     'max_spread': 8,
-    'topup': 30,
+    'topup': 10,
     'trade_start_us': 0,
     # hidden price S
     's_c': 0.026,
     's_exp': 0.5,
-    's_gap': 0.095,  # makers never quote within this of S
+    's_gap': 0.05,  # makers never quote within this of S
     # S-driven quoting
-    's_pull': 0.33,  # 0 = off
-    's_hyst': 0.035,
-    's_pull_flat': 0.13,  # the flattening part is pulled too once dist < this (-9 = never)
-    's_pull_pos': -0.03,  # adding-side threshold = s_pull + s_pull_pos * |pos| / cap
+    's_pull': 0.45,  # 0 = off
+    's_hyst': 0.0,
+    's_pull_flat': -9.0,  # the flattening part is pulled too once dist < this (-9 = never)
+    's_pull_pos': 0.0,  # adding-side threshold = s_pull + s_pull_pos * |pos| / cap
     's_keep_flat': 1,  # while bad keep min(resting, |pos|) at the touch on the side that flattens
     's_prejoin': 1,  # while bad rest the freed room one tick behind the touch
-    's_gen': 1,  # 1: quote each side at the best price p with dist(p) >= threshold (the pre-joined order follows S)
-    's_maxdepth': 2,
-    's_deep': 0,  # s_gen: while good also rest this many lots one tick behind the touch (room after the touch order)
-    's_qk': 0.0,  # s_gen: threshold += s_qk * s_c * sqrt(market lots queued ahead of our touch order, or the whole touch)  # s_gen: don't rest more than this many ticks behind the touch
-    's_take': 0.035,  # 0 = off; IOC when the far touch is at least this far through S
-    's_take_max': 100,
-    's_improve': 0.2,  # 0 = off
+    's_take': 0.0,  # 0 = off; IOC when the far touch is at least this far through S
+    's_take_max': 200,
+    's_improve': 0.0,  # 0 = off
     # sig_ladder guard (defaults = sig_ladder's)
-    'use_sig': 0,
+    's_oracle': '',  # research only: path to an npz of the tape's exact S (t, S); never in a submission
+    'use_sig': 1,
     'g_share': 0.10,
     'g_dep': 0.5,
     'flow_k': 0.10,
@@ -245,7 +242,10 @@ class SLadder(BaseStrategy):
             self.s_raw = (bb + ba) / 2.0
         self._bound_s(BUY, bb, lb)
         self._bound_s(SELL, ba, la)
-        S = self._s_value(now)
+        S = self.s_raw + self.off
+        if p['s_oracle']:
+            S = self._oracle(now)
+        self.S = S
         if ba - bb > p['max_spread'] or now < p['trade_start_us']:
             return
 
@@ -280,9 +280,6 @@ class SLadder(BaseStrategy):
             if ta < qa_px:
                 qa_px = ta
 
-        if p['s_gen']:
-            self._quote_gen(S, bb, ba, qb_px, qa_px, snapshot)
-            return
         for side, touch, step in ((BUY, qb_px, -1), (SELL, qa_px, 1)):
             unsafe = self.bad[side] or self.unsafe[side]
             mine = sorted(((o[3], oid, o) for oid, o in self.orders.items()
@@ -316,74 +313,16 @@ class SLadder(BaseStrategy):
             if q > 0:
                 self._send(side, touch, q)
 
-    @staticmethod
-    def _ahead(levels, price: int) -> int:
-        """Market lots ahead of our first order at `price`, or the whole level if we have none there."""
-        q = 0
-        for o in levels:
-            if o.price != price:
-                if q:
-                    break
-                continue
-            if o.owner != 'market':
-                return q
-            q += o.quantity
-        return q
-
-    def _quote_gen(self, S: float, bb: int, ba: int, qb_px: int, qa_px: int, snapshot) -> None:
-        p = self.p
-        for side, base, mt, step in ((BUY, qb_px, bb, -1), (SELL, qa_px, ba, 1)):
-            flat = (side == SELL and self.pos > 0) or (side == BUY and self.pos < 0)
-            th = p['s_pull'] if flat else p['s_pull'] + p['s_pull_pos'] * abs(self.pos) / p['cap']
-            if p['s_qk'] and not flat:
-                th += p['s_qk'] * p['s_c'] * self._ahead(snapshot.bids if side == BUY else snapshot.asks, base) ** 0.5
-            if side == BUY:
-                tgt = base if S - base >= th else min(base - 1, math.floor(S - th))
-            else:
-                tgt = base if base - S >= th else max(base + 1, math.ceil(S + th))
-            good = tgt == base
-            mine = sorted(((o[3], oid, o) for oid, o in self.orders.items()
-                           if o[0] == side and not o[4] and oid not in self.cancelling), key=lambda x: x[0])
-            at, ahead, deep = [], [], []
-            for _, oid, o in mine:
-                d = (o[1] - tgt) if side == BUY else (tgt - o[1])
-                if d == 0:
-                    at.append((oid, o))
-                elif d == -1 and good and p['s_deep']:
-                    deep.append((oid, o))
-                elif d > 0 and not good:
-                    ahead.append((oid, o))
-                else:
-                    self._cancel(oid)
-            if not good:
-                keep = abs(self.pos) if (p['s_keep_flat'] and flat and not self.sev[side]) else 0
-                for oid, o in ahead:
-                    keep = self._shrink(oid, o, keep)
-                if not p['s_prejoin'] or abs(tgt - mt) > p['s_maxdepth'] or tgt <= 0:
-                    for oid, o in at:
-                        self._cancel(oid)
-                    continue
-            have = sum(o[2] for _, o in at)
-            target = p['size_top']
-            if have:
-                short = target - have
-                target = short if p['topup'] and short >= p['topup'] and good else 0
-            q = min(target, self._room(side))
-            if q > 0:
-                self._send(side, tgt, q)
-            if good and p['s_deep'] and tgt + step > 0:
-                have = sum(o[2] for _, o in deep)
-                target = p['s_deep']
-                if have:
-                    short = target - have
-                    target = short if p['topup'] and short >= p['topup'] else 0
-                q = min(target, self._room(side))
-                if q > 0:
-                    self._send(side, tgt + step, q)
-
-    def _s_value(self, now: int) -> float:
-        """Current S estimate (research subclasses override this, e.g. with the tape's exact S)."""
-        return self.s_raw + self.off
+    def _oracle(self, now: int) -> float:
+        if not hasattr(self, '_ot'):
+            import numpy as np  # research only
+            z = np.load(self.p['s_oracle'])
+            self._ot, self._os, self._oi = z['t'].tolist(), z['S'].tolist(), 0
+        t, i = self._ot, self._oi
+        while i < len(t) and t[i] <= now:
+            i += 1
+        self._oi = i
+        return self._os[i - 1] if i else 10000.0
 
     def _snipe(self, snapshot: OrderBookSnapshot, S: float) -> None:
         p = self.p
