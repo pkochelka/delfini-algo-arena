@@ -164,3 +164,6 @@ $$\text{penalty} = 10{,}000 \cdot \int \mathbb{1}\big[|I(t)| > 100\big] dt \quad
 $$\text{PnL} = \text{cash} + \text{markout}(I) - \text{penalty}$$
 
 $\text{markout}(I)$ is the cash from liquidating $I$ against the resting *market* orders on the opposite side, best price outwards (volume beyond the book at the last swept price, or at the last traded price if that side is empty). It is computed at the end and every second for `pnl.csv` and `pnl_se`.
+
+# Fotka
+![Fotka](fotecka.jpeg)
