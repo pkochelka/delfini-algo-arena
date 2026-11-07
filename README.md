@@ -74,6 +74,22 @@ uv run backtest-explorer --log-dir logs/sample     # http://127.0.0.1:8050, --po
 
 A Dash app over a full-logs run (not `--no-logs`): best bid/ask with your fills marked, your PnL over time, the reconstructed order book at any clicked time, and the event log.
 
+## Strategy results report
+
+```bash
+uv run results-explorer logs/r1_ladder_mm --open                       # -> logs/r1_ladder_mm/report.html
+uv run results-explorer logs/a logs/b --out logs/a-vs-b.html --open    # comparison tab + one tab per run
+uv run results-explorer --all                                          # every run under logs/ -> logs/results-report.html
+```
+
+A self-contained interactive HTML report per run, plus `results_summary.json` (every metric) in each run directory. It reads only what the simulator wrote, plus the cached tape replay from `analysis/` for the market mid.
+
+- **Tiles:** PnL, PnL/hour, max drawdown, per-minute Sharpe and t-stat, winning minutes; inventory (mean |inv|, q95, time at limit / flat, breach time); execution (fills, maker share, edge and markouts per unit, PnL/unit); orders (fill ratios, orders per fill, cancels that lost the latency race, order lifetime, two-sided presence, time at the touch). Hover a tile for its definition.
+- **Timeline** (one shared zoom): PnL split into *spread edge* (side·(mid just before the fill − price)·qty) and *inventory PnL* (mark-to-mid minus edge, which is where adverse selection shows up), inventory against ±limit, market bid/ask with your fills and quotes, and drawdown.
+- **Charts:** PnL per bucket, per-minute PnL distribution, markout curve by horizon (maker/taker/buys/sells), time-weighted inventory distribution, fill edge and sizes, volume bought/sold, order outcomes, lifetimes and placement, and quote distance from the touch.
+
+Runs made with `--no-logs` get only the PnL-based metrics and charts; re-run without it to get the rest.
+
 ## Exploring the market data
 
 ```bash
