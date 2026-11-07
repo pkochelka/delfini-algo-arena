@@ -12,6 +12,8 @@ from analysis.replay import Tape
 from data_explorer import theme as T
 
 FINE_DT_S = 0.01  # base step of the fine autocorrelation chart
+MID_DT_S = 0.1  # step of the 100 ms autocorrelation chart
+MID_LAGS = 100  # its lags: 0.1 s to 10 s
 
 
 def render(tape: Tape, window: F.Window, dt: float) -> html.Div:
@@ -68,6 +70,23 @@ def render(tape: Tape, window: F.Window, dt: float) -> html.Div:
     else:
         T.empty(finef, 'Window too short')
 
+    r_mid = F.returns(tape, MID_DT_S, window)
+    ac_mid = F.acf(r_mid, MID_LAGS)
+    mid_band = 1.96 / np.sqrt(max(len(r_mid), 1))
+    midf = T.figure(f'Autocorrelation of {MID_DT_S * 1000:g} ms returns, every lag to {MID_DT_S * MID_LAGS:g} s', x='lag (s)', y='correlation', showlegend=False)
+    if np.isfinite(ac_mid).any():
+        midf.add_hrect(y0=-mid_band, y1=mid_band, fillcolor=T.AXIS, opacity=0.6, line_width=0, layer='below')
+        midf.add_trace(
+            go.Bar(
+                x=np.arange(1, MID_LAGS + 1) * MID_DT_S, y=ac_mid,
+                marker=dict(color=np.where(ac_mid >= 0, T.BLUE, T.ORANGE)),
+                hovertemplate='lag %{x:.1f}s: %{y:.4f}<extra></extra>',
+            )
+        )
+        midf.update_xaxes(dtick=1)
+    else:
+        T.empty(midf, f'Window too short for {MID_LAGS} lags of {MID_DT_S * 1000:g} ms')
+
     nl_ev = 50
     ev_ac, n_changes = F.mid_change_acf(tape, nl_ev, window)
     ev_band = 1.96 / np.sqrt(max(n_changes, 1))
@@ -100,6 +119,12 @@ def render(tape: Tape, window: F.Window, dt: float) -> html.Div:
             'One axis from 10 ms to 60 s, so it does not depend on the sampling selector. Negative at the shortest lags: '
             'bid-ask bounce or quote flicker. Positive at second-scale lags: momentum. Dashed line: our 5 ms latency. '
             'Values look small because most 10 ms returns are zero: compare them with the gray band, not with 1.',
+            wide=True,
+        ),
+        T.panel(
+            T.graph(midf),
+            f'{len(r_mid):,} returns. Between the two charts above: the lag at which bars turn from blue to orange is how long a move keeps going '
+            'before it starts to revert, which is a natural holding time or signal horizon.',
             wide=True,
         ),
         T.panel(T.graph(evf), f'{n_changes:,} mid changes. Lag 1 strongly negative: moves get undone (fade them). Positive: moves continue (follow them).'),
