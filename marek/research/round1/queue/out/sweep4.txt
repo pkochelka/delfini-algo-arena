@@ -1,0 +1,9 @@
+B2                           total=   450608 min=   40442 sd=  2301 fills= 37132 q95=100.0 breach=0
+f50_m100                     total=   449969 min=   40417 sd=  2298 fills= 37155 q95=100.0 breach=0  dTot=    -639 dSd=    50 t=-4.01 wins=1/10
+f50_m50                      total=   449245 min=   40844 sd=  2126 fills= 46119 q95=100.0 breach=0  dTot=   -1363 dSd=  1178 t=-0.37 wins=4/10
+f50_m75                      total=   453353 min=   41065 sd=  2214 fills= 45073 q95=100.0 breach=0  dTot=   +2745 dSd=   580 t=+1.50 wins=5/10
+f40_m100                     total=   449969 min=   40417 sd=  2298 fills= 37155 q95=100.0 breach=0  dTot=    -639 dSd=    50 t=-4.01 wins=1/10
+f60_m100                     total=   442993 min=   39516 sd=  2436 fills= 38295 q95=100.0 breach=0  dTot=   -7615 dSd=   381 t=-6.32 wins=0/10
+f45_m90                      total=   442310 min=   39563 sd=  2433 fills= 40098 q95=100.0 breach=0  dTot=   -8298 dSd=   356 t=-7.36 wins=0/10
+f50_m0                       total=   450453 min=   40859 sd=  2140 fills= 48017 q95=100.0 breach=0  dTot=    -155 dSd=  1253 t=-0.04 wins=4/10
+f70_m0                       total=   435600 min=   38846 sd=  2270 fills= 47361 q95=100.0 breach=0  dTot=  -15008 dSd=   760 t=-6.25 wins=1/10

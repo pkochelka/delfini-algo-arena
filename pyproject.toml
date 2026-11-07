@@ -23,6 +23,9 @@ dependencies = [
 exchange-simulator = "simulator.main:main"
 backtest-explorer = "explorer.main:main"
 data-explorer = "data_explorer.main:main"
+walk-forward = "walkforward.main:main"
+walk-forward-report = "walkforward.report:main"
+results-explorer = "results_explorer.report:main"
 
 [tool.uv]
 package = true
@@ -40,7 +43,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["simulator*", "explorer*", "analysis*", "data_explorer*"]
+include = ["simulator*", "explorer*", "analysis*", "data_explorer*", "walkforward*", "results_explorer*"]
 
 [tool.setuptools.package-data]
 explorer = ["assets/*"]

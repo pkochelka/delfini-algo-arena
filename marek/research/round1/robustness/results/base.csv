@@ -1,0 +1,4 @@
+strategy,tape,pnl,max_dd,breach_penalty,fills,traded_volume,inventory,abs_inventory_q50,abs_inventory_q95,pnl_se,error
+ladder,sample_v2,263512.0,200.0,0.0,8231,523406,-100,100,100,5629.573569751465,
+ladder,random_stress,-18561.0,20145.0,0.0,2136,86979,-21,100,100,3756.115255602955,
+ladder,sample,-10399.0,12318.0,0.0,163,2560,-60,55,100,9464.535990901422,

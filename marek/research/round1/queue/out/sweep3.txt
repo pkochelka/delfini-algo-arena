@@ -1,0 +1,10 @@
+B2                           total=   450608 min=   40442 sd=  2301 fills= 37132 q95=100.0 breach=0
+B2_both3                     total=   453901 min=   40773 sd=  2471 fills= 37432 q95=100.0 breach=0  dTot=   +3293 dSd=   286 t=+3.64 wins=9/10
+B2_y1                        total=   317860 min=   27531 sd=  2099 fills= 41289 q95=100.0 breach=0  dTot= -132748 dSd=  2018 t=-20.81 wins=0/10
+B2_y2                        total=   316216 min=   27333 sd=  2130 fills= 40900 q95=100.0 breach=0  dTot= -134392 dSd=  2012 t=-21.13 wins=0/10
+B2_keep2                     total=   311685 min=   25021 sd=  2891 fills= 25628 q95=100.0 breach=0  dTot= -138923 dSd=  1561 t=-28.13 wins=0/10
+B2_ms1                       total=   431111 min=   38494 sd=  2429 fills= 40601 q95=100.0 breach=0  dTot=  -19497 dSd=   981 t=-6.28 wins=1/10
+B2_ms2                       total=   451476 min=   40729 sd=  2399 fills= 37365 q95=100.0 breach=0  dTot=    +868 dSd=   302 t=+0.91 wins=6/10
+B2_imp5                      total=   437770 min=   39524 sd=  2542 fills= 40655 q95=100.0 breach=0  dTot=  -12838 dSd=  1158 t=-3.51 wins=2/10
+B2_tu20                      total=   450067 min=   40357 sd=  2299 fills= 38209 q95=100.0 breach=0  dTot=    -541 dSd=   122 t=-1.41 wins=3/10
+B2_tu5                       total=   450199 min=   40350 sd=  2301 fills= 36193 q95=100.0 breach=0  dTot=    -409 dSd=    71 t=-1.83 wins=2/10

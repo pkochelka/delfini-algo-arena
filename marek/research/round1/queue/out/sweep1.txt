@@ -1,0 +1,17 @@
+base                         total=   425118 min=   36821 sd=  2605 fills= 31327 q95=100.0 breach=0
+L2_t200_d100                 total=   354002 min=   30034 sd=  2591 fills= 25053 q95=100.0 breach=0  dTot=  -71116 dSd=  2119 t=-10.61 wins=0/10
+L2_t150_d50                  total=   415787 min=   37026 sd=  2391 fills= 34280 q95=100.0 breach=0  dTot=   -9331 dSd=  2396 t=-1.23 wins=5/10
+L2_t100_d100                 total=   450608 min=   40442 sd=  2301 fills= 37132 q95=100.0 breach=0  dTot=  +25490 dSd=  2251 t=+3.58 wins=9/10
+L2_t100_d200                 total=   450440 min=   40332 sd=  2309 fills= 35411 q95=100.0 breach=0  dTot=  +25322 dSd=  2276 t=+3.52 wins=9/10
+L2_t50_d150                  total=   376273 min=   34239 sd=  2670 fills= 35862 q95=100.0 breach=0  dTot=  -48845 dSd=  2656 t=-5.82 wins=1/10
+L2_t75_d125                  total=   424480 min=   38084 sd=  2512 fills= 38542 q95=100.0 breach=0  dTot=    -638 dSd=  2363 t=-0.09 wins=4/10
+L2_t125_d75                  total=   436090 min=   38764 sd=  2450 fills= 35589 q95=100.0 breach=0  dTot=  +10972 dSd=  2273 t=+1.53 wins=6/10
+L3_t100_d50                  total=   321820 min=   27694 sd=  2572 fills= 28758 q95=100.0 breach=0  dTot= -103298 dSd=  2239 t=-14.59 wins=0/10
+top150                       total=   395158 min=   33727 sd=  2496 fills= 47312 q95=100.0 breach=0  dTot=  -29960 dSd=   722 t=-13.12 wins=0/10
+top100                       total=   322871 min=   27532 sd=  2223 fills= 42619 q95=100.0 breach=0  dTot= -102247 dSd=  1279 t=-25.28 wins=0/10
+ir1                          total=   291457 min=   22611 sd=  2911 fills= 39507 q95=100.0 breach=0  dTot= -133661 dSd=  2117 t=-19.97 wins=0/10
+tight1                       total=   147744 min=   11230 sd=  2021 fills=  3740 q95=100.0 breach=0  dTot= -277374 dSd=  3189 t=-27.51 wins=0/10
+ms1                          total=   379850 min=   33465 sd=  2505 fills= 33835 q95=100.0 breach=0  dTot=  -45268 dSd=  1158 t=-12.36 wins=0/10
+ms2                          total=   424689 min=   36536 sd=  2663 fills= 31446 q95=100.0 breach=0  dTot=    -429 dSd=   182 t=-0.74 wins=5/10
+ms3                          total=   425177 min=   36880 sd=  2592 fills= 31336 q95=100.0 breach=0  dTot=     +59 dSd=    19 t=+1.00 wins=1/10
+ms20                         total=   425118 min=   36821 sd=  2605 fills= 31327 q95=100.0 breach=0  dTot=      +0 dSd=     0 t=+0.00 wins=0/10

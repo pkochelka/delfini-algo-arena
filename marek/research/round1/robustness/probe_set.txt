@@ -1,0 +1,1 @@
+data/splits_round1/wf/wf03.csv data/splits_round1/wf/wf07.csv data/stress/wf03_vscale0.3.csv data/stress/wf07_vscale0.3.csv data/stress/wf03_trendup.csv data/stress/wf03_noise3.csv data/stress/wf03_tscale0.25.csv data/random_stress.csv data/sample.csv data/sample_v2.csv

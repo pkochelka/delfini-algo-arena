@@ -29,7 +29,7 @@ from simulator.models import (
 from simulator.strategy import BaseStrategy
 
 PARAMS = {
-    'size_top': 200,  # lots at the touch (clipped by the guard; 200 = cap + a full opposite position)
+    'size_top': 400,  # lots at the touch (clipped by the guard; 200 = cap + a full opposite position)
     'size_deep': 0,  # lots at each level behind the touch
     'levels': 1,  # price levels per side, touch included
     'cap': 100,  # worst-case |position + open orders on a side|
