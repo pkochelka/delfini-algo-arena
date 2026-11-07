@@ -36,6 +36,9 @@ PARAMS = {
     'max_spread': 8,  # ignore books wider than this (a side backed by stale far orders)
     'tight_offset': 0,  # 1: with a 1-tick spread, start the ladder one tick behind the touch
     'topup': 10,  # >0: when a level is short by at least this many lots, add an order behind the one already there
+    # round1: a fill while our side's share of the touch queue is small marks out negative (the price is
+    # about to move through us); >0: rest nothing on a side whose share is below this
+    'imb_pull': 0.0,
     # tried, off
     'skew_lots': 0,
     'improve_reduce': 0,
@@ -76,11 +79,18 @@ class LadderMM(BaseStrategy):
                 self.ioc = None
 
     @staticmethod
-    def _touch(orders) -> int | None:
+    def _touch(orders) -> tuple[int | None, int]:
+        """Best market price on one side and the market quantity resting there."""
+        price, qty = None, 0
         for o in orders:
-            if o.owner == 'market':
-                return o.price
-        return None
+            if o.owner != 'market':
+                continue
+            if price is None:
+                price = o.price
+            elif o.price != price:
+                break
+            qty += o.quantity
+        return price, qty
 
     def _room(self, side: Side) -> int:
         rest = sum(o[2] for oid, o in self.orders.items() if o[0] == side and oid != self.ioc)
@@ -89,7 +99,7 @@ class LadderMM(BaseStrategy):
         return self.p['cap'] + self.pos - rest
 
     def on_order_book_change(self, snapshot: OrderBookSnapshot, trades: list[Trade]) -> None:
-        bb, ba = self._touch(snapshot.bids), self._touch(snapshot.asks)
+        (bb, qb), (ba, qa) = self._touch(snapshot.bids), self._touch(snapshot.asks)
         p = self.p
         if bb is None or ba is None or ba - bb > p['max_spread'] or snapshot.timestamp_us < p['trade_start_us']:
             return
@@ -113,8 +123,8 @@ class LadderMM(BaseStrategy):
             elif self.pos < 0:
                 b0 = bb + 1
 
-        for side, start, step in ((BUY, b0, -1), (SELL, a0, 1)):
-            want = [start + step * i for i in range(p['levels'])]
+        for side, start, step, share in ((BUY, b0, -1, qb / (qb + qa)), (SELL, a0, 1, qa / (qb + qa))):
+            want = [start + step * i for i in range(p['levels'])] if share >= p['imb_pull'] else []
             have: dict[int, int] = {}  # price -> resting lots of ours there
             for oid, o in self.orders.items():
                 if o[0] != side or oid in self.cancelling or oid == self.ioc:

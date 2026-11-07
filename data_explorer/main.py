@@ -21,7 +21,7 @@ from analysis import features as F
 from analysis import load_tape
 from analysis.replay import Tape
 from data_explorer import theme as T
-from data_explorer.tabs import compare, flow, liquidity, overview, predict, price, volatility
+from data_explorer.tabs import compare, execution, flow, liquidity, overview, predict, price, volatility
 
 TABS = {
     'overview': ('Overview', overview.render),
@@ -30,6 +30,9 @@ TABS = {
     'liq': ('Liquidity & book', liquidity.render),
     'flow': ('Trades & flow', flow.render),
     'predict': ('Predictability', predict.render),
+    'queue': ('Queue fills', execution.render_queue),
+    'maker': ('Maker markouts', execution.render_maker),
+    'latency': ('Latency & cancels', execution.render_latency),
     'compare': ('Compare tapes', None),
 }
 
@@ -61,11 +64,15 @@ def build_app(tapes: dict[str, Tape]) -> Dash:
     app = Dash(__name__, title='Data explorer', suppress_callback_exceptions=True)
     names = list(tapes)
 
-    @lru_cache(maxsize=64)
-    def render_tab(tab: str, name: str, window: tuple[float, float] | None, dt: float):
+    @lru_cache(maxsize=16)
+    def render_tab(tab: str, name: str, window: tuple[float, float] | None, dt: float,
+                   side: str, size: str, placement: str, horizon: float, latency: float, cancel_age: float):
         started = time.perf_counter()
         if tab == 'compare':
             out = compare.render(list(tapes.values()))
+        elif tab in ('queue', 'maker', 'latency'):
+            out = TABS[tab][1](tapes[name], window, dt, side=side, size=size, placement=placement,
+                              horizon=horizon, latency=latency, cancel_age=cancel_age)
         else:
             out = TABS[tab][1](tapes[name], window, dt)
         print(f'  rendered {tab} for {name} {window or "whole tape"} dt={dt} in {time.perf_counter() - started:.2f}s', flush=True)
@@ -93,6 +100,24 @@ def build_app(tapes: dict[str, Tape]) -> Dash:
                 children=[dcc.Tab(label=label, value=key, className='tab', selected_className='tab--selected') for key, (label, _) in TABS.items()],
                 className='tabs-row',
             ),
+            html.Div([
+                html.Div(['Maker side', dcc.Dropdown(
+                    options=[{'label': 'Both', 'value': 'both'}, {'label': 'Buy', 'value': 'B'}, {'label': 'Sell', 'value': 'A'}],
+                    value='both', clearable=False, id='exec-side')], className='control'),
+                html.Div(['Historical resting size', dcc.Dropdown(
+                    ['all', '1-5', '6-20', '21-100', '>100'], 'all', clearable=False, id='exec-size')], className='control'),
+                html.Div(['Placement (queue/cancels)', dcc.Dropdown(
+                    ['touch', 'inside', 'behind', 'all'], 'touch', clearable=False, id='exec-placement')], className='control'),
+                html.Div(['Fill / markout horizon', dcc.Dropdown(
+                    options=[{'label': f'{h:g} s', 'value': h} for h in (.005, .05, .1, .5, 1.0, 5.0)],
+                    value=1.0, clearable=False, id='exec-horizon')], className='control'),
+                html.Div(['Cancel latency', dcc.Dropdown(
+                    options=[{'label': f'{v:g} ms', 'value': v} for v in (1.0, 5.0, 10.0, 25.0)],
+                    value=5.0, clearable=False, id='exec-latency')], className='control'),
+                html.Div(['Request cancel at age', dcc.Dropdown(
+                    options=[{'label': f'{v:g} ms', 'value': v} for v in (0.0, 5.0, 50.0, 100.0, 500.0, 1000.0)],
+                    value=100.0, clearable=False, id='exec-cancel-age')], className='control'),
+            ], id='execution-controls', className='execution-controls', style={'display': 'none'}),
             dcc.Loading(html.Div(id='content'), type='dot', color=T.BLUE),
         ],
         className='app',
@@ -146,9 +171,17 @@ def build_app(tapes: dict[str, Tape]) -> Dash:
         t0, t1 = F.bounds(tapes[name], window)
         return f'Window {t0:,.1f}–{t1:,.1f} s ({(t1 - t0) / 60:.1f} min)'
 
-    @app.callback(Output('content', 'children'), Input('tab', 'value'), Input('tape', 'value'), Input('window', 'data'), Input('dt', 'value'))
-    def _content(tab, name, window, dt):
-        return render_tab(tab, name, tuple(window) if window else None, float(dt))
+    @app.callback(Output('execution-controls', 'style'), Input('tab', 'value'))
+    def _execution_controls(tab):
+        return {'display': 'flex' if tab in ('queue', 'maker', 'latency') else 'none'}
+
+    @app.callback(Output('content', 'children'), Input('tab', 'value'), Input('tape', 'value'),
+                  Input('window', 'data'), Input('dt', 'value'), Input('exec-side', 'value'),
+                  Input('exec-size', 'value'), Input('exec-placement', 'value'), Input('exec-horizon', 'value'),
+                  Input('exec-latency', 'value'), Input('exec-cancel-age', 'value'))
+    def _content(tab, name, window, dt, side, size, placement, horizon, latency, cancel_age):
+        return render_tab(tab, name, tuple(window) if window else None, float(dt), side, size, placement,
+                          float(horizon), float(latency), float(cancel_age))
 
     return app
 

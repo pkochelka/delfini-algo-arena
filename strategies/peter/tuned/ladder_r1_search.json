@@ -1,0 +1,87 @@
+{
+  "study": "ladder_r1_search",
+  "strategy": "ladder_mm",
+  "fit": "1-8",
+  "check": "9-12",
+  "objective": {
+    "risk_k": 0.5,
+    "inv_pen": 0.0
+  },
+  "fit_score": 26954.04792255036,
+  "params": {
+    "size_top": 99,
+    "topup": 6,
+    "levels": 2,
+    "size_deep": 50,
+    "tight_offset": 0,
+    "skew_lots": 100
+  },
+  "check_defaults": [
+    {
+      "fold": "wf09",
+      "pnl": 29345.0,
+      "fills": 2030,
+      "q95": 100,
+      "breach": 0.0
+    },
+    {
+      "fold": "wf10",
+      "pnl": 27733.0,
+      "fills": 1957,
+      "q95": 100,
+      "breach": 0.0
+    },
+    {
+      "fold": "wf11",
+      "pnl": 26376.0,
+      "fills": 1979,
+      "q95": 100,
+      "breach": 0.0
+    },
+    {
+      "fold": "wf12",
+      "pnl": 28573.0,
+      "fills": 1960,
+      "q95": 100,
+      "breach": 0.0
+    }
+  ],
+  "check_tuned": [
+    {
+      "fold": "wf09",
+      "pnl": 27153.0,
+      "fills": 3106,
+      "q95": 100,
+      "breach": 0.0
+    },
+    {
+      "fold": "wf10",
+      "pnl": 29588.0,
+      "fills": 3206,
+      "q95": 100,
+      "breach": 0.0
+    },
+    {
+      "fold": "wf11",
+      "pnl": 27718.0,
+      "fills": 3098,
+      "q95": 100,
+      "breach": 0.0
+    },
+    {
+      "fold": "wf12",
+      "pnl": 28201.0,
+      "fills": 3171,
+      "q95": 100,
+      "breach": 0.0
+    }
+  ],
+  "importance": {
+    "size_deep": 0.4855296601600901,
+    "size_top": 0.3454529182858407,
+    "topup": 0.1631781516074102,
+    "skew_lots": 0.0051713359342240315,
+    "tight_offset": 0.0005162373846192822,
+    "levels": 0.0001516966278157236
+  }
+}
