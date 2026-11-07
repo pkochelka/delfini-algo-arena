@@ -1,0 +1,24 @@
+{
+  "events": 2193064,
+  "orders": 1123282,
+  "matches": 197588,
+  "sorted_timestamps": true,
+  "duplicate_timestamps": 0,
+  "duplicate_insert_order_ids": 0,
+  "nonpositive_prices": 0,
+  "nonpositive_sizes": 0,
+  "fitting_limit_orders": 628818,
+  "fitting_crossing_limits": 0,
+  "aggressor_type_markouts": {
+    "G": {
+      "matches": 0,
+      "volume": 0,
+      "maker_markout_1s": null
+    },
+    "F": {
+      "matches": 113086,
+      "volume": 4046428,
+      "maker_markout_1s": -0.25931846557012755
+    }
+  }
+}

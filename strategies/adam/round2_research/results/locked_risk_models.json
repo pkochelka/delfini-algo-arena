@@ -1,0 +1,12 @@
+{
+  "locked_utc": "2026-11-07T18:36:24.348275+00:00",
+  "selections": {
+    "q90_0.1s": "hgb",
+    "jump_0.1s": "hgb",
+    "q90_1s": "hgb",
+    "jump_1s": "hgb",
+    "q90_5s": "hgb",
+    "jump_5s": "hgb"
+  },
+  "test_not_yet_scored": true
+}

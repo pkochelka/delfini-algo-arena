@@ -1,0 +1,13 @@
+{
+  "train_peak_period_s": 256.0,
+  "selection": "hgb_lagged",
+  "validation_deviance": {
+    "lagged": 1.682876580237774,
+    "phase_only": 2.144505358672488,
+    "lagged_plus_phase": 1.688650025834596,
+    "hgb_lagged": 1.5933366485570284,
+    "constant": 2.1361535390375064
+  },
+  "test_not_yet_scored": true,
+  "note": "Exploratory extension. One period selected using training Welch spectrum only; absolute-clock phase is tested explicitly and must not be assumed transferable to a new session."
+}

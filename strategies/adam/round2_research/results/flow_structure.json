@@ -1,0 +1,30 @@
+{
+  "count_correlations": [
+    {
+      "bin_s": 1,
+      "limit_ioc": -0.01641776597746957,
+      "limit_cancel": 0.6859197183399589,
+      "ioc_cancel": 0.02234800716454334
+    },
+    {
+      "bin_s": 10,
+      "limit_ioc": -0.5068034516999119,
+      "limit_cancel": 0.9808462861181136,
+      "ioc_cancel": -0.5150406632326425
+    },
+    {
+      "bin_s": 60,
+      "limit_ioc": -0.3327954871586079,
+      "limit_cancel": 0.9956140910741978,
+      "ioc_cancel": -0.3350121544285703
+    }
+  ],
+  "cancel_messages": 628801,
+  "linked_cancel_fraction": 1.0,
+  "cancel_message_lifetime_s": {
+    "mean": 0.44886473777236363,
+    "median": 0.320405,
+    "q90": 0.980169
+  },
+  "note": "Cancellation-message lag from original insertion, including messages for orders already filled. Not necessarily actual resting lifetime. Count correlations are contemporaneous, not advance forecasts."
+}

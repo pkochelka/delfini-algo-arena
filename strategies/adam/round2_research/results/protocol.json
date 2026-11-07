@@ -1,0 +1,44 @@
+{
+  "created_utc": "2026-11-07T18:28:55.725421+00:00",
+  "data": "C:\\Users\\adam\\Documents\\Codex\\2026-11-07\\new-chat-2\\delfini-algo-arena\\data\\round2_public.csv",
+  "data_sha256": "88ff641e962540c66fa1cc4a3547585d31838d0929340150690cabb4f3cfb9f4",
+  "grid_s": 0.1,
+  "latency_s": 0.005,
+  "horizons_s": [
+    0.1,
+    1.0,
+    5.0
+  ],
+  "train_s": [
+    60,
+    3590
+  ],
+  "validation_s": [
+    3600,
+    4790
+  ],
+  "test_s": [
+    4800,
+    5990
+  ],
+  "purge_s": 10,
+  "models": [
+    "training mean",
+    "microprice residual",
+    "ridge(alpha=10)",
+    "HGB leaves15",
+    "HGB leaves31"
+  ],
+  "hgb": {
+    "max_iter": 150,
+    "learning_rate": 0.05,
+    "min_samples_leaf": 100,
+    "l2_regularization": 10,
+    "early_stopping": false,
+    "seed": 1729
+  },
+  "selection": "For each horizon select fitted model by validation MSE; freeze before test. No trading strategy is selected by this analysis.",
+  "fill_models": "Historical passive-order any-fill within 1s, conditional first-fill 1s markout; ridge/logistic vs HGB; train-only sampling and chronological evaluation.",
+  "observability": "Predictors use book within 20 ticks and executed public prints. Raw submitted IOC sizes and off-screen insert/cancel messages are diagnostics only, never predictors.",
+  "limitations": "Public dataset already opened descriptively. Chronological fitting holdout, not organizer-private blind data. Historical maker fill cohorts are policy-dependent, not counterfactual fills."
+}
