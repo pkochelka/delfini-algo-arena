@@ -299,3 +299,27 @@ The sniper takes stale quotes by IOC once the book has moved at least `sn_jth` t
 - The gain is concentrated in a few big shocks (the +96 at 5396 s gives +18k), so expect noise.
 - An untimed version, triggering anywhere from 0.8 to 4 s after detection, fired 1–2 s before every jump and cost −21k on dev. The time-lock is the essential part.
 - `fvs_mm.py` is a snapshot of `fv_mm.py` (working tree at about 20:40) with the subclass `FVAShock` appended. Re-apply the layer if `fv_mm` changes: it is the block after "fvs_mm:" at the end of the file.
+
+## Fair-price filter ablations (`fvs_mm.py`, regime split)
+
+Baseline: dev 435.6k, test 116.7k (calm + turbulent). Each row changes one thing.
+
+| Change | Dev Δ | Test Δ | Reading |
+| --- | ---: | ---: | --- |
+| `regimes 1` (calm laws only, no volatile HMM) | −73k | −29k | The volatile regime model is essential |
+| √ impact (`e 0.5`) instead of the fitted 0.625 | −84k | −27k | The impact exponent matters |
+| `c` ×0.75 | −37k | −16k | |
+| `c` ×1.25 | −4k | +5k | Noise |
+| `sigma 0` / `sigma 0.6` | −6k / −7k | −3k / +13k | Flat. 0.3 is fine |
+| Impact noise `jv` 0 / ×2 | −6k / +7k | −4k / −3k | Flat |
+| Outlier share `eta` /10 / ×4 | ±1k / −6k | −2k / +1k | Flat |
+| Base jump rate `rho0` 0.01 / 0.2 | +4k / −2k | +1k / −3k | Flat |
+| Maker offsets `lam` ±0.1, volatile/drought offsets | +1k to +5k | −1k to −3k | Flat |
+| Regime switch rates /2–4, `taker_obs 1`, `far_tol 1.5` | ±1k | ±0–1k | No effect (`taker_obs` and `far_tol` don't change a single fill) |
+| **`kick 0`** (no extra jump expectation after a detected jump) | **+15k** | **+3k** | The only change that helps both |
+
+- **Stacking on `kick 0`:** adding `rho0 0.01`, `jv` ×2, `c` ×1.25 or `sigma 0.6` moves dev and test in opposite directions by a few k, so none of them is adopted.
+- **`kick 0` is now the default in `fvs_mm`.**
+  - Walk-forward, 12 folds: 439.3k → **454.1k**. 11 of 12 folds improve; the worst is −0.1k.
+  - Full tape: 591k → **607k**, no breach.
+- **Why it likely helps (not verified):** after a detected jump, the excitation flattens the prior over the whole grid for a few seconds. The filter then trusts single inserts too much and loses its quotes and takes to false re-centres. The real post-jump clustering is already carried by the volatile-regime HMM.
