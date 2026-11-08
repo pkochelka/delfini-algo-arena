@@ -20,6 +20,7 @@ import math
 import os
 import statistics
 import sys
+import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
@@ -67,7 +68,12 @@ def save(new: dict) -> None:
     disk.update(new)
     tmp = CACHE.with_suffix(f'.{os.getpid()}.tmp')
     tmp.write_text(json.dumps(disk))
-    os.replace(tmp, CACHE)
+    for k in range(50):  # Windows: the target may be open in another process for a moment
+        try:
+            os.replace(tmp, CACHE)
+            return
+        except PermissionError:
+            time.sleep(0.1 * (k + 1))
 
 
 def tstat(d: list[float]) -> float:
