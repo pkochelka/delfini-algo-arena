@@ -743,28 +743,18 @@ class FVMM(BaseStrategy):
                 if q > 0:
                     self._send(BUY, lim, q, OrderType.IOC)
                     rest_b += q
-        # ---- round 4: momentum take. In turbulence (or everywhere with mk_calm) the take reference moves by
-        # mk * forecast; a take only the shift allows is limited to m_cap (m_cap 0 = reduce-only).
+        # ---- round 4: momentum. In turbulence (calm: mk_calm) both take references move by mk * forecast, so a
+        # momentum entry is not undone by the opposite take; m_sl caps how far past the touch a shifted IOC may go.
         m = 0.0
-        if p['mk'] and (turb or p['mk_calm']) and take:
-            m = self.mom = self._mom(f.mean) * (p['mk'] if turb else p['mk_calm'])
-            mt = take + take_sd * sd + p['m_thr']
-            if m > 0 and ba <= F + m - mt and not ba <= lo_b:
-                lim = min(math.floor(F + m - mt), ba + p['m_sl'])
-                q = sum(o.quantity for o in asks if o.price <= lim and o.owner == 'market')
-                q = min(q, p['m_cap'] - pos - rest_b, cap - pos - rest_b)
-                if q > 0:
-                    self._send(BUY, lim, q, OrderType.IOC)
-                    rest_b += q
-            elif m < 0 and bb >= F + m + mt and not bb >= hi_a:
-                lim = max(math.ceil(F + m + mt), bb - p['m_sl'])
-                q = sum(o.quantity for o in bids if o.price >= lim and o.owner == 'market')
-                q = min(q, p['m_cap'] + pos - rest_a, cap + pos - rest_a)
-                if q > 0:
-                    self._send(SELL, lim, q, OrderType.IOC)
-                    rest_a += q
+        if p['mk'] and (turb or p['mk_calm']):
+            m = self._mom(f.mean) * (p['mk'] if turb else p['mk_calm'])
+            lo_b += m
+            hi_a += m
+        self.mom = m
         if take and ba <= lo_b:
             lim = math.floor(lo_b)
+            if m > 0:
+                lim = min(lim, max(math.floor(lo_b - m), ba + p['m_sl']))
             q = 0
             for o in asks:
                 if o.price > lim:
@@ -782,6 +772,8 @@ class FVMM(BaseStrategy):
                     self.cu_t, self.cu_s = self.now_t, 1
         if take and bb >= hi_a:
             lim = math.ceil(hi_a)
+            if m < 0:
+                lim = max(lim, min(math.ceil(hi_a - m), bb - p['m_sl']))
             q = 0
             for o in bids:
                 if o.price < lim:
@@ -874,6 +866,8 @@ class FVMM(BaseStrategy):
         # ---- passive quotes
         if p['cq_y'] and not turb:
             F = F - p['cq_y'] * f.Y  # develop: calm passive quotes around F - cq_y * Y
+        if p['mq'] and turb:
+            F = F + p['mq'] * self.mom  # round 4: turbulent passive quotes around the momentum-shifted F
         if p['cm_k'] and not turb and self.mbb is not None and self.mba is not None:
             # develop: calm book-lag momentum (S drifts toward F - mid: beta .24 / .44 / .63 at 1 / 2 / 5 s)
             g = F - 0.5 * (self.mbb + self.mba)
@@ -1595,4 +1589,4 @@ PARAMS.update({'c': 0.0168, 'e': 0.616, 'jv': 0.0169, 'tr_p': 0.50, 'tr_T': 16.7
 # round 4 (strategies/peter/round4_findings.md): momentum forecast, coefficients = OLS of the 5 s F change on
 # turbulent rows of the public tape (r4_alpha.py). mk = 0 reproduces r3_dev_best exactly.
 PARAMS.update({'mg': 2.77, 'm05': -0.36, 'm1': 0.37, 'm2': 0.20, 'm5': 0.32, 'm10': -0.15, 'm_max': 20.0,
-               'mk': 0.0, 'mk_calm': 0.0, 'm_thr': 0.0, 'm_cap': 100, 'm_sl': 0})
+               'mk': 0.0, 'mk_calm': 0.0, 'm_thr': 0.0, 'm_cap': 100, 'm_sl': 0, 'mq': 0.0})
