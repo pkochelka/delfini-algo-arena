@@ -53,8 +53,12 @@ def run(strategy: str, over: dict, tape: str) -> dict:
     for w in range(12):
         a = bisect.bisect_right(ts, 500 * w) - 1; b = bisect.bisect_right(ts, 500 * (w + 1)) - 1
         win.append(ps[max(b, 0)] - ps[max(a, 0)])
-    return {'tape': Path(tape).stem, 'pnl': r.pnl, 'breach': r.breach_penalty, 'fills': r.fills, 'parts': parts,
-            'per_shock': per_shock, 'win': win, 'onsets': on}
+    inv = sim._abs_inventory_time_us
+    tot_us = sum(inv.values()) or 1
+    capf = sum(v for k, v in inv.items() if k >= 95) / tot_us
+    flat = sum(v for k, v in inv.items() if k <= 20) / tot_us
+    return {'tape': Path(tape).stem, 'pnl': r.pnl, 'capf': capf, 'flat': flat, 'vol': r.traded_volume, 'breach': r.breach_penalty, 'fills': r.fills, 'parts': parts,
+            'per_shock': per_shock, 'win': win, 'onsets': on, 'curve': (ts, ps)}
 
 
 def tapes_of(spec: str) -> list[str]:
@@ -91,7 +95,9 @@ def main():
             pn = [r['pnl'] for r in res]
             line = (f"{Path(s).stem[:10]} {json.dumps(v)[:70]:70} mean {statistics.fmean(pn)/1e3:7.1f}k  "
                     f"calm {tot['calm']/1e3:6.1f} vol {tot['volatile']/1e3:6.1f} shock {tot['shock']/1e3:6.1f}  "
-                    f"breach {statistics.fmean(r['breach'] for r in res)/1e3:5.1f}k")
+                    f"breach {statistics.fmean(r['breach'] for r in res)/1e3:5.1f}k "
+                    f"atcap {statistics.fmean(r['capf'] for r in res):.2f} flat {statistics.fmean(r['flat'] for r in res):.2f} "
+                    f"vol {statistics.fmean(r['vol'] for r in res)/1e3:.0f}k")
             if base is None:
                 base = pn
             else:
