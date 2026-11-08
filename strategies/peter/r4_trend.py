@@ -228,6 +228,7 @@ class FV:
         self.inv2h2 = 1.0 / (2 * h * h)
         self.vj = 2 * p['bj_v'] ** 2 * p['lamj_v']  # variance rate of the volatile residual jumps
         self.kern: dict[int, np.ndarray] = {}
+        self.drift = 0.0  # round 4 (mo_drift): expected S drift (ticks/s) applied in predict, set by the strategy
 
     def predict(self, t: float) -> None:
         if self.t is None:
@@ -248,6 +249,8 @@ class FV:
             b = a if a < 0.45 else 0.45
             w[1:-1] = (1 - 2 * b) * w[1:-1] + b * (w[:-2] + w[2:])
             a -= b
+        if self.drift:
+            self.shift(self.drift * dt)
         if p['tr_on'] and self.Y:
             T = (1 - pv) * p['tr_T'] + pv * p['tr_T_v']
             dY = self.Y * -math.expm1(-dt / T)
@@ -698,6 +701,9 @@ class FVMM(BaseStrategy):
         if self.mo is not None:
             mid = 0.5 * (self.mbb + self.mba) if self.mbb is not None and self.mba is not None else None
             self.mo.update(t, f.mean, kicked, mid, f.pv)
+            if p['mo_drift']:
+                dm = p['mo_dmax']
+                f.drift = max(-dm, min(dm, p['mo_drift'] * self.mo.m1))
         if not bids or not asks or snapshot.timestamp_us < p['trade_start_us']:
             return
         self._quote(f, bids[0].price, asks[0].price, bids, asks)
@@ -1730,6 +1736,7 @@ PARAMS.update({
     'mo_hold': None,  # turbulence: no flatten-only quote while m5 points with the position by more than this
     'mo_x5': None, 'mo_x5_t': None,  # exit IOC when m5 points against the position by more than this (calm / turb)
     'mo_xu': 1.0, 'mo_xto': 0, 'mo_xgap': 0.05,
+    'mo_drift': 0.0, 'mo_dmax': 5.0,  # filter predict drifts S at mo_drift * m1 ticks/s (clipped at +-mo_dmax)
 })
 # fit on the whole round-4 public tape (r4_mfit.py; oos R2 on t >= 4500 s: 1 s calm 0.005 / volatile 0.196,
 # 5 s calm 0.011 / volatile -0.010)
@@ -1737,3 +1744,15 @@ PARAMS.update({'mo_b1c': [0.1407, 0.0058, 0.0099, 0.1889, -0.0507, 0.0205, -0.02
                'mo_b1v': [1.9171, 0.0901, 0.2236, -0.4239, 0.0588, 0.352, 0.1859],
                'mo_b5c': [0.3723, 0.0434, 0.0127, 0.2127, -0.2343, 0.124, -0.0615],
                'mo_b5v': [1.5083, -0.2371, 0.3473, -0.4597, 0.0889, 0.2177, 0.4805]})
+
+# ---- round-4 filter refit (r4_llfit.py: in-strategy maker-insert likelihood on 6 wf folds; r4_full.py: full tape)
+# volatile residual jumps lamj_v 0.23 -> 1.0 /s, Laplace scale bj_v 0.84 -> 1.2 (round 4 has more exogenous S moves in
+# turbulence): LL +1.2k nats (6/6 folds); full tape +27.3k, non-shock +13.7k (t 2.4, 9/12 pieces); r3 wf -7.6k (noise).
+# Rejected on PnL despite LL gains: c_v 0.055, e_v 0.58, eta 0.05 / 0.1, jv_v, tr_p_v; filter drift prior (mo_drift).
+PARAMS.update({'lamj_v': 1.0, 'bj_v': 1.2})
+
+# ---- round-4 drought quoting cut (found by the execution sweep in r4_mom.py's session): stop passive drought quotes at
+# onset + 2.1 s instead of + 2.7 s (round-4 shock jumps are bigger, sd 64 vs 49). With the jump refit above: full tape
+# 1438.3k (+45.0k, all in shock windows; non-shock -0.4k), plateau 0.8 / 0.9 = +42 / +45k; dev_best + both: wf +64.8k
+# (t 2.8), hold +12.8k (3/4).
+PARAMS.update({'dr_margin': 0.9})

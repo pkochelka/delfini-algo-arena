@@ -1,4 +1,16 @@
-"""r3_dev_best: round-3 strategy of the develop angle (marek/research/round3/ideas/develop.md).
+"""r4_mom: round-4 candidate = Marek's r3_dev_best + round-4 selection (end of file) + momentum flags (off).
+
+Round 4 = round 3 + momentum in the volatile regime (strategies/peter/round4_findings.md). Results (r4_eval.py):
+full r4 tape 1438.3k vs r3_dev_best 1365.9k (+72.3k, 9/12 pieces), wf folds +64.8k (t 2.8), holdout +12.8k (3/4).
+  kept:   dr_margin 0.9 (drought quoting stops 2.1 s after the onset estimate, 0.9 s before the jump), lamj_v 1.0 /
+          bj_v 1.2 (volatile residual jumps, refit on r4 by session db)
+  failed (flags kept, off): momentum-forecast shift of the take reference (mk, -33k..-400k on wf even with the
+          limit capped at the touch, m_sl), of the passive quote centre (mq), forecast veto of turbulent takes
+          (m_veto, ~0). The forecast is calibrated, but dev_best's stale-quote takes already follow it and the
+          +-100 cap binds ~90 % of turbulent time, so a shift can only chase or pay to flip.
+  flat (|d| < 7k): theta, theta_keep, take, take_t, take_sd_t, pv_thr, burst_exc, vf_*, cu_* unload, dr_theta/keep.
+
+--- r3_dev_best: round-3 strategy of the develop angle (marek/research/round3/ideas/develop.md).
 
 r3_best.py (fv_mm S filter + stale-quote taker + shock sniper, round-3 ladder filter) plus, all behind PARAMS flags
 (off = r3_best), the settings at the end of this file:
@@ -751,7 +763,8 @@ class FVMM(BaseStrategy):
             lo_b += m
             hi_a += m
         self.mom = m
-        if take and ba <= lo_b:
+        mv = self._mom(f.mean) if p['m_veto'] and turb else 0.0  # veto: no take against a strong forecast
+        if take and ba <= lo_b and not (mv and mv < -p['m_veto']):
             lim = math.floor(lo_b)
             if m > 0:
                 lim = min(lim, max(math.floor(lo_b - m), ba + p['m_sl']))
@@ -770,7 +783,7 @@ class FVMM(BaseStrategy):
                 if not turb:
                     self.cu_q = q + (self.cu_q if self.cu_s > 0 and self.now_t - self.cu_t < p['cu_t1'] else 0)
                     self.cu_t, self.cu_s = self.now_t, 1
-        if take and bb >= hi_a:
+        if take and bb >= hi_a and not (mv and mv > p['m_veto']):
             lim = math.ceil(hi_a)
             if m < 0:
                 lim = max(lim, min(math.ceil(hi_a - m), bb - p['m_sl']))
@@ -1589,4 +1602,9 @@ PARAMS.update({'c': 0.0168, 'e': 0.616, 'jv': 0.0169, 'tr_p': 0.50, 'tr_T': 16.7
 # round 4 (strategies/peter/round4_findings.md): momentum forecast, coefficients = OLS of the 5 s F change on
 # turbulent rows of the public tape (r4_alpha.py). mk = 0 reproduces r3_dev_best exactly.
 PARAMS.update({'mg': 2.77, 'm05': -0.36, 'm1': 0.37, 'm2': 0.20, 'm5': 0.32, 'm10': -0.15, 'm_max': 20.0,
-               'mk': 0.0, 'mk_calm': 0.0, 'm_thr': 0.0, 'm_cap': 100, 'm_sl': 0, 'mq': 0.0})
+               'mk': 0.0, 'mk_calm': 0.0, 'm_thr': 0.0, 'm_cap': 100, 'm_sl': 0, 'mq': 0.0, 'm_veto': 0.0})
+
+# ---- round-4 selection (2026-11-08): full r4 1438.3k vs dev_best 1365.9k (+72.3k, 9/12 500 s pieces), wf +64.8k,
+# hold +12.8k (3/4). dr_margin: stop drought quoting at onset + 2.1 s (plateau 0.7-1.0); lamj_v / bj_v: volatile
+# residual jumps refit on r4 (session db, r4_trend.py likelihood fit).
+PARAMS.update({'dr_margin': 0.9, 'lamj_v': 1.0, 'bj_v': 1.2})
