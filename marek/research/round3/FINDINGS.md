@@ -273,3 +273,17 @@ Six agents on `r3_hmm.py` (857.6k), real tape only, tags xs*/xr*/xf*/evo* in `st
 - **Evolutionary tournaments** (3 agents, champion vs 2 mutants per 500 s window tape `data/r3win/round3_wNN.csv`, ~10 s/run):
   every evolved champion lost on the full tape (calm −1.3..−10.2k, volatile −7.1k, shock −15.0k). Window noise ≫ knob effects;
   a +500 window margin selects noise.
+- **Exit/recycle follow-up** (tags ex1-ex3 on `r3_push.py`): post-shock position unwind `ss_unwind` (−4..−6k), excess exit floor
+  `xu_me`/`xu_pass` (−5k / −62..−66k), `xu_tgt` < 100 (−1M: the unwind runs everywhere), `dr_cap` 50 (−15k), calm partial IOC
+  unwind 95→80 (−9..−15k), volatile exit quote depth/gates `vf_*` (−1..−13k), flatten at the calm→volatile switch
+  (`r3_x_exit.py`, `rs_*`, −4..−22k). No exit or recycling rule beats holding.
+- **Value of speed** (`FASTSIM_DELAY_MS` env override in `fastsim/engine.py`, default 5 = grader; tags lat0-lat10, r3_push):
+  latency 0 / 1 / 2 / 3 / 5 / 10 ms → 874.9k / 889.1k / 879.2k / 870.5k / 863.3k / 787.2k. Even an impossible 1 ms is only
+  +25.8k (calm +6k, vol +7k, shock +12k); 10 ms costs −76k, mostly shocks. The strategy already acts on every event, so
+  higher frequency is not a route to 900k+ under the fixed 5 ms.
+- **Acting earlier / ML** (scripts in the session scratchpad; strategy knobs in `strategies/marek/round3/r3_x_damp.py`, off):
+  walk-forward (train windows < k, test k, 10 folds) GBM on causal features. True S moves 5-20 ms ahead: OOS R² ≤ 0 (the
+  generator has no diffusion; takers/jumps are i.i.d.). Error of the s_dynamics KF is predictable (R² 0.06, calm overreaction
+  −0.15·dF5ms −0.08·dF20ms), but damping our FV that way loses −4..−20k and the reverse −16k. Error of OUR FV (logged on every
+  event): R² +0.01 now / −0.01 at 5 ms; top 0.1 % signals ≈ +1 tick, 77 % volatile, fold-unstable (+0.1..+3.7). Volatile F−mid
+  extrapolation (`fm_k`) −11k..+1.5k (noise). Our filter is already close to the information limit; acting earlier has no edge.

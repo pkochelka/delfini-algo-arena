@@ -1,0 +1,14 @@
+{
+ "S": "S = F + Y + integral of velocity V; kick k = sign*c*filled^e + xi at each filled taker; F += p*k, Y += (1-p)*k, dY = -Y/T dt; dF = V dt; shock jump J -> F",
+ "calm": {"c": 0.0145, "e": 0.62, "p": 0.56, "T_s": 14.0, "xi_sd": 0.10,
+          "velocity": {"sd_tick_per_s": 0.4, "persistence_s": "1-1.5 (vhmm), 0.26 (KF, absorbs xi)", "confidence": "low"},
+          "maker_D": "0.032 + Exp(0.469)", "taker_limit": "round(S+-1), tail 2.3 % Exp(3.1)", "outlier_makers": 0.024},
+ "vol":  {"c": 0.0477, "e": 0.646, "p": 0.61, "T_s": 18.3, "xi_sd": 0.22,
+          "velocity": {"sd_tick_per_s": 3.1, "persistence_s": "~3 (1-s ACF, long-horizon variance); KF 1.6-1.9, OU-vhmm 3.1", "law": "Gaussian, exogenous to fills (kick->velocity coupling 0)", "confidence": "medium-high"},
+          "maker_D": "0.676 + Exp(0.995)", "taker_limit": "round(S+-2.55), tail 6 % Exp(6.6) on clean segments (12 % overall, side-law tail)", "outlier_makers": 0.021},
+ "velocity_switch_lead_s": 0.75,
+ "vol_mean_drift_tick_per_s": {"value": -0.37, "t": -2.4, "confidence": "low"},
+ "regimes": {"file": "vol_segments.csv", "n_vol": 32, "vol_frac": 0.298, "vol_mean_dwell_s": 55.8, "calm_mean_dwell_s": 134.6},
+ "shocks": {"n": 28, "jump_at": "onset + 3.02 s", "J_sd": 63.2, "J_mean_abs": 48.3, "law": "normal (KS p 0.99; Laplace NLL +0.7)", "reversion": "none"},
+ "hmm_loglik": {"S_v0_r3params": -1098290.4, "S_v1_v2b": -1072705.0, "S_final_v3": -1071070.6}
+}
