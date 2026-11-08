@@ -27,7 +27,7 @@ def key(strat, v, tape):
     h = hashlib.sha1(Path(strat).read_bytes())
     for d in DEPS:
         h.update(d.read_bytes())
-    return f"{h.hexdigest()[:12]}|{json.dumps(v, sort_keys=True)}|{tape}"
+    return f"v2|{h.hexdigest()[:12]}|{json.dumps(v, sort_keys=True)}|{tape}"
 
 
 def main():
@@ -50,12 +50,13 @@ def main():
             if 'err' in r:
                 print('ERR', v, r['err'][-1500:])
                 continue
-            cache[k] = {'pnl': r['pnl'], 'parts': r['parts'], 'win': r['win'], 'fills': r.get('fills'),
+            cache[k] = {'pnl': r['pnl'], 'parts': r['parts'], 'win': r['win'], 'win_cv': r['win_cv'], 'fills': r.get('fills'),
                         'breach': r.get('breach_penalty', 0), 'per_shock': r['per_shock']}
         disk = json.loads(CACHE.read_text()) if CACHE.exists() else {}
         disk.update(cache)
         CACHE.parent.mkdir(parents=True, exist_ok=True)
         CACHE.write_text(json.dumps(disk))
+    import math, statistics
     b = cache.get(ks[0])
     for v, k in zip(vs, ks):
         r = cache.get(k)
@@ -63,8 +64,12 @@ def main():
             continue
         P = r['parts']
         d = (r['pnl'] - b['pnl']) / 1e3 if b else 0.0
+        dw = [x - y for x, y in zip(r['win_cv'], b['win_cv'])]
+        sdw = statistics.stdev(dw) if any(dw) else 0
+        tcv = statistics.fmean(dw) / (sdw / math.sqrt(len(dw))) if sdw else 0.0
+        cv = sum(dw) / 1e3
         print(f"{json.dumps(v)[:64]:64} {r['pnl'] / 1e3:8.1f}k  calm {P['calm'] / 1e3:7.1f}  vol {P['volatile'] / 1e3:7.1f}"
-              f"  shock {P['shock'] / 1e3:7.1f}  d {d:+8.1f}k  fills {r['fills']}  breach {r['breach'] / 1e3:.1f}k",
+              f"  shock {P['shock'] / 1e3:7.1f}  d {d:+8.1f}k  cv {cv:+6.1f}k t {tcv:+4.1f} won {sum(x > 0 for x in dw):2d}/12  breach {r['breach'] / 1e3:.1f}k",
               flush=True)
 
 

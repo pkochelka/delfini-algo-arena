@@ -1,9 +1,9 @@
 """r4_mom: round-4 candidate = Marek's r3_dev_best + round-4 selection (end of file) + momentum flags (off).
 
 Round 4 = round 3 + momentum in the volatile regime (strategies/peter/round4_findings.md). Results (r4_eval.py):
-full r4 tape 1438.3k vs r3_dev_best 1365.9k (+72.3k, 9/12 pieces), wf folds +64.8k (t 2.8), holdout +12.8k (3/4).
-  kept:   dr_margin 0.9 (drought quoting stops 2.1 s after the onset estimate, 0.9 s before the jump), lamj_v 1.0 /
-          bj_v 1.2 (volatile residual jumps, refit on r4 by session db)
+full r4 tape 1412.7k vs r3_dev_best 1365.9k (+46.7k, 9/12 pieces), holdout +18.7k, wf +20.1k; fresh r4_synth +38.2k.
+  kept:   dr_margin 0.9 (drought quoting stops 2.1 s after the onset estimate, 0.9 s before the jump)
+  dropped: lamj_v 1.0 / bj_v 1.2 (public tape +27k, synth -35.6k: overfit the public tape)
   failed (flags kept, off): momentum-forecast shift of the take reference (mk, -33k..-400k on wf even with the
           limit capped at the touch, m_sl), of the passive quote centre (mq), forecast veto of turbulent takes
           (m_veto, ~0). The forecast is calibrated, but dev_best's stale-quote takes already follow it and the
@@ -1607,4 +1607,6 @@ PARAMS.update({'mg': 2.77, 'm05': -0.36, 'm1': 0.37, 'm2': 0.20, 'm5': 0.32, 'm1
 # ---- round-4 selection (2026-11-08): full r4 1438.3k vs dev_best 1365.9k (+72.3k, 9/12 500 s pieces), wf +64.8k,
 # hold +12.8k (3/4). dr_margin: stop drought quoting at onset + 2.1 s (plateau 0.7-1.0); lamj_v / bj_v: volatile
 # residual jumps refit on r4 (session db, r4_trend.py likelihood fit).
-PARAMS.update({'dr_margin': 0.9, 'lamj_v': 1.0, 'bj_v': 1.2})
+PARAMS.update({'dr_margin': 0.9})
+# lamj_v 1.0 / bj_v 1.2 dropped: +27k on the public tape, but -35.6k on the 12 fresh r4_synth tapes (session db's
+# generator, r4_full.py --syn sel) and worse on the user's held-out dev. dr_margin 0.9 holds there (+38.2k).

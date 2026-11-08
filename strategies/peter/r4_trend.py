@@ -1756,3 +1756,14 @@ PARAMS.update({'lamj_v': 1.0, 'bj_v': 1.2})
 # 1438.3k (+45.0k, all in shock windows; non-shock -0.4k), plateau 0.8 / 0.9 = +42 / +45k; dev_best + both: wf +64.8k
 # (t 2.8), hold +12.8k (3/4).
 PARAMS.update({'dr_margin': 0.9})
+
+# ---- selection on fresh round-4 synthetic tapes (r4_synth.py seeds 501-512, r4_full.py --syn sel): the jump refit
+# above does NOT hold there (reverting it: +35.6k, non-shock +7.2k, 7/12), so it is reverted; dr_margin 0.9 holds
+# (reverting it: -38.2k).
+PARAMS.update({'lamj_v': 0.23, 'bj_v': 0.84})
+
+# ---- real-tape screen (r4_full.py, 2026-11-08), base = dev_best + dr_margin 0.9 = 1412.7k: keep resting drought quotes
+# only while >= 0.8 ticks of edge (was 0.5). Plateau 0.65 / 0.8 / 1.0 = +10.4 / +18.5 / +13.1k (all shock windows).
+# Flat / noise (|ex| <= 4k, neighbours disagree): take, take_t, take_sd_t, theta, pv_thr, burst_exc, max_sd, ss_shots,
+# xu_lim, xu_lim2, xs_edge, xs_cap; losing: take_sd_t 2.5 (-34k), vf_on 0 (-20k), dr_theta 0.5 / 1.2, xu_ts2 0.04 / 0.15.
+PARAMS.update({'dr_keep': 0.8})

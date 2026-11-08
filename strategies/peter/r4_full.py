@@ -1,6 +1,10 @@
 """Paired full-tape evaluation with a shock / non-shock split (round 4).
 
     uv run python strategies/peter/r4_full.py STRAT.py '{"k":1}' '{"k":2}' [--base '{}'] [--tape data/round4_public.csv]
+    uv run python strategies/peter/r4_full.py STRAT.py '{"k":1}' --syn sel     # 12 fresh r4_synth tapes (seeds 501-512)
+
+With --syn the tapes are data/synth/r4_<tag>_seed<k>.csv; shock windows come from their .truth.json onsets, trading
+starts at 30 s, and the t-stat / won count are over tapes instead of 500 s pieces.
 
 Runs the whole tape once per variant (cached in logs/r4/full_cache.json by source hash + params + tape) and splits
 each paired PnL delta into the shock windows [outage start - 1 s, + 20 s) of the tape's 28 maker outages (found as in
@@ -25,10 +29,17 @@ ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / 'logs' / 'r4' / 'full_cache.json'
 
 
+SYN = {'sel': range(501, 513), 'conf': range(513, 525)}
+
+
 def shock_mask(tape: str, n: int) -> np.ndarray:
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from regime_split import labels
-    _, _, outages = labels(str(ROOT / tape), 5, 110)
+    truth = (ROOT / tape).with_suffix('.truth.json')
+    if truth.exists():
+        outages = [(o, None) for o in json.loads(truth.read_text())['onsets']]
+    else:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from regime_split import labels
+        _, _, outages = labels(str(ROOT / tape), 5, 110)
     m = np.zeros(n, dtype=bool)
     for s, _ in outages:
         m[max(0, int(s) - 1):min(n, int(s) + 20)] = True
@@ -38,6 +49,8 @@ def shock_mask(tape: str, n: int) -> np.ndarray:
 def run_one(strategy: str, over: dict, tape: str) -> list[float]:
     sys.path.insert(0, str(ROOT))
     from fastsim.engine import run_backtest
+    if 'synth' in tape:
+        over = over | {'trade_start_us': 30_000_000}
     _, curve = run_backtest(ROOT / strategy, ROOT / tape, over or None)
     n = int(curve[-1][0]) + 1
     per = [0.0] * n
@@ -54,15 +67,18 @@ def main() -> None:
     ap.add_argument('variants', nargs='*')
     ap.add_argument('--base', default='{}')
     ap.add_argument('--tape', default='data/round4_public.csv')
+    ap.add_argument('--syn', default=None, help='sel | conf: fresh r4_synth tapes instead of --tape')
     ap.add_argument('--jobs', type=int, default=8)
     a = ap.parse_args()
     base = json.loads(a.base)
+    tapes = [f'data/synth/r4_sel_seed{k}.csv' for k in SYN[a.syn]] if a.syn else [a.tape]
     vs = [{}] + [json.loads(v) for v in a.variants]
     src = hashlib.sha1((ROOT / a.strategy).read_bytes()).hexdigest()[:12]
-    keys = [f'{src}|{json.dumps(base | v, sort_keys=True)}|{a.tape}' for v in vs]
+    keys = [[f'{src}|{json.dumps(base | v, sort_keys=True)}|{tp}' for tp in tapes] for v in vs]
     cache = json.loads(CACHE.read_text()) if CACHE.exists() else {}
     with ProcessPoolExecutor(a.jobs) as ex:
-        futs = {k: ex.submit(run_one, a.strategy, base | v, a.tape) for k, v in zip(keys, vs) if k not in cache}
+        futs = {k: ex.submit(run_one, a.strategy, base | v, tp)
+                for ks, v in zip(keys, vs) for k, tp in zip(ks, tapes) if k not in cache}
         for k, f in futs.items():
             cache[k] = f.result()
             disk = json.loads(CACHE.read_text()) if CACHE.exists() else {}
@@ -71,20 +87,27 @@ def main() -> None:
             tmp = CACHE.with_suffix(f'.{os.getpid()}.tmp')
             tmp.write_text(json.dumps(disk))
             os.replace(tmp, CACHE)
-    curves = [np.array(cache[k]) for k in keys]
-    n = min(len(c) for c in curves)
-    sm = shock_mask(a.tape, n)
-    b = curves[0][:n]
-    print(f'{Path(a.strategy).name} {json.dumps(base)[:50]} on {a.tape}: total {b.sum() / 1e3:.1f}k  '
-          f'shock {b[sm].sum() / 1e3:.1f}k  ex {b[~sm].sum() / 1e3:.1f}k  ({sm.sum()} shock s)')
-    for v, c in zip(vs[1:], curves[1:]):
-        d = c[:n] - b
-        dx = np.where(sm, 0.0, d)
-        parts = [dx[i:i + 500].sum() for i in range(0, n, 500)]
-        sd = statistics.stdev(parts)
+    masks, bases = [], []
+    for j, tp in enumerate(tapes):
+        n = min(len(cache[ks[j]]) for ks in keys)
+        masks.append(shock_mask(tp, n))
+        bases.append(np.array(cache[keys[0][j]][:n]))
+    tot = lambda cs, f: sum(f(c, m) for c, m in zip(cs, masks)) / 1e3  # noqa: E731
+    print(f'{Path(a.strategy).name} {json.dumps(base)[:50]} on {a.syn or a.tape}: total {tot(bases, lambda c, m: c.sum()):.1f}k  '
+          f'shock {tot(bases, lambda c, m: c[m].sum()):.1f}k  ex {tot(bases, lambda c, m: c[~m].sum()):.1f}k')
+    for v, ks in zip(vs[1:], keys[1:]):
+        parts, dsum, dsh = [], 0.0, 0.0
+        for j, (b, m) in enumerate(zip(bases, masks)):
+            c = np.array(cache[ks[j]][:len(b)])
+            d = c - b
+            dsum += d.sum()
+            dsh += d[m].sum()
+            dx = np.where(m, 0.0, d)
+            parts += [dx.sum()] if a.syn else [dx[i:i + 500].sum() for i in range(0, len(dx), 500)]
+        sd = statistics.stdev(parts) if len(parts) > 1 else 0.0
         t = statistics.fmean(parts) / (sd / math.sqrt(len(parts))) if sd else 0.0
-        print(f'{json.dumps(v)[:62]:62} d {d.sum() / 1e3:+7.1f}k  shock {d[sm].sum() / 1e3:+6.1f}k  '
-              f'ex {dx.sum() / 1e3:+6.1f}k t {t:+4.1f} won {sum(p > 0 for p in parts)}/{len(parts)}  | {c[:n].sum() / 1e3:.1f}k')
+        print(f'{json.dumps(v)[:62]:62} d {dsum / 1e3:+7.1f}k  shock {dsh / 1e3:+6.1f}k  '
+              f'ex {(dsum - dsh) / 1e3:+6.1f}k t {t:+4.1f} won {sum(p > 0 for p in parts)}/{len(parts)}')
 
 
 if __name__ == '__main__':

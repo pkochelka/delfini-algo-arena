@@ -1,15 +1,19 @@
-"""Paired evaluation of PARAMS variants against a base on the round-4 tape (fastsim, cached).
+"""Paired evaluation of PARAMS variants against a base: ONE run of the round-4 tape per model (fastsim, cached).
 
-    uv run python strategies/peter/r4_eval.py STRAT.py '{"k":1}' '{"k":2}' [--base '{}'] [--tier wf|hold|full|r3] [--jobs 9]
-    uv run python strategies/peter/r4_eval.py A.py --vs B.py --tier full     # compare two files
+    uv run python strategies/peter/r4_eval.py STRAT.py '{"k":1}' '{"k":2}' [--base '{}'] [--jobs 9]
+    uv run python strategies/peter/r4_eval.py A.py --vs B.py                  # compare two files
+    uv run python strategies/peter/r4_eval.py STRAT.py '{"k":1}' --tape data/round3_public.csv   # another tape
 
-Tiers:
-    wf    real round-4 wf01-12 (60 s warmup + ~370 s each, first 75 % of the tape): iterate here
-    hold  the 4 hold16 folds that lie past 4500 s (never tuned on): confirm here
-    full  the whole round-4 tape in one run, PnL per 500 s piece (12 pieces)
-    r3    real round-3 wf01-12: a cross-round sanity check (the private r4 tape is another draw)
-Each line: total delta, t-stat over windows/pieces, windows won, and the variant's own total.
-Cache: logs/r4/cache.json keyed by sha1(source) + params + window.
+Every model (strategy file + params) trades the whole tape once; all statistics are cut from that run's PnL
+curve (stored in 50 s bins), so nothing is re-run per fold:
+    total   whole-tape PnL
+    dev     PnL before 4500 s (the part the round-4 audit / splits treat as development)
+    hold    PnL from 4500 s on (never used for selection in splits_r4)
+    t, won  over the 12 500 s pieces of the paired delta
+Variants run in parallel, one process each (~4 min for a dev_best-sized strategy on round 4).
+Selection caveat: one public tape overfits (lamj_v/bj_v: +27k here, -36k on fresh synth). Confirm candidates on
+session db's fresh round-4 synth tapes: strategies/peter/r4_full.py STRAT.py '{...}' --syn sel.
+Cache: logs/r4/cache.json keyed by sha1(source) + params + tape.
 """
 from __future__ import annotations
 
@@ -27,39 +31,25 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 CACHE = ROOT / 'logs' / 'r4' / 'cache.json'
+BIN_S = 50.0
+PIECE_S = 500.0
+HOLD_S = 4500.0
+VER = 'one1'
 
 
-def windows(tier: str) -> tuple[list[dict], float]:
-    if tier == 'full':
-        return [{'path': 'data/round4_public.csv', 'start': 0}], 500.0
-    if tier == 'r3full':
-        return [{'path': 'data/round3_public.csv', 'start': 0}], 500.0
-    d = {'wf': 'data/splits_r4/wf', 'hold': 'data/splits_r4/hold16', 'r3': 'data/splits_r3/wf'}[tier]
-    fs = json.loads((ROOT / d / 'folds.json').read_text())['folds']
-    if tier == 'hold':
-        fs = [f for f in fs if f['eval_start_s'] >= 4500]
-    return [{'path': f'{d}/{f["file"]}', 'start': f['trade_start_us']} for f in fs], 0.0
-
-
-def run_one(strategy: str, over: dict, w: dict, win_s: float) -> dict:
+def run_one(strategy: str, over: dict, tape: str) -> dict:
     sys.path.insert(0, str(ROOT))
     from fastsim.engine import grader_config, run_backtest
-    params = over | ({'trade_start_us': w['start']} if w['start'] else {})
     try:
-        r, curve = run_backtest(strategy, ROOT / w['path'], params, config=grader_config())
+        r, curve = run_backtest(strategy, ROOT / tape, over, config=grader_config())
     except ValueError:  # strategy without PARAMS: no overrides possible
-        r, curve = run_backtest(strategy, ROOT / w['path'], None, config=grader_config())
-    parts = [0.0]
-    if win_s:
-        n = int(curve[-1][0] // win_s) + 1
-        parts, prev = [0.0] * n, 0.0
-        for s, v in curve:
-            parts[min(int(s // win_s), n - 1)] += v - prev
-            prev = v
-    else:
-        parts = [r.pnl]
-    return {'pnl': r.pnl, 'parts': parts, 'breach': r.breach_penalty, 'fills': r.fills,
-            'q95': r.abs_inventory_q95}
+        r, curve = run_backtest(strategy, ROOT / tape, None, config=grader_config())
+    n = int(curve[-1][0] // BIN_S) + 1
+    bins, prev = [0.0] * n, 0.0
+    for s, v in curve:
+        bins[min(int(s // BIN_S), n - 1)] += v - prev
+        prev = v
+    return {'pnl': r.pnl, 'bins': bins, 'breach': r.breach_penalty, 'fills': r.fills}
 
 
 def save(new: dict) -> None:
@@ -81,32 +71,38 @@ def tstat(d: list[float]) -> float:
     return statistics.fmean(d) / (sd / math.sqrt(len(d))) if sd else 0.0
 
 
+def split(r: dict) -> tuple[float, float, list[float]]:
+    b = r['bins']
+    k = int(HOLD_S // BIN_S)
+    per = int(PIECE_S // BIN_S)
+    pieces = [sum(b[i:i + per]) for i in range(0, len(b), per)]
+    return sum(b[:k]), sum(b[k:]), pieces
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('strategy')
     ap.add_argument('variants', nargs='*')
     ap.add_argument('--vs', action='append', default=[], help='other strategy files to compare against the base')
     ap.add_argument('--base', default='{}')
-    ap.add_argument('--tier', default='wf', choices=['wf', 'hold', 'full', 'r3', 'r3full'])
+    ap.add_argument('--tape', default='data/round4_public.csv')
     ap.add_argument('--jobs', type=int, default=9)
     ap.add_argument('--no-cache', action='store_true')
     a = ap.parse_args()
-    ws, win_s = windows(a.tier)
     cache = {} if a.no_cache or not CACHE.exists() else json.loads(CACHE.read_text())
     base = json.loads(a.base)
     runs = [(a.strategy, {})] + [(a.strategy, json.loads(v)) for v in a.variants] + [(s, {}) for s in a.vs]
 
-    def key(s, v, w):
+    def key(s, v):
         src = hashlib.sha1(Path(s).read_bytes()).hexdigest()[:12]
-        return f"{src}|{json.dumps(base | v, sort_keys=True)}|{w['path']}|{w['start']}|{win_s}"
+        return f"{src}|{json.dumps(base | v, sort_keys=True)}|{a.tape}|{VER}"
 
-    keys = [[key(s, v, w) for w in ws] for s, v in runs]
+    keys = [key(s, v) for s, v in runs]
     with ProcessPoolExecutor(a.jobs) as ex:
         futs = {}
-        for (s, v), ks in zip(runs, keys):
-            for w, k in zip(ws, ks):
-                if k not in cache and k not in futs:
-                    futs[k] = ex.submit(run_one, s, base | v, w, win_s)
+        for (s, v), k in zip(runs, keys):
+            if k not in cache and k not in futs:
+                futs[k] = ex.submit(run_one, s, base | v, a.tape)
 
         def get(k):
             if k not in cache:
@@ -114,17 +110,18 @@ def main() -> None:
                 save({k: cache[k]})
             return cache[k]
 
-        b = [get(k) for k in keys[0]]
-        tot = lambda rs: sum(r['pnl'] for r in rs) / 1e3  # noqa: E731
-        print(f"[{a.tier}: {len(ws)} windows, {len(futs)} runs] {Path(a.strategy).name} {json.dumps(base)[:60]}: "
-              f"{tot(b):.1f}k  parts {' '.join(f'{p / 1e3:.0f}' for r in b for p in r['parts'])}"
-              f"  breach {sum(r['breach'] for r in b):.0f}", flush=True)
-        for (s, v), ks in zip(runs[1:], keys[1:]):
-            rs = [get(k) for k in ks]
-            dw = [p - q for x, y in zip(rs, b) for p, q in zip(x['parts'], y['parts'])]
+        b = get(keys[0])
+        bd, bh, bp = split(b)
+        print(f"[{Path(a.tape).stem}: {len(futs)} runs] {Path(a.strategy).name} {json.dumps(base)[:60]}: "
+              f"total {b['pnl'] / 1e3:.1f}k  dev {bd / 1e3:.1f}k  hold {bh / 1e3:.1f}k  breach {b['breach']:.0f}"
+              f"  pieces {' '.join(f'{p / 1e3:.0f}' for p in bp)}", flush=True)
+        for (s, v), k in zip(runs[1:], keys[1:]):
+            r = get(k)
+            d, h, ps = split(r)
+            dw = [p - q for p, q in zip(ps, bp)]
             name = json.dumps(v) if s == a.strategy else Path(s).name
-            print(f"{name[:70]:70} d {sum(dw) / 1e3:+7.1f}k t {tstat(dw):+5.1f} won {sum(x > 0 for x in dw):2d}/{len(dw)}"
-                  f" | {tot(rs):7.1f}k breach {sum(r['breach'] for r in rs):.0f}", flush=True)
+            print(f"{name[:66]:66} d {(r['pnl'] - b['pnl']) / 1e3:+7.1f}k t {tstat(dw):+5.1f} won {sum(x > 0 for x in dw):2d}/{len(dw)}"
+                  f" | dev {(d - bd) / 1e3:+6.1f}k hold {(h - bh) / 1e3:+6.1f}k | {r['pnl'] / 1e3:7.1f}k", flush=True)
 
 
 if __name__ == '__main__':

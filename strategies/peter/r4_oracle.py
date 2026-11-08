@@ -14,6 +14,11 @@ Knobs (all 0 = r4_best exactly; the filter itself always keeps running, only dec
     or_reg   1: _turbulent := true volatile segment; 2: also the filter's regime prob pv := truth
     or_on    1: drought onset estimate := true onset
     or_jmp   1: from the true onset to the jump, F += the coming jump J (perfect shock direction and size)
+    or_vel   1: F += V_true(now) * or_h (perfect velocity; smoothed KF drift state)
+    or_kvh   causal, not an oracle: F += kv * or_kvh (calm) / or_kvh_v (volatile, default = or_kvh)
+    kvl_v/c  causal, via _r4_shift (turb flag of the strategy): F += kv * kvl_v (turbulent) / kvl_c (calm)
+    a15_k    causal: calm F += side * a15_k for a15_w s after a 15/10-lot same-side-touch insert 1 us after a fill/cancel
+    or_src   'S' smoothed (two-sided) or 'Sf' the offline model's causal filter mean
     or_win   restrict or_lvl / or_mov to 'all' | 'calm' | 'vol' | 'noshock' (true labels)
 """
 import importlib.util
@@ -29,7 +34,7 @@ M = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(M)
 PARAMS = M.PARAMS
 PARAMS.update({'or_lvl': 0, 'or_mov': 0, 'or_h': 1.0, 'or_sd': 0.05, 'or_reg': 0, 'or_on': 0, 'or_jmp': 0,
-               'or_win': 'all', 'or_truth': str(_ROOT / 'logs/r4/oracle_truth.npz')})
+               'or_win': 'all', 'or_src': 'S', 'or_vel': 0, 'or_kvh': 0.0, 'or_kvh_v': None, 'a15_k': 0.0, 'kvl_v': 0.0, 'kvl_c': 0.0, 'a15_w': 2.0, 'or_truth': str(_ROOT / 'logs/r4/oracle_truth.npz')})
 
 _T = {}
 
@@ -45,6 +50,8 @@ class Oracle(M.FVAShock):
     def __init__(self):
         super().__init__()
         self.or_saved = None
+        self.a15_s = 0
+        self.a15_t = -1e9
 
     # ---- truth lookups
     def _tr(self):
@@ -53,7 +60,8 @@ class Oracle(M.FVAShock):
     def _S(self, t):
         z = self._tr()
         i = int(np.searchsorted(z['t'], t, 'right'))  # first insert after t: S includes every event up to t
-        return float(z['S'][min(i, len(z['S']) - 1)])
+        a = z[self.p['or_src']]
+        return float(a[min(i, len(a) - 1)])
 
     def _vol(self, t):
         z = self._tr()
@@ -84,6 +92,15 @@ class Oracle(M.FVAShock):
             self.or_saved = None
         if f is not None and self.p['or_reg'] == 2:
             f.pv = 1 - 1e-4 if self._vol(snapshot.timestamp_us * 1e-6) else 1e-4
+        if self.p['a15_k'] and f is not None and snapshot.timestamp_us - self.prev_us == 1 and self.prev_kind != 0:
+            for sgn, views in ((1, snapshot.bids), (-1, snapshot.asks)):
+                top = next((v.price for v in views if v.owner == 'market'), None)
+                for v in views:
+                    if v.price != top:
+                        break
+                    if v.owner == 'market' and v.order_id > self.max_id and v.quantity in (15, 10):
+                        self.a15_s, self.a15_t = sgn, snapshot.timestamp_us * 1e-6
+                        self.n_a15 = getattr(self, 'n_a15', 0) + 1
         super().on_order_book_change(snapshot, trades)
         f = self.f
         if f is not None and self.or_saved is not None:  # sniper code ran with oracle F; restore for the filter
@@ -100,6 +117,15 @@ class Oracle(M.FVAShock):
                 new_F, new_sd = self._S(t), p['or_sd']
             if p['or_mov']:
                 new_F += self._S(t + p['or_h']) - self._S(t)
+        if p['or_vel'] and self._win_ok(t):
+            z = self._tr()
+            new_F += float(np.interp(t, z['vt'], z['V'])) * p['or_h']
+        if p['or_kvh'] or p['or_kvh_v']:
+            k = p['or_kvh_v'] if (p['or_kvh_v'] is not None and f.pv > 0.5) else p['or_kvh']
+            if self.sg_t is None:
+                new_F += f.kv * k
+        if p['a15_k'] and self.a15_s and t - self.a15_t < p['a15_w'] and not self._turbulent(f) and self.sg_t is None:
+            new_F += self.a15_s * p['a15_k']
         if p['or_jmp']:
             z = self._tr()
             j = int(np.searchsorted(z['on'], t, 'right')) - 1
@@ -109,6 +135,13 @@ class Oracle(M.FVAShock):
             self.or_saved = (F, sd)
             f.mean, f.sd = new_F, new_sd
         super()._quote(f, bb, ba, bids, asks)
+
+    def _r4_shift(self, f, turb):
+        d = super()._r4_shift(f, turb)
+        k = self.p['kvl_v'] if turb else self.p['kvl_c']
+        if k and self.sg_t is None:
+            d += k * f.kv
+        return d
 
     def _turbulent(self, f):
         if self.p['or_reg']:
