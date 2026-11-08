@@ -55,6 +55,17 @@ uv run exchange-simulator --strategy strategies/trend_follower.py --backtest dat
 
 `logs/sample/result.json` holds the outcome (`pnl`, `cash`, `inventory`, `mark_price`, `breach_penalty`, `traded_volume`, `fills`, `pnl_se`, time-weighted quantiles of `|inventory|`) and `pnl.csv` the PnL sampled every second. Without `--no-logs` the directory also gets `run.jsonl`, `events.csv`, `book_deltas.csv` and `trades.csv`, several hundred MB per full round. Use `--no-logs` when you only need the result and the PnL curve; it is much faster. `--public-depth N` (default 20) sets how many ticks of the book you see.
 
+## Fast backtests (dev only)
+
+```bash
+uv run fast-sim --strategy S.py --backtest data/round3.csv --log-dir logs/x [--set k=v ...] [--jit]
+uv run python -m fastsim.tape data/round3.csv data/synth/*.csv [--verify]   # pre-build parquet caches
+uv run python -m fastsim.parity [--record]                                   # fast vs reference, byte for byte
+uv run python -m fastsim.bench --backtest data/round3.csv --strategy S.py --repeat 2
+```
+
+`fastsim/` runs the reference engine (subclassed, matching logic inherited unchanged) from a parquet cache of the tape (`<csv dir>/.cache/<stem>-<size>-<mtime>-v1.parquet`, built on first use) with a leaner replay loop. It writes the same `result.json` and `pnl.csv` as `exchange-simulator --no-logs`, checked byte for byte by `fastsim.parity` on four strategies × two tapes and by `tests/test_fastsim.py`. `fastsim.pool.run_many` runs many (strategy, tape, PARAMS) jobs in worker processes; `marek/research/round3/strategy/eval3.py` uses it. `--jit` numba-compiles the functions a strategy lists in a module-level `JIT_KERNELS` tuple; the strategy file itself never imports numba, so it is submitted unchanged. Use `exchange-simulator` for full logs and as the final check before submitting.
+
 ## Walk-forward evaluation
 
 ```bash

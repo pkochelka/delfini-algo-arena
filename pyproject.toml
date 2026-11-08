@@ -26,6 +26,7 @@ data-explorer = "data_explorer.main:main"
 walk-forward = "walkforward.main:main"
 walk-forward-report = "walkforward.report:main"
 results-explorer = "results_explorer.report:main"
+fast-sim = "fastsim.main:main"
 
 [tool.uv]
 package = true
@@ -38,12 +39,14 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
+    "numba>=0.68.1",
     "optuna>=5.0.0",
+    "pyarrow>=26.0.1",
     "pytest>=9.2.0",
 ]
 
 [tool.setuptools.packages.find]
-include = ["simulator*", "explorer*", "analysis*", "data_explorer*", "walkforward*", "results_explorer*"]
+include = ["simulator*", "explorer*", "analysis*", "data_explorer*", "walkforward*", "results_explorer*", "fastsim*"]
 
 [tool.setuptools.package-data]
 explorer = ["assets/*"]

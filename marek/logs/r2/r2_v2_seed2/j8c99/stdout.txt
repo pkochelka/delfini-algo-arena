@@ -1,0 +1,198 @@
+DBG vol=1 t=114.361 pos=-100
+DBG vol=0 t=170.768 pos=-100
+DBG shock 1 t=189.516 n=48 pos=-31
+DBG vol=1 t=193.018 pos=0
+DBG vol=0 t=199.205 pos=-100
+DBG vol=1 t=340.651 pos=-19
+DBG vol=0 t=347.360 pos=100
+DBG shock 2 t=384.276 n=49 pos=0
+DBG jump dir=-1 t=387.070 dt=2.794 S0=10093.4 fb=10076 fa=None bb=10076 ba=10080 pos=0
+DBG vol=1 t=387.783 pos=0
+DBG vol=0 t=393.141 pos=-100
+DBG vol=1 t=441.042 pos=-38
+DBG vol=0 t=450.508 pos=-100
+DBG vol=1 t=539.325 pos=100
+DBG shock 3 t=656.443 n=48 pos=-100
+DBG jump dir=-1 t=659.237 dt=2.793 S0=10041.4 fb=10033 fa=None bb=10033 ba=10036 pos=0
+DBG vol=0 t=699.245 pos=100
+DBG vol=1 t=724.293 pos=93
+DBG vol=0 t=732.642 pos=100
+DBG shock 4 t=820.282 n=42 pos=100
+DBG jump dir=1 t=822.946 dt=2.664 S0=10071.1 fb=None fa=10084 bb=10073 ba=10074 pos=0
+DBG vol=1 t=824.071 pos=100
+DBG vol=0 t=921.349 pos=100
+DBG vol=1 t=926.417 pos=-100
+DBG vol=0 t=931.059 pos=100
+DBG vol=1 t=1015.941 pos=56
+DBG vol=0 t=1024.570 pos=-100
+DBG shock 5 t=1060.241 n=48 pos=100
+DBG jump dir=1 t=1062.994 dt=2.753 S0=9988.0 fb=None fa=9998 bb=9988 ba=9989 pos=0
+DBG vol=1 t=1210.514 pos=-100
+DBG vol=0 t=1263.301 pos=0
+DBG vol=1 t=1269.979 pos=0
+DBG vol=0 t=1278.570 pos=0
+DBG shock 6 t=1319.582 n=47 pos=-100
+DBG jump dir=-1 t=1322.252 dt=2.670 S0=10016.7 fb=10008 fa=None bb=10016 ba=10017 pos=0
+DBG vol=1 t=1323.083 pos=-55
+DBG vol=0 t=1332.429 pos=100
+DBG shock 7 t=1497.691 n=49 pos=29
+DBG jump dir=-1 t=1500.481 dt=2.791 S0=10007.2 fb=9984 fa=None bb=9984 ba=9986 pos=0
+DBG vol=1 t=1543.004 pos=-100
+DBG vol=0 t=1547.240 pos=100
+DBG vol=1 t=1594.554 pos=-100
+DBG vol=0 t=1605.634 pos=-100
+DBG vol=1 t=1652.207 pos=100
+DBG shock 8 t=1656.039 n=45 pos=-100
+DBG jump dir=-1 t=1658.801 dt=2.762 S0=9982.8 fb=9949 fa=None bb=9948 ba=9950 pos=0
+DBG vol=0 t=1659.544 pos=0
+DBG vol=1 t=1669.369 pos=-30
+DBG vol=0 t=1673.820 pos=0
+DBG vol=1 t=1751.960 pos=100
+DBG vol=0 t=1778.332 pos=-87
+DBG shock 9 t=1847.215 n=46 pos=27
+DBG jump dir=-1 t=1849.955 dt=2.740 S0=9936.5 fb=9928 fa=None bb=9935 ba=9936 pos=0
+DBG vol=1 t=1850.716 pos=-93
+DBG vol=0 t=1855.925 pos=-100
+DBG vol=1 t=1859.221 pos=15
+DBG vol=0 t=1879.149 pos=100
+DBG vol=1 t=1947.310 pos=53
+DBG vol=0 t=1951.659 pos=100
+DBG shock 10 t=2095.796 n=49 pos=25
+DBG jump dir=-1 t=2098.581 dt=2.786 S0=9907.8 fb=9870 fa=None bb=9870 ba=9906 pos=0
+DBG vol=1 t=2099.296 pos=0
+DBG vol=0 t=2105.401 pos=-100
+DBG vol=1 t=2234.366 pos=25
+DBG vol=0 t=2238.605 pos=-100
+DBG vol=1 t=2289.178 pos=85
+DBG vol=0 t=2297.999 pos=100
+DBG shock 11 t=2330.212 n=47 pos=100
+DBG jump dir=-1 t=2332.933 dt=2.721 S0=9864.8 fb=9851 fa=None bb=9833 ba=9834 pos=0
+DBG vol=1 t=2333.712 pos=0
+DBG vol=0 t=2343.977 pos=100
+DBG vol=1 t=2405.736 pos=100
+DBG vol=0 t=2445.176 pos=-35
+DBG vol=1 t=2468.574 pos=70
+DBG vol=0 t=2475.949 pos=100
+DBG shock 12 t=2502.786 n=48 pos=49
+DBG jump dir=1 t=2505.469 dt=2.683 S0=9900.7 fb=None fa=9933 bb=9930 ba=9933 pos=0
+DBG vol=1 t=2506.291 pos=0
+DBG vol=0 t=2514.549 pos=-100
+DBG vol=1 t=2524.504 pos=100
+DBG vol=0 t=2529.913 pos=100
+DBG vol=1 t=2649.303 pos=100
+DBG vol=0 t=2656.507 pos=100
+DBG vol=1 t=2665.861 pos=-100
+DBG shock 13 t=2717.670 n=49 pos=100
+DBG jump dir=1 t=2720.320 dt=2.649 S0=9942.9 fb=None fa=9981 bb=9939 ba=9981 pos=0
+DBG vol=0 t=2798.726 pos=-100
+DBG vol=1 t=2874.260 pos=-87
+DBG vol=0 t=2898.413 pos=100
+DBG shock 14 t=2967.954 n=49 pos=-82
+DBG jump dir=-1 t=2970.727 dt=2.773 S0=9908.5 fb=9888 fa=None bb=9888 ba=9890 pos=0
+DBG vol=1 t=2971.458 pos=0
+DBG vol=0 t=2978.196 pos=100
+DBG vol=1 t=3013.267 pos=100
+DBG vol=0 t=3023.554 pos=-100
+DBG vol=1 t=3164.211 pos=-100
+DBG vol=0 t=3168.698 pos=100
+DBG shock 15 t=3181.428 n=48 pos=17
+DBG jump dir=-1 t=3184.154 dt=2.726 S0=9882.6 fb=9849 fa=None bb=9849 ba=9852 pos=0
+DBG vol=1 t=3184.932 pos=0
+DBG vol=0 t=3247.534 pos=100
+DBG vol=1 t=3297.211 pos=-100
+DBG vol=0 t=3301.496 pos=-100
+DBG shock 16 t=3426.390 n=48 pos=100
+DBG jump dir=-1 t=3429.108 dt=2.718 S0=9801.6 fb=9714 fa=None bb=9714 ba=9716 pos=0
+DBG vol=1 t=3449.593 pos=-100
+DBG vol=0 t=3462.707 pos=100
+DBG vol=1 t=3492.009 pos=94
+DBG vol=0 t=3497.572 pos=100
+DBG vol=1 t=3574.751 pos=0
+DBG vol=0 t=3581.186 pos=50
+DBG vol=1 t=3650.930 pos=100
+DBG vol=0 t=3710.653 pos=100
+DBG shock 17 t=3721.586 n=47 pos=67
+DBG jump dir=-1 t=3724.231 dt=2.645 S0=9645.8 fb=9632 fa=None bb=9644 ba=9647 pos=0
+DBG vol=1 t=3733.475 pos=-92
+DBG vol=0 t=3737.506 pos=-100
+DBG vol=1 t=3870.981 pos=-25
+DBG vol=0 t=3875.226 pos=100
+DBG vol=1 t=3974.027 pos=-100
+DBG shock 18 t=3974.051 n=48 pos=-100
+DBG vol=0 t=3985.406 pos=100
+DBG vol=1 t=4000.702 pos=-100
+DBG vol=0 t=4140.109 pos=100
+DBG shock 19 t=4182.730 n=46 pos=100
+DBG jump dir=-1 t=4185.433 dt=2.703 S0=9654.9 fb=9639 fa=None bb=9639 ba=9654 pos=0
+DBG vol=1 t=4220.295 pos=100
+DBG vol=0 t=4290.145 pos=100
+DBG shock 20 t=4360.827 n=49 pos=-100
+DBG jump dir=-1 t=4363.514 dt=2.686 S0=9680.1 fb=9664 fa=None bb=9680 ba=9681 pos=0
+DBG vol=1 t=4364.328 pos=-14
+DBG vol=0 t=4372.216 pos=100
+DBG vol=1 t=4416.968 pos=-90
+DBG vol=0 t=4454.730 pos=-100
+DBG vol=1 t=4467.554 pos=12
+DBG vol=0 t=4476.950 pos=100
+DBG vol=1 t=4537.228 pos=-100
+DBG vol=0 t=4558.202 pos=100
+DBG shock 21 t=4562.738 n=45 pos=-27
+DBG jump dir=1 t=4565.427 dt=2.689 S0=9649.2 fb=None fa=9690 bb=9650 ba=9690 pos=-13
+DBG vol=1 t=4566.240 pos=-6
+DBG vol=0 t=4572.140 pos=-100
+DBG vol=1 t=4625.091 pos=100
+DBG vol=0 t=4719.755 pos=-100
+DBG shock 22 t=4789.346 n=48 pos=-78
+DBG jump dir=1 t=4792.117 dt=2.771 S0=9607.6 fb=None fa=9637 bb=9608 ba=9637 pos=0
+DBG vol=1 t=4792.848 pos=0
+DBG vol=0 t=4799.918 pos=-100
+DBG vol=1 t=4863.340 pos=68
+DBG vol=0 t=4867.631 pos=-100
+DBG vol=1 t=4909.079 pos=-100
+DBG vol=0 t=4929.000 pos=-100
+DBG vol=1 t=4992.444 pos=-83
+DBG vol=0 t=4999.138 pos=-100
+DBG vol=1 t=5017.708 pos=-100
+DBG vol=0 t=5027.017 pos=100
+DBG vol=1 t=5052.908 pos=100
+DBG vol=0 t=5068.631 pos=-100
+DBG shock 23 t=5073.021 n=48 pos=-100
+DBG jump dir=-1 t=5075.835 dt=2.814 S0=9685.9 fb=9664 fa=9697 bb=9664 ba=9665 pos=0
+DBG vol=1 t=5085.923 pos=-100
+DBG vol=0 t=5243.111 pos=100
+DBG vol=1 t=5320.800 pos=61
+DBG shock 24 t=5339.435 n=46 pos=100
+DBG jump dir=1 t=5342.150 dt=2.715 S0=9615.9 fb=None fa=9691 bb=9688 ba=9690 pos=0
+DBG vol=0 t=5361.385 pos=-100
+DBG vol=1 t=5442.707 pos=-100
+DBG vol=0 t=5447.082 pos=100
+DBG shock 25 t=5537.199 n=48 pos=100
+DBG jump dir=1 t=5539.814 dt=2.616 S0=9694.2 fb=None fa=9752 bb=9694 ba=9752 pos=0
+DBG vol=1 t=5540.702 pos=0
+DBG vol=0 t=5547.775 pos=100
+DBG vol=1 t=5560.744 pos=71
+DBG vol=0 t=5564.853 pos=-100
+DBG vol=1 t=5577.016 pos=67
+DBG vol=0 t=5583.718 pos=-100
+DBG vol=1 t=5664.253 pos=-100
+DBG vol=0 t=5669.216 pos=-100
+DBG vol=1 t=5712.352 pos=-100
+DBG vol=0 t=5733.690 pos=-100
+DBG shock 26 t=5825.730 n=48 pos=100
+DBG jump dir=1 t=5828.473 dt=2.743 S0=9736.5 fb=None fa=9832 bb=9831 ba=9832 pos=0
+DBG vol=1 t=5881.326 pos=75
+DBG vol=0 t=5893.320 pos=100
+Simulation complete
+fills=12848
+traded_volume=959656
+inventory=-100
+cash=1464005.00
+mark_price=9826.18
+breach_penalty=0.00
+pnl=481387.00
+pnl_se=20239.06
+abs_inventory_q50=100
+abs_inventory_q68=100
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=/Users/marek/Documents/delfini-algo-arena/marek/logs/r2/r2_v2_seed2/j8c99

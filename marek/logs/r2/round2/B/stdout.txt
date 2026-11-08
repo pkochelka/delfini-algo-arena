@@ -1,0 +1,144 @@
+DBG vol_in t=47.326 pos=100
+DBG vol_out t=67.123 pos=0
+DBG vol_in t=105.079 pos=-82
+DBG vol_out t=109.272 pos=0
+DBG vol_in t=271.568 pos=37
+DBG vol_out t=283.324 pos=0
+DBG vol_in t=344.270 pos=29
+DBG vol_out t=374.487 pos=0
+DBG vol_in t=421.470 pos=-100
+DBG vol_out t=429.237 pos=0
+DBG vol_in t=444.473 pos=-69
+DBG vol_out t=453.177 pos=0
+DBG vol_in t=483.789 pos=-100
+DBG vol_out t=520.283 pos=0
+DBG vol_in t=661.785 pos=-100
+DBG vol_out t=671.539 pos=0
+DBG vol_in t=777.641 pos=20
+DBG vol_out t=786.437 pos=0
+DBG vol_in t=841.547 pos=-100
+DBG vol_out t=851.762 pos=0
+DBG vol_in t=973.993 pos=100
+DBG vol_out t=979.051 pos=0
+DBG vol_in t=1068.674 pos=39
+DBG vol_out t=1077.300 pos=0
+DBG vol_in t=1230.467 pos=0
+DBG vol_out t=1234.660 pos=0
+DBG vol_in t=1243.314 pos=-92
+DBG vol_out t=1253.129 pos=0
+DBG vol_in t=1286.390 pos=7
+DBG vol_out t=1294.777 pos=0
+DBG vol_in t=1419.643 pos=100
+DBG vol_out t=1424.339 pos=0
+DBG vol_in t=1469.810 pos=100
+DBG vol_out t=1475.649 pos=0
+DBG vol_in t=1535.097 pos=100
+DBG vol_out t=1539.348 pos=0
+DBG vol_in t=1543.338 pos=5
+DBG vol_out t=1568.334 pos=0
+DBG vol_in t=1639.429 pos=39
+DBG vol_out t=1644.061 pos=0
+DBG vol_in t=1655.251 pos=80
+DBG vol_out t=1666.249 pos=0
+DBG vol_in t=1722.739 pos=-61
+DBG vol_out t=1731.819 pos=0
+DBG vol_in t=1791.393 pos=25
+DBG vol_out t=1805.917 pos=0
+DBG vol_in t=1821.759 pos=-100
+DBG vol_out t=1835.443 pos=0
+DBG vol_in t=1967.368 pos=-100
+DBG vol_out t=1976.351 pos=0
+DBG vol_in t=2015.926 pos=-64
+DBG vol_out t=2028.193 pos=0
+DBG vol_in t=2032.789 pos=0
+DBG vol_out t=2149.384 pos=0
+DBG vol_in t=2151.338 pos=100
+DBG vol_out t=2163.070 pos=0
+DBG vol_in t=2224.817 pos=-100
+DBG vol_out t=2228.889 pos=0
+DBG vol_in t=2261.833 pos=63
+DBG vol_out t=2270.812 pos=0
+DBG vol_in t=2443.718 pos=-76
+DBG vol_out t=2447.767 pos=0
+DBG vol_in t=2464.954 pos=-21
+DBG vol_out t=2478.128 pos=0
+DBG vol_in t=2501.621 pos=-100
+DBG vol_out t=2506.219 pos=0
+DBG vol_in t=2523.130 pos=-100
+DBG vol_out t=2527.233 pos=0
+DBG vol_in t=2601.141 pos=-100
+DBG vol_out t=2635.527 pos=0
+DBG vol_in t=2667.660 pos=-100
+DBG vol_out t=2688.908 pos=0
+DBG vol_in t=2756.573 pos=-99
+DBG vol_out t=2769.887 pos=0
+DBG vol_in t=3016.790 pos=-100
+DBG vol_out t=3032.983 pos=0
+DBG vol_in t=3053.965 pos=74
+DBG vol_out t=3062.511 pos=0
+DBG vol_in t=3206.343 pos=-100
+DBG vol_out t=3215.953 pos=0
+DBG vol_in t=3420.634 pos=-35
+DBG vol_out t=3430.082 pos=0
+DBG vol_in t=3515.943 pos=-100
+DBG vol_out t=3520.118 pos=0
+DBG vol_in t=3618.356 pos=-52
+DBG vol_out t=3628.408 pos=0
+DBG vol_in t=3633.088 pos=100
+DBG vol_out t=3741.809 pos=0
+DBG vol_in t=3817.724 pos=100
+DBG vol_out t=4038.214 pos=0
+DBG vol_in t=4067.264 pos=13
+DBG vol_out t=4073.628 pos=0
+DBG vol_in t=4096.787 pos=100
+DBG vol_out t=4104.216 pos=0
+DBG vol_in t=4211.213 pos=76
+DBG vol_out t=4215.659 pos=0
+DBG vol_in t=4227.220 pos=64
+DBG vol_out t=4239.209 pos=0
+DBG vol_in t=4249.942 pos=-11
+DBG vol_out t=4343.864 pos=0
+DBG vol_in t=4412.205 pos=100
+DBG vol_out t=4420.410 pos=0
+DBG vol_in t=4441.334 pos=100
+DBG vol_out t=4445.432 pos=0
+DBG vol_in t=4582.345 pos=25
+DBG vol_out t=4591.312 pos=0
+DBG vol_in t=4650.706 pos=100
+DBG vol_out t=4660.212 pos=0
+DBG vol_in t=4823.176 pos=0
+DBG vol_out t=4835.840 pos=0
+DBG vol_in t=4967.292 pos=0
+DBG vol_out t=4989.828 pos=0
+DBG vol_in t=5190.029 pos=-78
+DBG vol_out t=5199.681 pos=0
+DBG vol_in t=5232.918 pos=57
+DBG vol_out t=5236.915 pos=0
+DBG vol_in t=5396.297 pos=-69
+DBG vol_out t=5433.056 pos=0
+DBG vol_in t=5445.968 pos=-100
+DBG vol_out t=5452.329 pos=0
+DBG vol_in t=5492.281 pos=-100
+DBG vol_out t=5511.883 pos=0
+DBG vol_in t=5567.259 pos=-44
+DBG vol_out t=5580.726 pos=0
+DBG vol_in t=5615.757 pos=-100
+DBG vol_out t=5728.107 pos=0
+DBG vol_in t=5843.241 pos=-100
+DBG vol_out t=5851.907 pos=0
+DBG vol_in t=5878.320 pos=100
+DBG vol_out t=5894.322 pos=0
+Simulation complete
+fills=6894
+traded_volume=543538
+inventory=38
+cash=-258140.00
+mark_price=9689.00
+breach_penalty=0.00
+pnl=110042.00
+pnl_se=8492.07
+abs_inventory_q50=71
+abs_inventory_q68=100
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=/Users/marek/Documents/delfini-algo-arena/marek/logs/r2/round2/B

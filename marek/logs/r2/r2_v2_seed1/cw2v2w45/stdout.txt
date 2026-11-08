@@ -1,0 +1,225 @@
+DBG vol=1 t=0.741 pos=-15
+DBG vol=0 t=5.544 pos=-100
+DBG vol=1 t=101.815 pos=-100
+DBG vol=0 t=110.587 pos=0
+DBG vol=1 t=168.493 pos=100
+DBG vol=0 t=181.029 pos=100
+DBG vol=1 t=193.828 pos=16
+DBG vol=0 t=198.144 pos=0
+DBG shock 1 t=227.094 n=46 pos=92
+DBG jump dir=1 t=229.781 dt=2.688 S0=9979.9 fb=None fa=None bb=9980 ba=9981 pos=0
+DBG sweep BUY lim=9981 q=100 avail=102 t=229.781 bb=9980 ba=9981
+DBG vol=1 t=230.598 pos=0
+DBG vol=0 t=236.910 pos=-100
+DBG vol=1 t=304.049 pos=100
+DBG vol=0 t=442.886 pos=100
+DBG shock 2 t=519.719 n=45 pos=-100
+DBG jump dir=-1 t=522.356 dt=2.636 S0=9883.8 fb=None fa=None bb=9882 ba=9883 pos=0
+DBG sweep SELL lim=9882 q=100 avail=193 t=522.356 bb=9882 ba=9883
+DBG vol=1 t=523.222 pos=-57
+DBG vol=0 t=530.214 pos=100
+DBG vol=1 t=609.881 pos=100
+DBG shock 3 t=691.261 n=48 pos=-100
+DBG jump dir=-1 t=693.887 dt=2.626 S0=9818.1 fb=None fa=None bb=9817 ba=9818 pos=0
+DBG sweep SELL lim=9817 q=100 avail=131 t=693.887 bb=9817 ba=9818
+DBG vol=0 t=780.411 pos=100
+DBG shock 4 t=983.712 n=48 pos=-87
+DBG jump dir=-1 t=986.354 dt=2.642 S0=9765.9 fb=9696 fa=None bb=9696 ba=9766 pos=0
+DBG vol=1 t=987.215 pos=0
+DBG vol=0 t=993.990 pos=100
+DBG vol=1 t=1027.438 pos=-100
+DBG vol=0 t=1035.115 pos=100
+DBG vol=1 t=1062.041 pos=16
+DBG vol=0 t=1066.178 pos=100
+DBG vol=1 t=1101.136 pos=-100
+DBG vol=0 t=1110.040 pos=-100
+DBG vol=1 t=1159.502 pos=-17
+DBG vol=0 t=1169.183 pos=-100
+DBG shock 5 t=1180.298 n=49 pos=35
+DBG jump dir=-1 t=1183.057 dt=2.759 S0=9663.6 fb=None fa=None bb=9660 ba=9661 pos=0
+DBG sweep SELL lim=9660 q=2 avail=2 t=1183.057 bb=9660 ba=9661
+DBG vol=1 t=1183.806 pos=0
+DBG vol=0 t=1191.911 pos=100
+DBG vol=1 t=1229.477 pos=-100
+DBG vol=0 t=1234.131 pos=-100
+DBG vol=1 t=1335.662 pos=100
+DBG vol=0 t=1351.878 pos=0
+DBG shock 6 t=1393.826 n=47 pos=-91
+DBG jump dir=1 t=1396.546 dt=2.721 S0=9520.8 fb=None fa=9533 bb=9522 ba=9523 pos=0
+DBG sweep BUY lim=9531 q=100 avail=1046 t=1396.546 bb=9522 ba=9523
+DBG vol=1 t=1460.215 pos=-27
+DBG vol=0 t=1466.087 pos=100
+DBG vol=1 t=1478.129 pos=-95
+DBG vol=0 t=1485.585 pos=100
+DBG vol=1 t=1526.487 pos=0
+DBG vol=0 t=1530.871 pos=100
+DBG vol=1 t=1582.450 pos=-100
+DBG vol=0 t=1586.440 pos=-100
+DBG vol=1 t=1603.452 pos=13
+DBG vol=0 t=1608.569 pos=-100
+DBG shock 7 t=1668.041 n=49 pos=-100
+DBG jump dir=1 t=1670.723 dt=2.682 S0=9527.3 fb=None fa=9550 bb=9527 ba=9550 pos=0
+DBG vol=1 t=1671.545 pos=0
+DBG vol=0 t=1676.831 pos=100
+DBG vol=1 t=1689.235 pos=100
+DBG vol=0 t=1693.558 pos=-100
+DBG vol=1 t=1745.895 pos=100
+DBG vol=0 t=1754.458 pos=100
+DBG vol=1 t=1780.184 pos=76
+DBG vol=0 t=1799.603 pos=100
+DBG shock 8 t=1879.366 n=45 pos=0
+DBG jump dir=-1 t=1882.131 dt=2.765 S0=9543.0 fb=9452 fa=None bb=9452 ba=9547 pos=0
+DBG vol=1 t=2028.509 pos=12
+DBG vol=0 t=2034.154 pos=-100
+DBG shock 9 t=2111.704 n=49 pos=-35
+DBG jump dir=-1 t=2114.513 dt=2.808 S0=9428.0 fb=None fa=None bb=9426 ba=9427 pos=0
+DBG sweep SELL lim=9426 q=100 avail=106 t=2114.513 bb=9426 ba=9427
+DBG sweep SELL lim=9405 q=1 avail=1 t=2114.530 bb=9422 ba=9427
+DBG vol=1 t=2119.086 pos=81
+DBG vol=0 t=2124.026 pos=-100
+DBG vol=1 t=2127.854 pos=-42
+DBG vol=0 t=2140.098 pos=0
+DBG vol=1 t=2216.328 pos=-100
+DBG vol=0 t=2220.373 pos=100
+DBG shock 10 t=2265.911 n=48 pos=-75
+DBG jump dir=1 t=2268.654 dt=2.743 S0=9430.3 fb=None fa=None bb=9431 ba=9432 pos=0
+DBG sweep BUY lim=9432 q=100 avail=116 t=2268.654 bb=9431 ba=9432
+DBG vol=1 t=2269.415 pos=100
+DBG vol=0 t=2279.230 pos=50
+DBG vol=1 t=2492.288 pos=-15
+DBG vol=0 t=2502.176 pos=100
+DBG shock 11 t=2528.960 n=44 pos=100
+DBG jump dir=-1 t=2531.739 dt=2.780 S0=9517.9 fb=9428 fa=None bb=9428 ba=9429 pos=0
+DBG vol=1 t=2571.140 pos=71
+DBG vol=0 t=2672.705 pos=100
+DBG vol=1 t=2694.159 pos=-100
+DBG vol=0 t=2699.487 pos=-100
+DBG shock 12 t=2759.772 n=48 pos=-64
+DBG jump dir=1 t=2762.427 dt=2.656 S0=9397.3 fb=None fa=None bb=9398 ba=9399 pos=0
+DBG sweep BUY lim=9399 q=57 avail=57 t=2762.427 bb=9398 ba=9399
+DBG sweep BUY lim=9402 q=43 avail=70 t=2762.436 bb=9398 ba=9402
+DBG vol=1 t=2931.586 pos=41
+DBG vol=0 t=2938.662 pos=100
+DBG shock 13 t=2959.080 n=48 pos=-100
+DBG jump dir=1 t=2961.855 dt=2.775 S0=9486.2 fb=None fa=None bb=9487 ba=9488 pos=0
+DBG sweep BUY lim=9488 q=74 avail=74 t=2961.855 bb=9487 ba=9488
+DBG sweep BUY lim=9489 q=26 avail=215 t=2961.863 bb=9487 ba=9489
+DBG vol=1 t=3124.228 pos=-36
+DBG vol=0 t=3128.759 pos=-100
+DBG vol=1 t=3217.522 pos=67
+DBG shock 14 t=3227.447 n=48 pos=100
+DBG jump dir=1 t=3230.128 dt=2.681 S0=9559.9 fb=None fa=9604 bb=9563 ba=9603 pos=0
+DBG vol=0 t=3262.656 pos=-100
+DBG vol=1 t=3304.173 pos=100
+DBG vol=0 t=3316.897 pos=-100
+DBG shock 15 t=3422.960 n=49 pos=-100
+DBG jump dir=1 t=3425.609 dt=2.649 S0=9655.5 fb=None fa=None bb=9656 ba=9657 pos=0
+DBG sweep BUY lim=9657 q=100 avail=114 t=3425.609 bb=9656 ba=9657
+DBG sweep BUY lim=9661 q=1 avail=1 t=3425.618 bb=9656 ba=9661
+DBG vol=1 t=3426.462 pos=0
+DBG vol=0 t=3433.588 pos=-100
+DBG vol=1 t=3556.088 pos=27
+DBG vol=0 t=3563.019 pos=100
+DBG vol=1 t=3626.713 pos=42
+DBG vol=0 t=3634.204 pos=0
+DBG shock 16 t=3640.947 n=48 pos=-41
+DBG jump dir=1 t=3643.624 dt=2.677 S0=9709.8 fb=None fa=None bb=9710 ba=9711 pos=0
+DBG sweep BUY lim=9711 q=51 avail=51 t=3643.624 bb=9710 ba=9711
+DBG sweep BUY lim=9712 q=15 avail=15 t=3643.632 bb=9710 ba=9712
+DBG sweep BUY lim=9713 q=23 avail=23 t=3643.638 bb=9710 ba=9713
+DBG vol=1 t=3644.447 pos=60
+DBG vol=0 t=3652.798 pos=50
+DBG vol=1 t=3663.594 pos=100
+DBG vol=0 t=3669.727 pos=-100
+DBG vol=1 t=3737.120 pos=36
+DBG vol=0 t=3743.862 pos=-100
+DBG vol=1 t=3746.348 pos=-100
+DBG vol=0 t=3764.739 pos=-100
+DBG shock 17 t=3811.009 n=49 pos=5
+DBG jump dir=1 t=3813.732 dt=2.723 S0=9761.0 fb=None fa=None bb=9763 ba=9764 pos=0
+DBG sweep BUY lim=9764 q=100 avail=217 t=3813.732 bb=9763 ba=9764
+DBG shock 18 t=4021.532 n=45 pos=21
+DBG jump dir=1 t=4024.230 dt=2.698 S0=9800.3 fb=None fa=None bb=9801 ba=9802 pos=0
+DBG sweep BUY lim=9802 q=100 avail=123 t=4024.230 bb=9801 ba=9802
+DBG vol=1 t=4025.033 pos=26
+DBG vol=0 t=4033.199 pos=-100
+DBG vol=1 t=4042.091 pos=-35
+DBG vol=0 t=4047.885 pos=-100
+DBG shock 19 t=4202.021 n=49 pos=-100
+DBG jump dir=-1 t=4204.723 dt=2.702 S0=9869.1 fb=None fa=None bb=9867 ba=9868 pos=0
+DBG sweep SELL lim=9867 q=100 avail=147 t=4204.723 bb=9867 ba=9868
+DBG vol=1 t=4305.612 pos=100
+DBG vol=0 t=4313.441 pos=0
+DBG vol=1 t=4350.193 pos=-43
+DBG vol=0 t=4354.546 pos=-100
+DBG shock 20 t=4391.467 n=48 pos=100
+DBG jump dir=-1 t=4394.063 dt=2.596 S0=9846.5 fb=None fa=None bb=9844 ba=9845 pos=22
+DBG sweep SELL lim=9844 q=100 avail=3517 t=4394.063 bb=9844 ba=9845
+DBG sweep SELL lim=9844 q=22 avail=3417 t=4394.071 bb=9844 ba=9845
+DBG vol=1 t=4394.968 pos=-100
+DBG vol=0 t=4400.032 pos=-100
+DBG vol=1 t=4452.458 pos=-100
+DBG vol=0 t=4457.345 pos=0
+DBG vol=1 t=4496.802 pos=100
+DBG vol=0 t=4504.448 pos=100
+DBG vol=1 t=4546.713 pos=25
+DBG shock 21 t=4653.943 n=49 pos=-100
+DBG jump dir=-1 t=4656.649 dt=2.705 S0=9921.8 fb=9841 fa=None bb=9841 ba=9842 pos=0
+DBG vol=0 t=4662.492 pos=-100
+DBG shock 22 t=4846.030 n=49 pos=-65
+DBG jump dir=1 t=4848.757 dt=2.726 S0=9873.9 fb=None fa=9887 bb=9876 ba=9877 pos=0
+DBG sweep BUY lim=9885 q=100 avail=373 t=4848.757 bb=9876 ba=9877
+DBG vol=1 t=4849.534 pos=100
+DBG vol=0 t=4858.662 pos=100
+DBG vol=1 t=4894.680 pos=90
+DBG vol=0 t=4898.821 pos=100
+DBG vol=1 t=4958.490 pos=-93
+DBG shock 23 t=5068.690 n=44 pos=-100
+DBG jump dir=-1 t=5071.237 dt=2.546 S0=9905.2 fb=None fa=None bb=9900 ba=9901 pos=0
+DBG sweep SELL lim=9900 q=100 avail=805 t=5071.237 bb=9900 ba=9901
+DBG vol=0 t=5225.289 pos=0
+DBG vol=1 t=5265.256 pos=21
+DBG vol=0 t=5281.545 pos=100
+DBG vol=1 t=5350.602 pos=-100
+DBG vol=0 t=5354.780 pos=100
+DBG shock 24 t=5366.033 n=47 pos=-100
+DBG jump dir=-1 t=5368.576 dt=2.543 S0=9847.1 fb=None fa=None bb=9846 ba=9847 pos=0
+DBG sweep SELL lim=9846 q=71 avail=71 t=5368.576 bb=9846 ba=9847
+DBG sweep SELL lim=9845 q=100 avail=357 t=5368.588 bb=9845 ba=9846
+DBG sweep SELL lim=9818 q=50 avail=50 t=5368.598 bb=9818 ba=9846
+DBG vol=1 t=5382.110 pos=-75
+DBG vol=0 t=5386.293 pos=-100
+DBG vol=1 t=5409.991 pos=-100
+DBG vol=0 t=5455.664 pos=100
+DBG vol=1 t=5456.810 pos=25
+DBG vol=0 t=5463.334 pos=100
+DBG vol=1 t=5589.235 pos=100
+DBG vol=0 t=5634.158 pos=0
+DBG shock 25 t=5660.258 n=49 pos=-91
+DBG jump dir=1 t=5662.824 dt=2.566 S0=9804.2 fb=None fa=None bb=9805 ba=9806 pos=0
+DBG sweep BUY lim=9806 q=100 avail=166 t=5662.824 bb=9805 ba=9806
+DBG vol=1 t=5663.760 pos=0
+DBG vol=0 t=5669.613 pos=100
+DBG vol=1 t=5804.226 pos=-100
+DBG vol=0 t=5850.872 pos=100
+DBG vol=1 t=5892.502 pos=-13
+DBG vol=0 t=5899.224 pos=0
+DBG shock 26 t=5918.910 n=48 pos=100
+DBG jump dir=1 t=5921.536 dt=2.626 S0=9788.9 fb=None fa=None bb=9791 ba=9792 pos=0
+DBG sweep BUY lim=9792 q=31 avail=31 t=5921.536 bb=9791 ba=9792
+DBG vol=1 t=5937.158 pos=100
+DBG vol=0 t=5950.243 pos=-100
+Simulation complete
+fills=12784
+traded_volume=947360
+inventory=-96
+cash=1423169.00
+mark_price=9794.00
+breach_penalty=0.00
+pnl=482945.00
+pnl_se=25195.69
+abs_inventory_q50=100
+abs_inventory_q68=100
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=/Users/marek/Documents/delfini-algo-arena/marek/logs/r2/r2_v2_seed1/cw2v2w45

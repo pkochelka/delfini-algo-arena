@@ -1,0 +1,10 @@
+{
+  "trader": "marek",
+  "trader_class": "SigLadder",
+  "data_file": "/Users/marek/Documents/delfini-algo-arena/data/stress/wf03_takers3.csv",
+  "latency": 0.005,
+  "position_limit": 100,
+  "max_potential_position": 1000,
+  "position_breach_penalty_per_second": 10000.0,
+  "run_timestamp": "2026-11-07T17:38:01.569001"
+}

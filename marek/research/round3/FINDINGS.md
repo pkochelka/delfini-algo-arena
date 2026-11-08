@@ -251,3 +251,25 @@ priority without spending room; ≈ 45k of shock value left (shocks 2, 14, 20).
    the ladder's clock, those constants must be re-measured (the eta increase is the generic fallback).
 7. **Commit:** none of this is committed yet (strategy files, `marek/research/round3/strategy/`, this file).
 
+
+## E. HMM regime angle (2026-11-08)
+
+Details: `hmm/README.md`. A fitted multi-stream Poisson HMM recovers the generator's three regimes (calm, volatile,
+3 s drought; BIC prefers K = 3 among real regimes, K ≥ 4 only splits bursty ladder activity), all already modelled.
+Quotes at the takers' own limit price capture impact-free residuals (+2.6/lot at 1 s in volatile) but only on the
+momentum side where room is already used; every way of making room for them lost (−9k to −90k). Hindsight DP: volatile
+take selection optimal 345k vs greedy 240k, no threshold rule beats greedy. Sweep of 63 knobs on r3_dev_best: flat.
+New file `strategies/marek/round3/r3_hmm.py` (take_sd 1.0, take_sd_t 1.0): **857.6k** (+3.9k, noise level).
+
+## F. Push sprint (2026-11-08 05:10-05:45)
+
+Six agents on `r3_hmm.py` (857.6k), real tape only, tags xs*/xr*/xf*/evo* in `strategy/results.jsonl`.
+- **Kept:** `dr_theta 1.0, dr_margin 0.2` → `strategies/marek/round3/r3_push.py` **863.3k** (calm −0.8k, vol +0.1k, shock +6.4k;
+  +9.7k without the biggest shock). Fragile: dr_theta 1.1 or dr_margin 0.15 lose 7-10k (shock #18 flips −12..−15k).
+- **Dead:** size_top 15-75 (−13..−21k), min_post, take_q (−9..−35k), cap_t 90 (−48k), volatile reduce-only IOC
+  (`r3_x_room.py` tr_take_t, flat/−17k), extra take edge past |pos| 70 (rt_*), base-maker-cancel F shift
+  (`r3_x_filt.py` ca_*, −9..−85k both signs), taker-stop S bound (tk_*, calm negative everywhere), lad_wait/lad_tol, grid
+  h 0.025, d0/d0_v, max_sd, ss_shots/gap/hold, sg_thr/sg_win, shock_lead/len, shock_flat, ps_on, dr_fu 2.
+- **Evolutionary tournaments** (3 agents, champion vs 2 mutants per 500 s window tape `data/r3win/round3_wNN.csv`, ~10 s/run):
+  every evolved champion lost on the full tape (calm −1.3..−10.2k, volatile −7.1k, shock −15.0k). Window noise ≫ knob effects;
+  a +500 window margin selects noise.

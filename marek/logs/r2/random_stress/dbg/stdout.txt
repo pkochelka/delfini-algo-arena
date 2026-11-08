@@ -1,0 +1,286 @@
+DBG vol=1 t=0.155 pos=-90
+DBG shock 1 t=0.565 n=36 pos=-93
+DBG shock 2 t=10.565 n=27 pos=-71
+DBG shock 3 t=20.570 n=19 pos=100
+DBG shock 4 t=30.573 n=26 pos=-100
+DBG shock 5 t=40.582 n=19 pos=-100
+DBG vol=0 t=44.091 pos=-41
+DBG vol=1 t=46.004 pos=-100
+DBG shock 6 t=50.598 n=23 pos=-100
+DBG shock 7 t=60.611 n=18 pos=-100
+DBG shock 8 t=70.624 n=30 pos=100
+DBG shock 9 t=80.634 n=17 pos=-100
+DBG shock 10 t=90.652 n=24 pos=-100
+DBG shock 11 t=100.653 n=17 pos=-100
+DBG vol=0 t=104.177 pos=0
+DBG vol=1 t=105.517 pos=100
+DBG shock 12 t=110.656 n=26 pos=26
+DBG shock 13 t=120.683 n=31 pos=-6
+DBG shock 14 t=130.688 n=15 pos=-100
+DBG shock 15 t=140.688 n=19 pos=100
+DBG shock 16 t=150.697 n=19 pos=-100
+DBG shock 17 t=160.716 n=23 pos=-100
+DBG shock 18 t=170.720 n=20 pos=-100
+DBG vol=0 t=178.591 pos=-100
+DBG vol=1 t=179.216 pos=-100
+DBG shock 19 t=180.722 n=16 pos=-100
+DBG shock 20 t=190.732 n=26 pos=100
+DBG shock 21 t=200.738 n=23 pos=100
+DBG shock 22 t=210.742 n=25 pos=97
+DBG shock 23 t=220.742 n=24 pos=-100
+DBG shock 24 t=230.751 n=28 pos=100
+DBG shock 25 t=240.758 n=21 pos=-100
+DBG shock 26 t=250.770 n=19 pos=100
+DBG shock 27 t=260.790 n=24 pos=-66
+DBG shock 28 t=270.801 n=25 pos=100
+DBG vol=0 t=274.301 pos=64
+DBG vol=1 t=275.008 pos=100
+DBG shock 29 t=280.808 n=25 pos=100
+DBG shock 30 t=290.837 n=23 pos=-100
+DBG shock 31 t=300.845 n=12 pos=-100
+DBG shock 32 t=310.847 n=26 pos=-100
+DBG shock 33 t=320.854 n=23 pos=-100
+DBG vol=0 t=329.384 pos=-100
+DBG shock 34 t=330.866 n=23 pos=-100
+DBG shock 35 t=340.874 n=20 pos=58
+DBG vol=1 t=346.213 pos=64
+DBG shock 36 t=350.880 n=22 pos=100
+DBG shock 37 t=360.885 n=31 pos=100
+DBG vol=0 t=364.386 pos=78
+DBG vol=1 t=366.869 pos=100
+DBG shock 38 t=370.898 n=12 pos=100
+DBG shock 39 t=380.903 n=5 pos=100
+DBG shock 40 t=390.905 n=20 pos=100
+DBG shock 41 t=400.909 n=17 pos=100
+DBG shock 42 t=410.917 n=18 pos=100
+DBG shock 43 t=420.924 n=32 pos=100
+DBG shock 44 t=430.926 n=23 pos=-100
+DBG shock 45 t=440.930 n=24 pos=100
+DBG shock 46 t=450.934 n=29 pos=-75
+DBG shock 47 t=460.937 n=22 pos=-100
+DBG shock 48 t=470.943 n=18 pos=89
+DBG shock 49 t=480.976 n=22 pos=100
+DBG shock 50 t=490.992 n=29 pos=-100
+DBG shock 51 t=501.008 n=18 pos=100
+DBG shock 52 t=511.008 n=23 pos=100
+DBG shock 53 t=521.016 n=20 pos=100
+DBG shock 54 t=531.021 n=15 pos=100
+DBG shock 55 t=541.023 n=14 pos=100
+DBG shock 56 t=551.035 n=14 pos=100
+DBG shock 57 t=561.040 n=12 pos=-100
+DBG shock 58 t=571.058 n=28 pos=100
+DBG shock 59 t=581.061 n=19 pos=41
+DBG vol=0 t=589.979 pos=-100
+DBG shock 60 t=591.071 n=8 pos=-100
+DBG vol=1 t=594.573 pos=-71
+DBG shock 61 t=601.074 n=7 pos=-100
+DBG shock 62 t=611.082 n=6 pos=-100
+DBG shock 63 t=621.083 n=12 pos=-100
+DBG shock 64 t=631.087 n=32 pos=-100
+DBG shock 65 t=641.114 n=14 pos=100
+DBG shock 66 t=651.122 n=21 pos=95
+DBG shock 67 t=661.122 n=23 pos=-100
+DBG shock 68 t=671.136 n=14 pos=-100
+DBG shock 69 t=681.144 n=23 pos=-100
+DBG vol=0 t=684.656 pos=-90
+DBG vol=1 t=685.827 pos=-100
+DBG shock 70 t=691.175 n=17 pos=-100
+DBG vol=0 t=694.679 pos=-91
+DBG shock 71 t=701.177 n=14 pos=-100
+DBG vol=1 t=705.388 pos=-100
+DBG shock 72 t=711.194 n=10 pos=-100
+DBG vol=0 t=720.044 pos=-100
+DBG shock 73 t=721.195 n=28 pos=-100
+DBG vol=1 t=727.951 pos=-70
+DBG shock 74 t=731.206 n=16 pos=100
+DBG shock 75 t=741.209 n=30 pos=100
+DBG shock 76 t=751.254 n=22 pos=-100
+DBG shock 77 t=761.258 n=25 pos=100
+DBG shock 78 t=771.284 n=16 pos=100
+DBG shock 79 t=781.294 n=22 pos=100
+DBG vol=0 t=784.801 pos=83
+DBG vol=1 t=785.534 pos=100
+DBG shock 80 t=791.300 n=26 pos=100
+DBG vol=0 t=794.811 pos=89
+DBG vol=1 t=797.628 pos=100
+DBG shock 81 t=801.302 n=19 pos=100
+DBG vol=0 t=810.373 pos=100
+DBG shock 82 t=811.306 n=36 pos=100
+DBG vol=1 t=819.239 pos=100
+DBG shock 83 t=821.314 n=26 pos=100
+DBG shock 84 t=831.326 n=18 pos=100
+DBG vol=0 t=834.829 pos=83
+DBG vol=1 t=838.078 pos=100
+DBG shock 85 t=841.339 n=25 pos=100
+DBG vol=0 t=844.851 pos=67
+DBG vol=1 t=845.555 pos=100
+DBG shock 86 t=851.358 n=9 pos=100
+DBG shock 87 t=861.359 n=16 pos=-100
+DBG shock 88 t=871.366 n=19 pos=-100
+DBG shock 89 t=881.380 n=26 pos=-100
+DBG shock 90 t=891.392 n=5 pos=-100
+DBG shock 91 t=901.404 n=23 pos=-100
+DBG shock 92 t=911.408 n=12 pos=-100
+DBG shock 93 t=921.421 n=29 pos=-100
+DBG vol=0 t=931.328 pos=-100
+DBG shock 94 t=931.424 n=15 pos=-100
+DBG vol=1 t=935.659 pos=-100
+DBG shock 95 t=941.432 n=22 pos=-100
+DBG vol=0 t=944.946 pos=-66
+DBG shock 96 t=951.437 n=6 pos=-100
+DBG vol=1 t=955.645 pos=-100
+DBG shock 97 t=961.440 n=9 pos=-100
+DBG shock 98 t=971.441 n=13 pos=-100
+DBG vol=0 t=980.954 pos=-100
+DBG shock 99 t=981.449 n=16 pos=-100
+DBG vol=1 t=985.646 pos=-100
+DBG shock 100 t=991.470 n=1 pos=-100
+DBG shock 101 t=1001.472 n=21 pos=-100
+DBG shock 102 t=1011.479 n=8 pos=-100
+DBG shock 103 t=1021.479 n=35 pos=100
+DBG shock 104 t=1031.506 n=23 pos=-80
+DBG shock 105 t=1041.515 n=18 pos=100
+DBG shock 106 t=1051.538 n=20 pos=-100
+DBG shock 107 t=1061.543 n=31 pos=-100
+DBG shock 108 t=1071.545 n=26 pos=100
+DBG shock 109 t=1081.569 n=10 pos=100
+DBG shock 110 t=1091.587 n=13 pos=100
+DBG shock 111 t=1101.602 n=27 pos=100
+DBG shock 112 t=1111.633 n=23 pos=-100
+DBG shock 113 t=1121.639 n=15 pos=-100
+DBG shock 114 t=1131.645 n=26 pos=100
+DBG shock 115 t=1141.645 n=26 pos=100
+DBG shock 116 t=1151.654 n=13 pos=-100
+DBG shock 117 t=1161.657 n=21 pos=100
+DBG shock 118 t=1171.658 n=25 pos=-22
+DBG shock 119 t=1181.680 n=30 pos=100
+DBG shock 120 t=1191.687 n=21 pos=100
+DBG shock 121 t=1201.687 n=17 pos=100
+DBG shock 122 t=1211.703 n=22 pos=100
+DBG shock 123 t=1221.710 n=23 pos=100
+DBG shock 124 t=1231.710 n=26 pos=100
+DBG vol=0 t=1235.213 pos=97
+DBG vol=1 t=1238.649 pos=100
+DBG shock 125 t=1241.713 n=23 pos=-100
+DBG shock 126 t=1251.726 n=19 pos=100
+DBG vol=0 t=1260.860 pos=100
+DBG shock 127 t=1261.742 n=17 pos=100
+DBG vol=1 t=1269.443 pos=100
+DBG shock 128 t=1271.743 n=15 pos=100
+DBG shock 129 t=1281.754 n=18 pos=-100
+DBG vol=0 t=1285.259 pos=0
+DBG vol=1 t=1287.004 pos=100
+DBG shock 130 t=1291.763 n=47 pos=100
+DBG vol=0 t=1299.946 pos=100
+DBG vol=1 t=1301.599 pos=100
+DBG shock 131 t=1301.764 n=13 pos=100
+DBG shock 132 t=1311.787 n=19 pos=100
+DBG vol=0 t=1315.304 pos=100
+DBG vol=1 t=1316.974 pos=100
+DBG shock 133 t=1321.805 n=37 pos=-3
+DBG shock 134 t=1331.813 n=24 pos=-94
+DBG shock 135 t=1341.823 n=22 pos=-100
+DBG shock 136 t=1351.831 n=29 pos=50
+DBG shock 137 t=1361.841 n=5 pos=-100
+DBG shock 138 t=1371.855 n=13 pos=-100
+DBG shock 139 t=1381.861 n=10 pos=-100
+DBG shock 140 t=1391.886 n=27 pos=100
+DBG shock 141 t=1401.908 n=24 pos=100
+DBG shock 142 t=1411.914 n=26 pos=100
+DBG shock 143 t=1421.914 n=18 pos=100
+DBG shock 144 t=1431.919 n=25 pos=-100
+DBG vol=0 t=1435.423 pos=-14
+DBG vol=1 t=1436.133 pos=100
+DBG vol=0 t=1441.188 pos=-100
+DBG shock 145 t=1441.919 n=18 pos=-100
+DBG vol=1 t=1445.434 pos=0
+DBG shock 146 t=1451.922 n=17 pos=-100
+DBG shock 147 t=1461.929 n=12 pos=100
+DBG vol=0 t=1468.459 pos=100
+DBG shock 148 t=1471.939 n=29 pos=100
+DBG vol=1 t=1477.210 pos=-100
+DBG shock 149 t=1481.941 n=17 pos=100
+DBG vol=0 t=1485.447 pos=100
+DBG vol=1 t=1487.426 pos=100
+DBG shock 150 t=1491.989 n=23 pos=-100
+DBG shock 151 t=1501.989 n=27 pos=-100
+DBG shock 152 t=1512.003 n=33 pos=-100
+DBG shock 153 t=1522.006 n=23 pos=-100
+DBG shock 154 t=1532.008 n=38 pos=53
+DBG shock 155 t=1542.024 n=13 pos=-100
+DBG vol=0 t=1548.537 pos=-100
+DBG vol=1 t=1551.464 pos=-100
+DBG shock 156 t=1552.033 n=15 pos=-100
+DBG shock 157 t=1562.035 n=23 pos=-100
+DBG shock 158 t=1572.048 n=26 pos=-100
+DBG shock 159 t=1582.058 n=29 pos=-100
+DBG shock 160 t=1592.081 n=24 pos=100
+DBG shock 161 t=1602.107 n=13 pos=100
+DBG vol=0 t=1605.630 pos=5
+DBG vol=1 t=1606.519 pos=100
+DBG shock 162 t=1612.125 n=20 pos=-100
+DBG shock 163 t=1622.130 n=19 pos=100
+DBG shock 164 t=1632.134 n=13 pos=100
+DBG vol=0 t=1635.645 pos=96
+DBG vol=1 t=1636.337 pos=100
+DBG shock 165 t=1642.144 n=0 pos=100
+DBG shock 166 t=1652.155 n=0 pos=100
+DBG shock 167 t=1662.171 n=0 pos=100
+DBG shock 168 t=1672.190 n=0 pos=100
+DBG shock 169 t=1682.209 n=10 pos=100
+DBG shock 170 t=1692.217 n=21 pos=100
+DBG shock 171 t=1702.219 n=19 pos=100
+DBG shock 172 t=1712.245 n=13 pos=100
+DBG shock 173 t=1722.249 n=28 pos=100
+DBG shock 174 t=1732.251 n=14 pos=100
+DBG shock 175 t=1742.261 n=20 pos=100
+DBG vol=0 t=1745.778 pos=70
+DBG vol=1 t=1746.066 pos=100
+DBG shock 176 t=1752.265 n=10 pos=100
+DBG shock 177 t=1762.272 n=18 pos=100
+DBG vol=0 t=1765.773 pos=0
+DBG vol=1 t=1771.697 pos=100
+DBG shock 178 t=1772.292 n=0 pos=100
+DBG shock 179 t=1782.292 n=2 pos=100
+DBG shock 180 t=1792.294 n=0 pos=100
+DBG shock 181 t=1802.297 n=0 pos=100
+DBG shock 182 t=1812.306 n=0 pos=100
+DBG shock 183 t=1822.309 n=2 pos=100
+DBG shock 184 t=1832.315 n=12 pos=100
+DBG shock 185 t=1842.346 n=8 pos=100
+DBG shock 186 t=1852.351 n=12 pos=100
+DBG shock 187 t=1862.353 n=16 pos=100
+DBG shock 188 t=1872.383 n=15 pos=100
+DBG shock 189 t=1882.389 n=20 pos=100
+DBG shock 190 t=1892.423 n=14 pos=100
+DBG shock 191 t=1902.429 n=20 pos=100
+DBG shock 192 t=1912.435 n=10 pos=100
+DBG vol=0 t=1915.938 pos=78
+DBG vol=1 t=1916.635 pos=100
+DBG shock 193 t=1922.441 n=22 pos=-100
+DBG shock 194 t=1932.458 n=28 pos=-100
+DBG shock 195 t=1942.466 n=19 pos=-100
+DBG vol=0 t=1948.971 pos=51
+DBG shock 196 t=1952.470 n=14 pos=100
+DBG vol=1 t=1957.093 pos=100
+DBG shock 197 t=1962.470 n=26 pos=100
+DBG vol=0 t=1971.055 pos=100
+DBG shock 198 t=1972.491 n=0 pos=100
+DBG vol=1 t=1976.723 pos=100
+DBG shock 199 t=1982.504 n=0 pos=100
+DBG shock 200 t=1992.504 n=1 pos=100
+DBG shock 201 t=2002.510 n=1 pos=100
+Simulation complete
+fills=981
+traded_volume=41777
+inventory=89
+cash=-872043.00
+mark_price=10028.73
+breach_penalty=0.00
+pnl=20514.00
+pnl_se=6487.50
+abs_inventory_q50=100
+abs_inventory_q68=100
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=/Users/marek/Documents/delfini-algo-arena/marek/logs/r2/random_stress/dbg

@@ -1,0 +1,42 @@
+DBG shock 1 t=271.324 n=49 pos=100
+DBG shock 2 t=444.285 n=47 pos=-76
+DBG shock 3 t=661.715 n=49 pos=-100
+DBG shock 4 t=841.495 n=49 pos=-100
+DBG shock 5 t=1068.391 n=49 pos=100
+DBG shock 6 t=1286.024 n=48 pos=100
+DBG shock 7 t=1556.956 n=49 pos=100
+DBG shock 8 t=1791.134 n=49 pos=0
+DBG shock 9 t=1966.973 n=49 pos=-100
+DBG shock 10 t=2261.510 n=47 pos=63
+DBG shock 11 t=2464.890 n=49 pos=-100
+DBG shock 12 t=2760.356 n=49 pos=-72
+DBG shock 13 t=3053.499 n=45 pos=100
+DBG shock 14 t=3206.175 n=41 pos=-23
+DBG shock 15 t=3420.484 n=47 pos=0
+DBG shock 16 t=3617.929 n=49 pos=100
+DBG shock 17 t=3870.546 n=42 pos=100
+DBG shock 18 t=4021.768 n=49 pos=25
+DBG shock 19 t=4264.595 n=46 pos=100
+DBG shock 20 t=4411.690 n=48 pos=100
+DBG shock 21 t=4582.078 n=49 pos=25
+DBG shock 22 t=4822.978 n=49 pos=-100
+DBG shock 23 t=4981.010 n=49 pos=-82
+DBG shock 24 t=5132.955 n=49 pos=-100
+DBG shock 25 t=5189.892 n=49 pos=-100
+DBG shock 26 t=5396.186 n=44 pos=13
+DBG shock 27 t=5567.184 n=44 pos=-44
+DBG shock 28 t=5843.079 n=44 pos=10
+Simulation complete
+fills=10865
+traded_volume=829024
+inventory=38
+cash=-533755.00
+mark_price=9689.00
+breach_penalty=0.00
+pnl=-165573.00
+pnl_se=26514.88
+abs_inventory_q50=100
+abs_inventory_q68=100
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=/Users/marek/Documents/delfini-algo-arena/marek/logs/r2/round2/A

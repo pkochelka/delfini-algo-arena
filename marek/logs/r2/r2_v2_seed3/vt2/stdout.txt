@@ -1,0 +1,14 @@
+Simulation complete
+fills=10453
+traded_volume=806672
+inventory=-100
+cash=1237048.00
+mark_price=9963.00
+breach_penalty=0.00
+pnl=240748.00
+pnl_se=21907.90
+abs_inventory_q50=100
+abs_inventory_q68=100
+abs_inventory_q95=100
+abs_inventory_q997=100
+log_dir=/Users/marek/Documents/delfini-algo-arena/marek/logs/r2/r2_v2_seed3/vt2
