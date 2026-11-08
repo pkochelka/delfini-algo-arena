@@ -1,0 +1,12 @@
+{"lamj_v":1.5}
+{"lamj_v":2.5}
+{"lamj_v":3.0}
+{"lamj_v":2.0,"bj_v":1.2}
+{"lamj_v":2.0,"sigma":0.3}
+{"lamj_v":2.0,"vel_tau":0.5,"vd_k":0.3}
+{"lamj_v":2.0,"vel_tau":1.0,"vd_k":0.5}
+{"lamj_v":2.0,"vel_tau":1.0,"vel_kv":0.2}
+{"lamj_v":2.0,"take_sd_t":1.5}
+{"lamj_v":2.0,"take_t":0.2}
+{"lamj_v":2.0,"jv_v":0.3}
+{"lamj_v":2.0,"vf_on":0}

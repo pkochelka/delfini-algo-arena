@@ -1,0 +1,17 @@
+{"lamj_v":0.5}
+{"lamj_v":1.0}
+{"lamj_v":2.0}
+{"lamj_v":4.0}
+{"bj_v":1.5}
+{"sigma":0.25}
+{"sigma":0.35}
+{"take_t":0.15}
+{"take_t":0.5}
+{"take_sd_t":0.5}
+{"take_sd_t":1.5}
+{"vel_tau":1.0,"vel_kv":0.2}
+{"gm_kv":0.2}
+{"theta":0.35}
+{"theta":0.2}
+{"eta":0.1}
+{"eta":0.2}

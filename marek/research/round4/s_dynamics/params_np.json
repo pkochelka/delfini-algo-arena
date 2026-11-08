@@ -1,0 +1,4 @@
+{"calm": {"sig": 0.127, "c": 0.0, "e": 0.6, "theta": 0.4756, "d0": 0.0487, "eps": 0.0245, "jv0": 0.15, "off": 1.0, "lamj": 0.0001, "bj": 1.0, "lamr": 0.003, "tau": 3.4, "wout": 0.0265},
+ "vol":  {"sig": 0.5, "c": 0.0, "e": 0.6, "theta": 1.0, "d0": 0.673, "eps": 0.046, "jv0": 2.0, "off": 2.55, "lamj": 0.0001, "bj": 0.84, "lamr": 0.003, "tau": 5.93, "wout": 0.026},
+ "shock": {"lamr": 20.0, "win": [2.5, 3.8], "file": "../flow/shock_events.csv"},
+ "vol_segments": "vol_segments.csv"}
