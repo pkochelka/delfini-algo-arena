@@ -2,6 +2,8 @@
 selection tapes. Changes against Marek's generator, each to match the real round-3 tape (tt_realsynth.py checks):
   - bug fix: a ladder's length used the same uniform as its start offset (u[2]), so every multi-rung ladder not
     starting at touch-2 started at touch-6 and was cut to 2 rungs; the length now has its own draw (u[3])
+  - bug fix: pending ladder rungs were written after every cancel due before the next event, so a rung could take
+    a later cancel's stamp and lose its exact 2000 us spacing (37 % of volatile chains); rungs now go in time order
   - TT_FIT below: Marek's own final real-tape fit (marek/research/round3/s_dynamics/params_final.json) where
     r3_synth still had older values (no residual volatile jumps, volatile impact 0.062, taker tails, ...), and
     the calibrated ladder / taker-tail values
@@ -102,9 +104,18 @@ TT_FIT = {
 # makers README (0.066 + Exp(0.450)). Not matched: volatile takers <= -2 ticks inside the touch (real 3.4 %, here
 # ~8.5 %) and volatile deep singles (real 75 /s, here ~90 /s); vol_beta 6.1 did not move them, and the real tape's
 # volatile labels (1 s Viterbi) mix in calm-like seconds, so part of the gap is the labelling.
-TT_FIT.update({'calm_lad_single': 0.73, 'vol_lad_single': 0.18, 'vol_lad_tilt': 0.5,
+# (after the rung-stamp fix Marek's single shares 0.83 / 0.42 match the real chain rates again; the 0.73 / 0.18 of the
+# first calibration only compensated the chains that bug broke.) Ladder size spreads from tt_singles.py on the real
+# tape: singles LN(5.03, 0.35) calm, LN(3.51, 0.25) volatile, incl. the per-rung noise lad_rung_sd 0.15.
+# Final (tt_singles.py on the real tape, corrected for the fit's own bias measured on these tapes): ladder singles
+# ~3.6 /s calm, ~6.1 /s volatile, chains 1.15 / 10.4 /s -> rate 4.75 / 16.5, single share 0.76 / 0.37; no length tilt
+# (with the fixed stamps volatile chains already reach the real rung count).
+TT_FIT.update({'calm_lad_rate': 4.75, 'calm_lad_single': 0.76, 'vol_lad_rate': 16.5, 'vol_lad_single': 0.37,
+               'vol_lad_tilt': 0.0,
+               'calm_lad_mu': 5.03, 'calm_lad_sd': 0.32, 'vol_lad_mu': 3.51, 'vol_lad_sd': 0.20,
                'calm_eps': 0.045, 'calm_tau': 2.8, 'calm_d_shift': 0.066, 'calm_d_scale': 0.450})
 PARAMS.update(TT_FIT)
+LAD_LOG: list = []  # (t, side, length, d0, regime) of every ladder event of the last generate()
 
 def schedule(p, rng):
     """Shock onsets and regime segments [(start, end, vol)]."""
@@ -241,12 +252,19 @@ def generate(p: dict[str, float], seed: int):
 
     def lad_rungs(t):
         while rungs and rungs[0][0] <= t:
+            lad_one()
+
+    def lad_one():
+        # tt_synth fix: one pending rung, called in time order with the cancels (flush); r3_synth flushed all cancels
+        # before t first, so a rung due before a cancel got that cancel's later stamp and lost its exact 2000 us
+        # spacing (37 % of volatile chains broken, invisible to a 2 ms chain filter)
+        if True:
             tr, _, s, px, v = heapq.heappop(rungs)
             if st['drought'] or px <= 0:
-                continue
+                return
             if prices[1 - s]:  # never cross the other side
                 if (s == 0 and px >= prices[1][0]) or (s == 1 and px <= prices[0][-1]):
-                    continue
+                    return
             lad_insert(tr, s, px, v)
 
     def lad_cancels(t):
@@ -280,9 +298,12 @@ def generate(p: dict[str, float], seed: int):
         while True:
             td = decisions[0][0] if decisions else math.inf
             tc = cancels[0][0] if cancels else math.inf
-            if min(td, tc) >= t:
+            tr = rungs[0][0] if rungs else math.inf
+            if min(td, tc, tr) >= t:
                 return
-            if td <= tc:
+            if tr < td and tr < tc:
+                lad_one()
+            elif td <= tc:
                 _, o, ver = heapq.heappop(decisions)
                 q = pending.get(o)
                 if q is not None and q[5] == ver:
@@ -354,6 +375,7 @@ def generate(p: dict[str, float], seed: int):
             L = min(L, 8 - d0)
             z = lad_z[i]
             base = p[pref() + 'lad_mu'] + p[pref() + 'lad_sd'] * z[0]
+            LAD_LOG.append((t, s, L, d0, pref()))  # diagnostics only (tt_singles check)
             for k in range(L):
                 if p['lad_rung_u'] > 0:
                     v = max(1, int(round(math.exp(base) * (1 + p['lad_rung_u'] * (2 * lad_u[i - k - 1][0] - 1)))))
