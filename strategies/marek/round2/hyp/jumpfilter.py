@@ -75,6 +75,13 @@ FV_PARAMS = {
     'tau': 1.5,
     'far_tol': 3.0,  # outside a shock window, two far inserts must agree within this to restart the grid
     'taker_obs': 0,
+    # ---- jumpfilter (volatile-only filter fixes; defaults reproduce the baseline)
+    'jmix': 0,  # 1: volatile residual jumps as a Laplace(bj_v * jmix_b) mixture at pv * lamj_v * jmix_r /s (not diffusion)
+    'jmix_b': 1.0,
+    'jmix_r': 1.0,
+    'jvv_x': 1.0,  # multiplier on the volatile impact-noise variance jv_v
+    'sig_v': 0.0,  # extra volatile-only diffusion (ticks / sqrt s), scaled by pv
+    'rho0_v': -1.0,  # >= 0: flat-jump base rate used in proportion to pv (rho0 * (1-pv) + rho0_v * pv)
 }
 
 
@@ -199,6 +206,16 @@ class FV:
         self.inv2h2 = 1.0 / (2 * h * h)
         self.vj = 2 * p['bj_v'] ** 2 * p['lamj_v']  # variance rate of the volatile residual jumps
         self.kern: dict[int, np.ndarray] = {}
+        self.jmix = p.get('jmix', 0)
+        if self.jmix:
+            self.vj = 0.0
+            b = p['bj_v'] * p.get('jmix_b', 1.0) * self.inv_h
+            m = int(math.ceil(7 * b))
+            x = np.arange(-m, m + 1)
+            lk = np.exp(-np.abs(x) / b)
+            self.lap = lk / lk.sum()
+            self.lamj = p['lamj_v'] * p.get('jmix_r', 1.0)
+        self.vj += p.get('sig_v', 0.0) ** 2
 
     def predict(self, t: float) -> None:
         if self.t is None:
@@ -219,11 +236,19 @@ class FV:
             b = a if a < 0.45 else 0.45
             w[1:-1] = (1 - 2 * b) * w[1:-1] + b * (w[:-2] + w[2:])
             a -= b
+        if self.jmix:
+            pj = -math.expm1(-pv * self.lamj * dt)
+            if pj > 1e-6:
+                w *= 1.0 - pj
+                w += pj * np.convolve(w / (1.0 - pj), self.lap, 'same')
         if self.exc:
             self.exc *= 0.5 ** (dt / p['exc_hl'])
             if self.exc < 1e-4:
                 self.exc = 0.0
-        pi = 1.0 - math.exp(-((p['rho_shock'] if self.hot else p['rho0']) + self.exc) * dt)
+        r0 = p['rho0']
+        if p.get('rho0_v', -1.0) >= 0:
+            r0 = r0 * (1 - pv) + p['rho0_v'] * pv
+        pi = 1.0 - math.exp(-((p['rho_shock'] if self.hot else r0) + self.exc) * dt)
         w *= 1.0 - pi
         w += pi / w.size
 
@@ -364,7 +389,7 @@ class FV:
             pv = self.pv
             d = (1 - pv) * p['c'] * filled ** p['e'] + pv * p['c_v'] * filled ** p['e_v']
             self.shift(d if is_buy else -d)
-            var = (1 - pv) * p['jv'] + pv * p['jv_v']
+            var = (1 - pv) * p['jv'] + pv * p['jv_v'] * p.get('jvv_x', 1.0)
             if var > 0:
                 self._blur(var)
 
