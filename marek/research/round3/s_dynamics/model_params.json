@@ -1,0 +1,18 @@
+{
+ "_doc": "Round-3 S dynamics, identified by s_dynamics (see README.md). Times in seconds, prices in ticks. Each filled taker gives a kick k = sign*c*filled^e + xi, xi ~ N(0, xi_sd^2); S jumps by k at once, then the kick decays as K(tau) = p + (1-p)*exp(-tau/T) in clock time (S = F + Y, F gets p*k, Y gets (1-p)*k, Y decays). Unfilled IOCs: no effect. No diffusion between trades. HMM-format parameters: params_final.json.",
+ "calm": {"c": 0.0168, "e": 0.616, "xi_sd": 0.130, "p_perm": 0.50, "T_decay": 16.7,
+          "maker_D": {"shift": 0.049, "exp_scale": 0.476}, "maker_outlier_uniform_share": 0.026,
+          "taker_offset": 1.0, "taker_tail": {"share": 0.0245, "exp_scale": 3.4},
+          "diffusion_sig": 0.0, "extra_jumps": null},
+ "vol":  {"c": 0.062, "e": 0.628, "xi_sd": 0.26, "p_perm": 0.55, "T_decay": 13.6,
+          "maker_D": {"shift": 0.673, "exp_scale": 1.00}, "maker_outlier_uniform_share": 0.026,
+          "taker_offset": 2.55, "taker_tail": {"share": 0.046, "exp_scale": 5.9},
+          "diffusion_sig": 0.0, "extra_jumps_low_confidence": {"rate": 0.18, "laplace_scale": 0.92}},
+ "xi_decays_with_same_kernel": "probably (medium confidence)",
+ "regime": {"states": 2, "vol_episodes": 28, "vol_time_share": 0.282, "vol_dwell_mean": 60.3, "calm_dwell_mean": 156.7,
+            "switch_times": "vol_segments.csv"},
+ "shocks": {"n": 27, "jump_lag_after_drought_onset": 3.03, "J_sd": 48.1, "J_mean_abs": 33.2, "J_laplace_scale": 33.2,
+            "reverts": false, "table": "shocks.csv"},
+ "round2_for_comparison": {"calm": {"c": 0.0142, "e": 0.625, "xi_sd": 0.124, "p_perm": 1.0},
+                           "vol": {"c": 0.0741, "e": 0.606, "xi_sd": 0.28, "p_perm": 1.0}}
+}

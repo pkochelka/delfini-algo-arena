@@ -12,10 +12,130 @@ round-2 strategies. Sources:
 **Bottom line.** Round 3 is round 2 plus a new "ladder" maker and transient impact. The round-2 approach (Bayesian S
 filter, stale-quote sniping, shock sniper) still works, but **out of the box it loses 40 % of its edge**, because the
 S filter mistakes ladder orders for ordinary makers. Two small fixes recover all of it and more:
-`strategies/marek/round3/r3_lad.py` makes **RESULT_R3** on round 3 against 451k for `shockgen_best.py`, and
-**RESULT_SYN** against 558k on six synthetic round-3 tapes. No change of approach is needed.
+`strategies/marek/round3/r3_lad.py` makes **795k** on round 3 against 451k for `shockgen_best.py`, and
+**923k** on six synthetic round-3 tapes (shockgen_best's filter without the ladder fix: 558k), and 862k on four held-out synthetic tapes (shockgen_best: 356k). No change of approach is needed. The brainstorm and development round (section D) raised this to **853.7k** (`r3_dev_best.py`).
 
-STRATEGY_SECTION
+## B. Strategy findings
+
+### B1. Round-2 strategies on the round-3 tape, unchanged
+
+PnL net of the breach penalty, split by period (`strategy/eval3.py`). Shock = onset −1 s … +20 s; regimes from
+`flow/regimes_1s.csv`.
+
+| Strategy | Round 3 | calm | volatile | shock | Round 2 (same split) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `strategies/peter/fvs_mm.py` | 485.0k | 117.0k | 290.4k | 77.5k | 606.8k |
+| `strategies/marek/round2/final3.py` | 457.0k | 120.1k | 229.9k | 107.1k | |
+| `strategies/marek/round2/overfit_best.py` | 455.4k | 118.6k | 227.8k | 109.0k | |
+| `strategies/marek/round2/shockgen_best.py` (r2 best) | 451.0k | 118.6k | 227.3k | 105.1k | 772.4k (calm 305.6k, vol 211.3k, shock 255.5k) |
+| `strategies/marek/round2/r2_ladder.py` | 424.3k | 87.5k | 316.1k | 20.8k | 365.3k |
+| `strategies/marek/round2/snipe_best.py` | 79.5k | −92.3k | 157.3k | 14.5k | |
+| `strategies/marek/round1/robust_ladder.py` | −11.2k | 12.0k | −14.8k | −8.5k | |
+| `strategies/marek/round1/s_ladder.py` | −493.0k | 53.9k | −447.8k | −99.1k | −163.9k |
+
+- Everything that does not track S with the round-2 model loses money, as in round 2.
+- The S-filter family stays positive, but **calm PnL per second halves** (≈ 31 /s vs ≈ 66 /s on r2) and volatile per
+  second drops by 40 %, although the base book is the same. That pointed at the filter, not at the market.
+
+### B2. Fix 1: filter out the ladder maker (+280k, the main result)
+
+The FV filter treats every market insert as an S-maker: bid = ⌊S − D⌋ with D = 0.05 + Exp(0.45) in calm. Ladder rungs
+sit 2–7 ticks behind the touch regardless of S, so under that law they look like strong evidence that S is low (for
+bids) and, through their width, that the regime is volatile. In volatile they are ≈ 14 % of all maker inserts.
+
+`strategies/marek/round3/r3_lad.py` (flag `lad_on`):
+- Drop any insert that arrives exactly 2000 ± 3 µs after the previous market insert on the same side, one tick further
+  out (rung 2+).
+- Hold any insert that sits ≥ 2 ticks behind its same-side touch for 2.01 ms; drop it if a rung follows, else feed it to
+  the filter then. Rung 1 is caught this way.
+- Do not hold inserts during a detected drought (`lad_dr`): post-jump inserts are urgent and ladders stop in droughts
+  anyway. Holding them cost 19k of shock PnL.
+- `lad_ss`: ignore possible rungs in the shock sniper's "far insert" direction rule. Neutral (−3k), kept on.
+
+| Variant (round 3) | PnL | calm | volatile | shock |
+| --- | ---: | ---: | ---: | ---: |
+| filter off (= shockgen_best) | 451.0k | 118.6k | 227.3k | 105.1k |
+| rung 2+ dropped only, no holding | 724.2k | 166.7k | 419.7k | 137.8k |
+| rung 2+ dropped + deep inserts held (also in droughts) | 731.1k | 191.4k | 419.7k | 120.0k |
+| + no holding in droughts (`lad_dr 1`) | 749.7k | 190.7k | 419.5k | 139.5k |
+
+Synth (6 seeds, with round-3 constants): filter off 557.5k → on 841.8k (+284k).
+
+### B3. Fix 2: a larger outlier share in the filter (+40k)
+
+About 3 % (calm) to 4 % (volatile) of maker inserts are single-order ladder placements that the 2 ms test cannot see.
+The filter's uniform outlier share eta (0.005 in round 2) is too small to absorb them.
+
+| eta | Round 3 | Synth mean (6) |
+| --- | ---: | ---: |
+| 0.005 | 757.6k | 841.8k |
+| 0.05 | 795.6k | 882.8k |
+| 0.08 | 771.9k | 883.8k |
+| 0.10 | 778.1k | 897.2k |
+| 0.12 | 798.3k | 901.9k |
+| **0.15** | **796.4k** | **907.9k** |
+| 0.20 | 778.3k | — |
+
+Calm PnL rises monotonically up to 0.12–0.15; the round-3 total wobbles with the shock part (see B5).
+
+### B4. Smaller tuning (round 3 / synth-mean deltas, base = eta 0.1)
+
+| Change | Round 3 | Synth | Kept |
+| --- | ---: | ---: | --- |
+| s_dynamics v3 calm c 0.0171, e 0.61, D scale 0.4756, volatile D scale 1.06 (vs r2 constants) | +8k | +116k* | yes |
+| transient impact in the filter (`tr_on`; S drifts back by the decaying share, T 17.3 / 15 s; reset at a drought, `tr_sr`) | +2.0k | +4.2k | yes |
+| calm theta 0.25 (0.30) | +4.2k | +6.4k | yes |
+| volatile take_t 0.3 (0.15) | +2.0k | +4.2k | yes |
+| pv_thr 0.7 (0.5) | +0.8k | +6.6k | yes |
+| shock trigger on a taker sweeping ≥ 2 levels (`ss_trade`) | 0 | +2.7k | yes |
+| eta 0.15 | +18.3k | +10.7k | yes |
+| calm theta 0.35 | +14.3k | −0.7k | no |
+| take_sd_t 1.0 / take_t 0.05 | +12.8k / +13.3k | −16.5k / −6.4k | no (shock luck on r3) |
+| pv_thr 0.3 | +1.9k | −2.3k | no |
+| ss_lim 10 (8) | −4.8k | −0.7k | no |
+| xs_cap 600 / 1200 (950) | −0.9k / −1.8k | +0.7k / **−68.6k** | no |
+| volatile passive quotes (theta_t 2.0 / 2.5) | −38.6k / −13.4k | −12.9k / −1.7k | no |
+| theta_t, theta_keep_t, reach_t alone | 0 | 0 | no effect: passive quoting is off in volatile |
+| shock sniper off (`ss_on 0`) | −16.1k | −46.8k | (the sniper is worth ≈ 47k) |
+| skew quotes by the transient stock, y_k 0.05 / 0.1 / 0.2 / 0.5 / 1.0 | −5k / −53k / −222k / −456k / −590k | — | **no**: it also moves IOC take prices |
+| the ladder filter off, at eta 0.1 | — | −131.6k | (the filter is still worth that much after the eta fix) |
+
+\* vs the synth tapes generated with these same constants, so the synth number overstates it; the round-3 +8k is the
+honest figure.
+
+### B5. Final file and validation
+
+`strategies/marek/round3/r3_best.py` = `r3_lad.py` + the "kept" rows of B4.
+
+| Tape | shockgen_best (r2 best) | r3_lad (eta 0.1) | **r3_best** |
+| --- | ---: | ---: | ---: |
+| round 3 | 451.0k | 778.1k | **795.0k** (calm 238.6k, vol 421.7k, shock 134.7k, breach 17.7k) |
+| synth v1 (6 seeds, used for selection) | — | 897.2k | **923.1k** |
+| synth v2 (4 seeds, held out: makers' ladder law, stronger decay) | 356.0k | 852.7k | **861.7k** |
+| round 2 (regression) | 772.4k | 772.6k | 761.0k (−11k, shock windows) |
+
+- **Shock PnL is heavy-tailed and fragile on round 3.** One shock (4127 s, J = +124) flips between +0.2k and +17.5k
+  on small parameter changes. There the first sign of the jump is a 402-lot taker sweeping the stale asks at 4129.835,
+  ≈ 50 ms before any maker quotes at the new level, so the maker-insert trigger is sometimes too late. Judge shock
+  changes on synth.
+- Per period r3_best now earns at round-2 rates: calm ≈ 63 /s (r2 66), volatile ≈ 254 /s (r2 264), shocks ≈ 5k each
+  (r2 ≈ 6k excluding the 5398 outlier).
+- `peter/fvs_mm.py` has the same filter and should gain from the same fix, but our lineage is ahead of it on both tapes.
+
+### B6. Tools added
+
+| Path | What |
+| --- | --- |
+| `strategy/eval3.py` | runs files on round3 / synth / round2, splits PnL into calm / volatile / shock and per shock, 12 × 500 s windows |
+| `strategy/ab.sh`, `strategy/batch*.sh`, `strategy/summ.py` | parallel A/B configs; summary table with deltas vs a base tag |
+| `strategy/r3_synth.py` | round-3 synthetic generator: r2_synth + ladder maker + transient impact + r3 regime rates and burst head |
+| `data/synth/r3_v1_seed1-6.csv`, `r3_v2_seed11-14.csv` | synth tapes (v2: makers' ladder law U(0.75, 1.25) rungs, calm hazard 0.25 at −5…−7, decay calm 0.45/30 s, vol 0.52/18 s) |
+| `data_explorer/r3_v1_seed1/`, `compare-round3-r3_v1_seed1/` | synth vs real fingerprint |
+
+**Synth fidelity:** events/s, touch size, spread, insert/taker sizes and the depth bump at 2–4 ticks match the real
+tape; σ is ≈ 18 % too high (5.3 vs 4.5 at 1 s), the ladder is thinner at 5–7 ticks in v1, and impact decays less than
+on the tape (variance ratio 60 s: 0.89 vs 0.86). Good for A/B of mechanisms, not for absolute levels.
+
 
 ## A. What changed in the data (round 3 vs round 2)
 
@@ -77,6 +197,57 @@ Everything below is from the four agent READMEs; confidence is theirs.
   explorer), i.e. passive quoting at the touch is still a losing game for the generator's makers; our edge comes from S.
 - Not testable on a replayed tape: the ladder is touch-anchored, so in a live generator our own quotes would move it.
 
+## D. Brainstorm and development (five agents + one dev agent)
+
+Reports: `ideas/{ceiling,bigmoves,volatile,calm,novel,develop}.md`. After the brainstorm the user dropped synth testing
+(slow, not informative), so the final stack is accepted on round 3 only.
+
+**Best file: `strategies/marek/round3/r3_dev_best.py`: round 3 853.7k (+58.7k over r3_best), round 2 778.4k (+17.4k).**
+Verified with eval3: calm 254.5k, volatile 430.1k, shock 169.0k, breach 17.1k. It leads r3_best in all 12 windows of
+500 s. Same imports as r3_best, no `modify_order`.
+
+| Kept change | Round 3 alone | In stack (leave-one-out) |
+| --- | ---: | ---: |
+| bigmoves C2: early shock trigger on a ≥ 3-tick one-sided sweep from onset + 2.90 s, clip edge credit (`bm_sw*`, `ss_clip_e 2`) | +34.0k (shock; +28k of it is the 4127 s shock) | +31.6k |
+| calm c2: take 0.10, reduce-only calm IOC at edge ≥ 0 + 1·sd, theta_keep 0 (also standalone `r3_calm_c2.py`, 811.5k) | +16.5k | +10.0k |
+| volatile vfm20: one flatten-only passive quote at F ± 2 once the book-lag carry has run out | +12.1k | +8.5k |
+| final s_dynamics filter constants | +7.3k | +5.4k |
+
+**Why nothing doubles (all agents agree):**
+- **The ±100 limit binds.** |pos| ≥ 95 for 59 % of calm and 90 % of volatile time. 73 % of volatile stale-quote events
+  find no room (358k of flat-start value). Volatile cap 200 would gross +425k, but holding it costs ≈ 1,560 s of breach.
+- **The filter and latency are not the limit.** An exact-S oracle adds +34k. Regime detection lags the true switch by
+  ≈ 40 ms. 97–98 % of stale lots are still there after 5 ms.
+- **Volatile momentum (new).** When the book lags S, the next 1–3 s S move ≈ 0.6 × (S − mid). Snipe edge is 1.31/lot at
+  20 ms, 1.70 at 1 s and 2.13 at 5 s, and the carry is ≈ 40 % of volatile PnL. Every exit loses: IOC unwind −133k, IOC exit
+  after 1–3 s −1.5k to −34k, ungated passive exits −4k to −17k.
+- **Oversize outside shocks is dead.** Exit depth within 1–4 ticks of S after a big move is a median 0 lots. The ladder sits
+  3–8 ticks below our fill, so selling into it loses.
+- **Shocks.** Ceiling ≈ 104k (with oversize) against 58k captured before C2; the cap and IOC limit never bind. Round 2's
+  higher shock PnL was one shock (5398 s, 251k stale value).
+- **Calm.** Adverse selection from the filling taker's impact costs 0.56/lot (≈ 337k). Queue-first passive ceiling ≈ 365k
+  against 123k realised, but every way of buying priority with room lost (pre-join −62k, deeper split −54k to −126k,
+  over-cap seniority −46k plus penalty).
+- **Simulator.** No exploitable rule: the breach penalty is an exact time integral, and the book never crosses, so an instant
+  unwind always pays the spread.
+- **Fading transient impact** loses everywhere (calm takes −24k to −193k, passive ±−90k, volatile −42k to −236k). The hold
+  is 1–2.5 s; the decay takes 15–40 s.
+
+**Bug to know about:** with `modify_order`, a REJECTED reply to a failed modify makes the base handler drop a live order,
+and the position runs past the cap (one test scored −20M). `ideas/calm_a.py` counts pending modifies per order to fix it.
+
+**Remaining leads:** a single volatile exit rule at the takers' limit round(F ± 2.55) with the momentum gate; calm queue
+priority without spending room; ≈ 45k of shock value left (shocks 2, 14, 20).
+
 ## C. Open questions and next steps
 
-NEXT_SECTION
+1. **The 2× question:** see section D. The gap is volatile position room; a cheap exit is the open problem.
+2. **Shock trigger latency** (4127 s case): fire on the first trade far through the stale touch, not only on maker
+   inserts at the new level.
+3. **Transient impact as an inventory signal** (not as a quote skew): untested.
+4. **Port the ladder filter to `peter/fvs_mm.py`** if that lineage is still used.
+5. **Synth fidelity:** fit σ (impact c or decay) and the ladder wake rule; regenerate.
+6. **Round 4 robustness:** the ladder filter keys on an exact 2000 µs gap and the touch−2…−7 band. If round 4 changes
+   the ladder's clock, those constants must be re-measured (the eta increase is the generic fallback).
+7. **Commit:** none of this is committed yet (strategy files, `marek/research/round3/strategy/`, this file).
+

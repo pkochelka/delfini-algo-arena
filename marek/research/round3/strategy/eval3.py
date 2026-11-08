@@ -2,9 +2,13 @@
 uv run python marek/research/round3/strategy/eval3.py FILE [FILE ...] [--tape data/round3.csv] [--set k=v ...] [--tag T]
 Shock window = onset-1 s .. onset+20 s (onsets: flow/shock_events.csv). Regimes: flow/regimes_1s.csv (1 s Viterbi).
 12 x 500 s windows as walk-forward folds. Rows appended to strategy/results.jsonl. pnl is net of breach penalty.
+Runs on fastsim (parquet tape cache, in-process worker pool; byte-identical to exchange-simulator, see fastsim/parity.py).
+--jit compiles the strategies' JIT_KERNELS with numba; --workers sets the pool size (default cores - 1).
 """
-import argparse, ast, bisect, json, pathlib, subprocess, tempfile, time, concurrent.futures as cf, csv
+import argparse, ast, bisect, json, pathlib, sys, time, csv
 ROOT = pathlib.Path(__file__).resolve().parents[4]
+sys.path.insert(0, str(ROOT))
+from fastsim.pool import Job, run_many
 HERE = pathlib.Path(__file__).parent
 RES = HERE / 'results.jsonl'
 R3 = HERE.parent
@@ -33,15 +37,12 @@ def label(t, on, reg):
             return g
     return 'calm'
 
-def run(strat, tape, logdir, on, reg):
-    p = subprocess.run(['uv', 'run', 'exchange-simulator', '--strategy', strat, '--backtest', str(ROOT / tape),
-                        '--log-dir', logdir, '--no-logs'], cwd=ROOT, capture_output=True, text=True)
-    try:
-        r = json.load(open(pathlib.Path(logdir) / 'result.json'))
-    except Exception:
-        return {'err': p.stderr[-2000:]}
-    rows = [l.split(',') for l in open(pathlib.Path(logdir) / 'pnl.csv').read().split('\n')[1:] if l]
-    ts = [float(a) for a, b in rows]; ps = [float(b) for a, b in rows]
+def split(out, on, reg):
+    """Per-regime / per-shock / per-window PnL from one fastsim.pool output (result.json + pnl curve)."""
+    if 'err' in out:
+        return {'err': out['err']}
+    r = dict(out['result'])
+    ts = [a for a, b in out['curve']]; ps = [b for a, b in out['curve']]
     parts = {'calm': 0.0, 'volatile': 0.0, 'shock': 0.0}
     per_shock = [0.0] * len(on)
     for k in range(1, len(ts)):
@@ -63,23 +64,16 @@ def main():
     ap.add_argument('files', nargs='+'); ap.add_argument('--tape', default='data/round3.csv',
                                                          help='tape path, or comma list; "synth" = data/synth/r3_v1_seed1-6')
     ap.add_argument('--set', nargs='*', default=[]); ap.add_argument('--tag', default='')
+    ap.add_argument('--jit', action='store_true'); ap.add_argument('--workers', type=int, default=None)
     a = ap.parse_args()
     tapes = [f'data/synth/r3_v1_seed{i}.csv' for i in range(1, 7)] if a.tape == 'synth' else a.tape.split(',')
     over = {}
     for kv in a.set:
         k, v = kv.split('=', 1); over[k] = ast.literal_eval(v)
-    tmp = pathlib.Path(tempfile.mkdtemp(prefix='r3_'))
-    jobs = []
-    for i, f in enumerate(a.files):
-        src = pathlib.Path(f).read_text()
-        if over:
-            src += f'\n\nPARAMS.update({over!r})\n'
-        s = tmp / f'{i}_{pathlib.Path(f).name}'; s.write_text(src)
-        for j, tp in enumerate(tapes):
-            jobs.append((f, str(s), str(tmp / f'log{i}_{j}'), tp))
+    jobs = [Job(f, tp, over, a.jit) for f in a.files for tp in tapes]
     t0 = time.time()
-    with cf.ThreadPoolExecutor(min(9, len(jobs))) as ex:
-        out = list(ex.map(lambda j: (j[0], j[3], run(j[1], j[3], j[2], *load_ctx(j[3]))), jobs))
+    outs = run_many(jobs, a.workers)
+    out = [(j.strategy, j.tape, split(o, *load_ctx(j.tape))) for j, o in zip(jobs, outs)]
     for f, tp, r in out:
         row = {'tag': a.tag, 'file': f, 'tape': tp, 'set': over, 'secs': round(time.time() - t0)}
         if 'err' in r:

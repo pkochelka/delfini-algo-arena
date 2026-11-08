@@ -165,3 +165,14 @@
   vol D 0.57 + Exp(1.05) (mean 1.62, ≈ r2); base cancel α 1.69 calm / 1.73 vol / 5.1 drought, **β ≈ 3.4 /tick in calm
   (r2 6.1)**, the same on v0 and v1 (real, or a transient-impact artefact? open). Base lifetimes and size are r2's exactly.
   Vol gap mid−S persists longer than r2 (ACF 0.64 at 200 ms vs 0.15).
+- [s_dynamics 2026-11-08] **Final S path published (`s_dynamics/s_path.parquet`, run `final`, supersedes v1) + README.**
+  Exact switch times: `s_dynamics/vol_segments.csv` (28 vol episodes, 28.2 % of time; end times moved ≤ 0.43 s vs v1).
+  Shock table: `s_dynamics/shocks.csv`. Model: `s_dynamics/model_params.json` (HMM format: params_final.json).
+  Kick k = sign·c·filled^e + ξ, decaying as p + (1−p)e^(−τ/T) in clock time: calm c .0168 e .616 ξ sd .130 p .50 T 16.7 s;
+  vol c .062 e .63 ξ sd .26 p .55 T 13.6 s (r2: .0142/.0741, permanent). Full-tape likelihood profiles; method checked on r1, r2
+  and on strategy's synthetic r3 tape (recovers c, e, p, T, ξ). **ξ probably decays with the same kernel** (residual variogram
+  V/h falls ×0.4 like the synth with tr_xi=1; r2 flat) — the KF ξ test is blind to this (fails on synth), so medium confidence.
+  No diffusion, no calm jumps, unfilled IOCs inert; vol Laplace jumps 0.18 /s (0.92) weak as in r2. Shocks: +3.03 s, J sd 48,
+  no reversion; 6/27 |J| < 3 (possible no-jump class, unresolved). D calm 0.049+Exp(0.476), vol 0.673+Exp(1.00).
+- [lead 2026-11-08] All four agents done. Combined spec: `round3_generator.md` (this folder). Added s_dynamics/.gitignore
+  for `_cache/` (1.7 GB). Open: ladder wake rule, ξ decay (2-D filter), calm β drop, shock jump law, recheck +0.09 S ACF on final S.
