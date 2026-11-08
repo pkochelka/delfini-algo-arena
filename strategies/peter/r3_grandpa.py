@@ -1,4 +1,29 @@
-"""fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
+"""r3_grandpa: Marek's r3_best (strategies/marek/round3/r3_best.py) + four round-3 changes (Peter, 2026-11-08).
+
+Adopted (block at the end of the file; every change is a PARAMS key, so 0 / off restores r3_best exactly):
+    tk_on 1         taker reach: a market taker that filled up to price P had an IOC limit >= P; limits are
+                    round(S +- 1) calm / round(S +- 2.55) volatile plus a small tail, so this bounds S and is fast
+                    regime evidence (FV.taker_reach). Nearly all of its value is the regime part (tk_rw 0: ~0).
+    lm_on 1         touch-anchored ladder mixture for deep inserts that no rung follows (FV.lad_alt), with
+    eta 0.25        a higher outlier share (r3_best 0.15).
+    take_skew 0.2   inventory-aware take thresholds: long -> buying needs 0.2 * pos / 100 ticks more edge, selling
+                    less. The +-100 room is the scarce resource; this spends it on the better takes.
+Evidence on the real round-3 tape (strategies/peter/grandpa_eval.py; synthetic tapes not used for these choices:
+they come from our own generator model, so filter changes that encode it score well there by construction):
+    whole tape (one 6000 s run)     795.0k -> 821.4k (+26.4k, +3.3 %; 500 s pieces won 10/12, t 2.8; outside the
+                                    shock windows +16.9k, t 2.4)
+    tuning windows (12 x 370 s)     +21.1k (t 2.2), non-shock +15.0k
+    holdout 4515-6000 s (4 x 370 s) +3.3k, non-shock +0.2k: the gain does not show there (on the whole tape the
+                                    4500-6000 s pieces are +1.8k), so expect anywhere from ~0 to ~+3 % out of sample.
+Tested and left off (all relative to the adopted set or to r3_best, real tape): lm_rw (ladder regime evidence)
+0.5 / 1, lad_mem (chain matching across interleaved inserts), lm_w 0.3-2, eta 0.1, Marek's final impact refit and the
+round-3 regime switch rates (~0), take_skew_t 0.1 / 0.35 and take_skew_pow 2 (worse), inv_skew 0.1-0.2 (flat),
+pcap 50 / 75 (passive quoting is worth its room: -28k / -9k), pj_q 30 (-40k), xcap 250 (deliberate breaches on
+turbulent snipes: -417k, the turbulent book is too thin to unwind).
+Speed: ss_fast is a behaviour-identical fast path of the shock sniper outside shock windows (~8 %).
+
+---- original r3_best / fv_mm docstring ----
+fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
 
 Round 2 broke s_mm: S still drives the makers (bid = min(floor(S - D), ask - 1), ask mirrored, D = d0 + Exp(lam))
 and the takers' impact (c * sign * sqrt(filled)), but S now also diffuses and jumps (194 jumps > 5 ticks,
@@ -401,9 +426,47 @@ class FV:
                 return
         self._observe(is_bid, price, clamped, count_ll, alt)
 
-    def taker(self, t: float, is_buy: bool, price, filled: int) -> None:
+    def taker_reach(self, is_buy: bool, px: int) -> None:
+        """A market taker filled up to price px (buys; sells mirrored), so its IOC limit was >= px.
+
+        Taker limits are round(S +- off) plus, for a share eps, a further ceil(0.5 + Exp(tau)) ticks, per regime
+        (calm off 1, volatile 2.55; marek/research/round2/round2_generator.md, round-3 fit s_dynamics/params_final).
+        A censored observation of S before the taker's own impact: a lower bound for buys, an upper one for sells,
+        and regime evidence (a calm taker rarely reaches more than 1.5 ticks through S).
+        """
+        p = self.p
+        S = self.c * self.h + self.r + self.k
+
+        def lik(off: float, eps: float, tau: float) -> np.ndarray:
+            y = (px - np.round(S + off)) if is_buy else (np.round(S - off) - px)  # ticks beyond the regular limit
+            L = (1 - eps) * (y <= 0) + eps * np.where(y <= 1, 1.0, np.exp(-(y - 1.5) / tau))
+            return np.maximum(L, p['tk_floor'])
+
+        Lc = lik(p['tk_off_c'], p['tk_eps_c'], p['tk_tau_c'])
+        w = self.w
+        if not self.two:
+            post = w * Lc
+            self._post(post, float(post.sum()), False)
+            return
+        Lv = lik(p['tk_off_v'], p['tk_eps_v'], p['tk_tau_v'])
+        pc_ = w * Lc
+        pv_ = w * Lv
+        zc = float(pc_.sum())
+        zv = float(pv_.sum())
+        pv = self.pv
+        if zc > 1e-300 and zv > 1e-300 and p['tk_rw']:
+            lr = (zv / zc) ** p['tk_rw']
+            self.pv = min(max(pv * lr / (pv * lr + 1 - pv), 1e-4), 1 - 1e-4)
+        pc_ *= 1 - pv
+        pv_ *= pv
+        pc_ += pv_
+        self._post(pc_, float(pc_.sum()), False)
+
+    def taker(self, t: float, is_buy: bool, price, filled: int, reach=None) -> None:
         self.predict(t)
         p = self.p
+        if reach is not None and p['tk_on']:
+            self.taker_reach(is_buy, reach)
         if p['taker_obs'] and price is not None:
             S = self.c * self.h + self.r + self.k
             o = (price - S) if is_buy else (S - price)
@@ -585,11 +648,14 @@ class FVMM(BaseStrategy):
         q = 0
         sgn = 0
         tid = None
+        reach = None  # the market taker's most aggressive fill price
         for tr in trades:
             if tr.taker_owner == 'market':
                 q += tr.quantity
                 sgn = 1 if tr.book_side == 'ask' else -1
                 tid = tr.taker_order_id
+                if reach is None or (tr.price > reach if sgn > 0 else tr.price < reach):
+                    reach = tr.price
         # new market inserts: only scan a side whose view list grew or whose top moved
         nb, na = len(bids), len(asks)
         scan_b = nb > self.nb or (nb and bids[0].price != self.mbb)
@@ -614,7 +680,7 @@ class FVMM(BaseStrategy):
                 self.max_id = tid
             rested = (newb is not None and newb.order_id == tid) or (newa is not None and newa.order_id == tid)
             if not rested:  # a crossing limit order (only possible against us) is no IOC: no impact
-                f.taker(t, sgn > 0, None, q)
+                f.taker(t, sgn > 0, None, q, reach)
         elif newb is not None:
             if lad:
                 self._lad_maker(t, snapshot.timestamp_us, True, newb.price, pbb, pba, newb.quantity)
@@ -746,6 +812,13 @@ class FVMM(BaseStrategy):
         else:
             tk = take + take_sd * sd
             lo_b, hi_a = F - tk, F + tk
+        ks = p['take_skew_t'] if turb and p['take_skew_t'] is not None else p['take_skew']
+        if ks:
+            # the +-100 room is the scarce resource: long -> a buy needs ks * (pos / cap)^pow more edge, a sell less
+            x = pos / p['cap']
+            sh = ks * (x if p['take_skew_pow'] == 1 else math.copysign(abs(x) ** p['take_skew_pow'], x))
+            lo_b -= sh
+            hi_a -= sh
         if take and ba <= lo_b:
             lim = math.floor(lo_b)
             q = 0
@@ -844,12 +917,13 @@ class FVMM(BaseStrategy):
                 if q >= p['min_post']:
                     self._send(SELL, ta + 1, q, OrderType.LIMIT)
                     rest_a += q
-        if not have_b or (p['fill_room'] and cap - pos - rest_b >= p['fill_room']):
-            q = min(cap - pos - rest_b, p['size_top'])
+        pc = min(cap, p['pcap']) if p['pcap'] else cap  # passive quotes keep cap - pcap of room for the takes
+        if not have_b or (p['fill_room'] and pc - pos - rest_b >= p['fill_room']):
+            q = min(pc - pos - rest_b, p['size_top'])
             if q >= p['min_post']:
                 self._send(BUY, tb, q, OrderType.LIMIT)
-        if not have_a or (p['fill_room'] and cap + pos - rest_a >= p['fill_room']):
-            q = min(cap + pos - rest_a, p['size_top'])
+        if not have_a or (p['fill_room'] and pc + pos - rest_a >= p['fill_room']):
+            q = min(pc + pos - rest_a, p['size_top'])
             if q >= p['min_post']:
                 self._send(SELL, ta, q, OrderType.LIMIT)
 
@@ -1467,4 +1541,16 @@ PARAMS.update({
     'lm_mu_c': 5.02, 'lm_sd_c': 0.37, 'lm_mu_v': 3.52, 'lm_sd_v': 0.34, 'reg_mu': 2.657, 'reg_sd': 1.803,
     'lm_k0': 2, 'lm_k1': 6, 'lm_p2': 0.61,
     'lad_mem': 0,
+    # tk_on: taker-reach observation (FV.taker_reach); limits round(S +- tk_off) + tail eps * ceil(0.5 + Exp(tau)),
+    # L floored at tk_floor (robustness), regime evidence weight tk_rw
+    'tk_on': 0, 'tk_off_c': 1.0, 'tk_eps_c': 0.0245, 'tk_tau_c': 3.415,
+    'tk_off_v': 2.55, 'tk_eps_v': 0.046, 'tk_tau_v': 5.93, 'tk_floor': 0.01, 'tk_rw': 1.0,
+    # room allocation (the +-100 cap binds): take_skew shifts both take thresholds by take_skew * pos / cap ticks;
+    # pcap > 0 caps the passive quotes' position at pcap (takes still use cap / cap_t)
+    'take_skew': 0.0, 'pcap': 0,
+    'take_skew_t': None,  # turbulent value of take_skew (None: the same)
+    'take_skew_pow': 1.0,  # skew shape: 1 linear in pos, > 1 flatter near 0 and steeper near the cap
 })
+
+# ---- r3_grandpa adopted defaults (2026-11-08; evidence in the module docstring) ----
+PARAMS.update({'tk_on': 1, 'lm_on': 1, 'eta': 0.25, 'take_skew': 0.2})

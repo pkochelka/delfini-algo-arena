@@ -6,6 +6,8 @@
 Tiers (every window = 60 s warmup + ~370 s traded; the strategy only trades from trade_start_us):
     r3     round-3 public wf01-12 (default). The synth tapes come from our own generator model, so a filter change
            that encodes the same model scores well there by construction; the real tape is the arbiter.
+    hold   round-3 public holdout, 4 windows trading 4515-6000 s (data/splits_r3/hold16; never used for tuning)
+    r3full the whole round-3 tape in one run, PnL per 500 s window (12 windows)
     quick  round-3 public wf01,03,..,11 (6) + 2 windows per synthetic tape (12)        ~ 7.7k s of tape
     std    round-3 public wf01-12 (12)  + 4 windows per synthetic tape (24)            ~ 15.5k s
     full   the 7 whole tapes (round 3 public + synth seeds 1-6), PnL per 500 s window  ~ 42k s
@@ -40,7 +42,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 CACHE = ROOT / 'logs' / 'r3' / 'gp_cache.json'
 FULL = ['data/round3_public.csv'] + [f'data/synth/r3_v1_seed{i}.csv' for i in range(1, 7)]
-VER = 'v2'  # cache key version: v2 adds the shock split
+VER = 'v3'  # cache key version: v3 = shock split per part
 
 
 def onsets(group: str) -> list[float]:
@@ -52,6 +54,11 @@ def onsets(group: str) -> list[float]:
 
 def windows(tier: str) -> list[dict]:
     out = []
+    if tier == 'hold':  # round-3 holdout 4515-6000 s (never used for tuning): 4 windows
+        d = ROOT / 'data/splits_r3/hold16'
+        return [{'name': f'h_{f["name"]}', 'path': f'data/splits_r3/hold16/{f["file"]}', 'start': f['trade_start_us'],
+                 'group': 'r3', 'on': 'r3'} for f in json.loads((d / 'folds.json').read_text())['folds']
+                if (d / f['file']).exists()]
     r3 = json.loads((ROOT / 'data/splits_r3/wf/folds.json').read_text())['folds']
     for k, f in enumerate(r3):
         if tier in ('std', 'r3') or k % 2 == 0:
@@ -85,22 +92,19 @@ def run_one(strategy: str, over: dict, w: dict, win_s: float) -> dict:
     r = sim.run(ROOT / w['path'])
     curve = sim.pnl_curve(r.pnl)
     on = onsets(w['on'])
-    shock, prev_t, prev_v = 0.0, None, 0.0
-    for ts, v in curve:  # PnL increments whose interval starts inside a shock window
+    t0 = curve[0][0]
+    n = int((curve[-1][0] - t0) // (win_s * 1e6)) + 1 if win_s else 1  # whole tape: win_s windows
+    parts, shock = [0.0] * n, [0.0] * n
+    prev_t, prev_v = None, 0.0
+    for ts, v in curve:  # each 1 s PnL increment goes to its window, and to `shock` if it starts in a shock window
         if prev_t is not None:
+            k = min(int((prev_t - t0) // (win_s * 1e6)), n - 1) if win_s else 0
+            parts[k] += v - prev_v
             s = prev_t * 1e-6
             i = bisect.bisect_right(on, s + 1.0) - 1
             if i >= 0 and on[i] - 1.0 <= s < on[i] + 20.0:
-                shock += v - prev_v
+                shock[k] += v - prev_v
         prev_t, prev_v = ts, v
-    parts = [r.pnl]
-    if win_s:  # whole tape: split the PnL curve into win_s windows
-        t0, parts, k, last = curve[0][0], [], 1, 0.0
-        for ts, v in curve:
-            while ts - t0 >= k * win_s * 1e6:
-                parts.append(v - last)
-                last, k = v, k + 1
-        parts.append(r.pnl - last)
     return {'pnl': r.pnl, 'parts': parts, 'shock': shock, 'breach': r.breach_penalty, 'fills': r.fills}
 
 
@@ -123,13 +127,13 @@ def main() -> None:
     ap.add_argument('strategy')
     ap.add_argument('variants', nargs='*')
     ap.add_argument('--base', default='{}')
-    ap.add_argument('--tier', default='r3', choices=['r3', 'quick', 'std', 'full'])
+    ap.add_argument('--tier', default='r3', choices=['r3', 'hold', 'r3full', 'quick', 'std', 'full'])
     ap.add_argument('--jobs', type=int, default=8)
     ap.add_argument('--no-cache', action='store_true')
     a = ap.parse_args()
-    if a.tier == 'full':
+    if a.tier in ('full', 'r3full'):
         ws = [{'name': Path(p).stem, 'path': p, 'start': 0, 'group': 'r3' if 'round3' in p else 'synth',
-               'on': 'r3' if 'round3' in p else f's{p[-5]}'} for p in FULL]
+               'on': 'r3' if 'round3' in p else f's{p[-5]}'} for p in (FULL if a.tier == 'full' else FULL[:1])]
         win_s = 500.0
     else:
         ws, win_s = windows(a.tier), 0.0
@@ -156,13 +160,14 @@ def main() -> None:
         grp = lambda rs, g: sum(r['pnl'] for r, w in zip(rs, ws) if w['group'] == g)  # noqa: E731
         print(f"[{a.tier}: {len(ws)} windows, {len(futs)} runs] base {json.dumps(base)[:80]}: total "
               f"{sum(r['pnl'] for r in b) / 1e3:.1f}k (r3 {grp(b, 'r3') / 1e3:.1f}k, synth {grp(b, 'synth') / 1e3:.1f}k;"
-              f" shock part {sum(r['shock'] for r in b) / 1e3:.1f}k), breach {sum(r['breach'] for r in b) / 1e3:.1f}k",
+              f" shock part {sum(sum(r['shock']) for r in b) / 1e3:.1f}k), breach {sum(r['breach'] for r in b) / 1e3:.1f}k",
               flush=True)
         for v, ks in zip(vs[1:], keys[1:]):
             rs = [get(k) for k in ks]
             dw = [p - q for x, y in zip(rs, b) for p, q in zip(x['parts'], y['parts'])]
-            dx = [(x['pnl'] - x['shock']) - (y['pnl'] - y['shock']) for x, y in zip(rs, b)]
-            dsh = sum(x['shock'] - y['shock'] for x, y in zip(rs, b))
+            dx = [(p - ps) - (q - qs) for x, y in zip(rs, b)
+                  for p, ps, q, qs in zip(x['parts'], x['shock'], y['parts'], y['shock'])]
+            dsh = sum(sum(x['shock']) - sum(y['shock']) for x, y in zip(rs, b))
             line = (f"{json.dumps(v)[:66]:66} d {sum(dw) / 1e3:+6.1f}k t {tstat(dw):+5.1f} won {sum(x > 0 for x in dw):2d}/{len(dw)}"
                     f" | ex {sum(dx) / 1e3:+6.1f}k t {tstat(dx):+5.1f} won {sum(x > 0 for x in dx):2d} | sh {dsh / 1e3:+6.1f}k")
             if a.tier != 'r3':
