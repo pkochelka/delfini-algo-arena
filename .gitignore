@@ -22,3 +22,10 @@ marek/research/**/cache/
 marek/research/**/*.pkl
 marek/research/**/*.npz
 marek/research/**/*.parquet
+marek/research/**/*.npy
+marek/research/**/*.out
+# Backtest raw outputs (huge)
+marek/research/**/events.csv
+marek/research/**/book_deltas.csv
+marek/research/**/run.jsonl
+marek/research/**/trades.csv

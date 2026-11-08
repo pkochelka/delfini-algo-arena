@@ -1,0 +1,166 @@
+SHOT 273.928 Side.BUY 9959 0 ref 9951 edge 6.6
+SHOT 273.9566 Side.BUY 9959 0 ref 9951 edge 6.6
+SHOT 273.9731 Side.BUY 9959 0 ref 9951 edge 6.6
+SHOT 446.8829 Side.BUY 9960 850 ref 9952 edge 6.1
+SHOT 446.9105 Side.BUY 9960 0 ref 9952 edge 7.3
+SHOT 446.9291 Side.BUY 9960 0 ref 9952 edge 7.3
+SHOT 664.4707 Side.SELL 9892 1050 ref 9900 edge 4.4
+SHOT 664.4891 Side.SELL 9892 895 ref 9900 edge 4.4
+SHOT 664.5225 Side.SELL 9892 602 ref 9900 edge 4.4
+SHOT 1071.1685 Side.SELL 9869 0 ref 9877 edge 8.6
+SHOT 1071.1894 Side.SELL 9869 0 ref 9877 edge 9.2
+SHOT 1071.2067 Side.SELL 9869 0 ref 9877 edge 10.1
+SHOT 1288.7316 Side.SELL 9859 33 ref 9867 edge 10.6
+SHOT 1288.7469 Side.SELL 9859 44 ref 9867 edge 11.2
+SHOT 1288.7716 Side.SELL 9859 44 ref 9867 edge 11.2
+SHOT 1793.8139 Side.SELL 9917 850 ref 9925 edge 5.4
+SHOT 1793.8329 Side.SELL 9917 592 ref 9925 edge 17.5
+SHOT 1793.8489 Side.SELL 9917 592 ref 9925 edge 17.5
+SHOT 1969.7122 Side.SELL 9896 0 ref 9904 edge 5.2
+SHOT 1969.7312 Side.SELL 9896 0 ref 9904 edge 5.6
+SHOT 1969.7498 Side.SELL 9896 0 ref 9904 edge 5.6
+SHOT 2264.1628 Side.SELL 9925 109 ref 9933 edge 4.9
+SHOT 2264.1801 Side.SELL 9925 0 ref 9933 edge 5.3
+SHOT 2264.1969 Side.SELL 9925 0 ref 9933 edge 5.3
+DBG 2467.5428 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9907 9914 newb None newa None pos 100 F 9909.1 room 850 1050
+DBG 2467.5491 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9907 9914 newb None newa None pos 100 F 9909.1 room 850 1050
+DBG 2467.5497 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9907 9914 newb None newa None pos 100 F 9909.1 room 850 1050
+DBG 2467.5584 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9907 9914 newb 9913 newa None pos 100 F 9918.3 room 850 1050
+DBG 2467.5615 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9913 9914 newb None newa None pos 100 F 9918.3 room 850 1050
+DBG 2467.5671 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9913 9914 newb None newa 9949 pos 100 F 9946.6 room 850 1050
+DBG 2467.5682 sg 2464.89 on 2464.579 win False dir 0 ssg False pb 9913 9949 newb 9947 newa None pos 100 F 9948.0 room 850 1050
+DBG 2467.5769 sg 2464.89 on 2464.579 win True dir 0 ssg False pb 9947 9949 newb None newa None pos 100 F 9948.0 room 850 1050
+SHOT 2467.6246 Side.SELL 9939 200 ref 9947 edge -1.0
+SHOT 2467.6469 Side.SELL 9939 64 ref 9947 edge -1.0
+SHOT 2467.6655 Side.SELL 9939 0 ref 9947 edge -1.0
+SHOT 2763.1229 Side.SELL 9951 850 ref 9959 edge 4.7
+SHOT 2763.1424 Side.SELL 9951 849 ref 9959 edge 51.1
+SHOT 2763.1644 Side.SELL 9951 849 ref 9959 edge 51.1
+DBG 3056.1843 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.1865 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.196 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.1971 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.1976 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2005 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2047 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.207 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2095 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2131 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2141 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2222 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2274 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.0 room 1050 850
+DBG 3056.2298 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb None newa None pos -100 F 9931.9 room 1050 850
+DBG 3056.2345 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9929 9933 newb 9959 newa None pos -100 F 9961.4 room 1050 850
+DBG 3056.2376 sg 3053.499 on 3053.184 win True dir 0 ssg False pb 9959 9933 newb None newa 9962 pos -100 F 9960.5 room 1050 850
+SHOT 3056.2376 Side.BUY 9941 200 ref 9933 edge 27.5
+DBG 3056.2379 sg 3053.499 on 3053.184 win True dir 1 ssg True pb 9959 9962 newb None newa 9963 pos -100 F 9960.6 room 850 850
+DBG 3056.2381 sg 3053.499 on 3053.184 win True dir 1 ssg True pb 9959 9962 newb None newa None pos -100 F 9960.6 room 850 850
+SHOT 3056.2554 Side.BUY 9941 200 ref 9933 edge 27.8
+SHOT 3056.2777 Side.BUY 9941 200 ref 9933 edge 28.8
+SHOT 3208.8479 Side.BUY 9978 1050 ref 9970 edge 5.5
+SHOT 3208.8651 Side.BUY 9978 812 ref 9970 edge 27.1
+SHOT 3208.886 Side.BUY 9978 812 ref 9970 edge 27.1
+DBG 3620.7142 sg 3617.929 on 3617.675 win True dir 0 ssg False pb 9947 9951 newb None newa None pos 100 F 9948.9 room 850 1050
+DBG 3620.7145 sg 3617.929 on 3617.675 win True dir 0 ssg False pb 9947 9951 newb None newa None pos 100 F 9948.9 room 850 1050
+DBG 3620.7178 sg 3617.929 on 3617.675 win True dir 0 ssg False pb 9947 9951 newb None newa None pos 100 F 9948.9 room 850 1050
+DBG 3620.7195 sg 3617.929 on 3617.675 win True dir 0 ssg False pb 9947 9951 newb None newa 9948 pos 100 F 9941.3 room 850 1050
+SHOT 3620.7195 Side.SELL 9939 1050 ref 9947 edge 5.7
+DBG 3620.7199 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9947 9948 newb None newa None pos 100 F 9941.3 room 850 0
+DBG 3620.7206 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9947 9948 newb None newa 9948 pos 100 F 9940.9 room 850 0
+DBG 3620.7232 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9947 9948 newb None newa 9948 pos 100 F 9940.5 room 850 0
+DBG 3620.7233 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9947 9948 newb None newa None pos 100 F 9940.5 room 850 0
+DBG 3620.7282 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9947 9948 newb None newa 9948 pos -645 F 9927.4 room 1595 305
+DBG 3620.7293 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb None newa None pos -645 F 9927.4 room 1595 305
+DBG 3620.7316 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb None newa None pos -645 F 9927.4 room 1595 305
+DBG 3620.7328 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb 9924 newa None pos -645 F 9926.6 room 1595 305
+DBG 3620.7343 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb None newa None pos -645 F 9926.6 room 1595 305
+DBG 3620.735 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb 9925 newa None pos -645 F 9926.6 room 1595 305
+SHOT 3620.735 Side.SELL 9939 305 ref 9947 edge 20.4
+DBG 3620.7354 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb None newa None pos -645 F 9926.6 room 1595 0
+DBG 3620.7388 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb 9925 newa None pos -645 F 9926.6 room 1595 0
+DBG 3620.744 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb 9925 newa None pos -645 F 9926.6 room 1595 305
+DBG 3620.7493 sg 3617.929 on 3617.675 win True dir -1 ssg True pb 9925 9948 newb 9925 newa None pos -645 F 9926.6 room 1595 305
+SHOT 3620.7502 Side.SELL 9939 305 ref 9947 edge 20.4
+SHOT 3873.1792 Side.SELL 9818 0 ref 9826 edge 80.6
+SHOT 3873.2075 Side.SELL 9818 0 ref 9826 edge 81.4
+SHOT 3873.2229 Side.SELL 9818 0 ref 9826 edge 81.4
+SHOT 4024.5153 Side.SELL 9626 0 ref 9634 edge -1.5
+SHOT 4024.5339 Side.SELL 9626 0 ref 9634 edge 0.3
+SHOT 4024.5494 Side.SELL 9626 0 ref 9634 edge 1.7
+DBG 4267.3198 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9573 9580 newb None newa None pos -100 F 9576.0 room 1050 850
+DBG 4267.3275 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9573 9580 newb None newa None pos -100 F 9574.9 room 1050 850
+DBG 4267.3287 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9572 9580 newb None newa None pos -100 F 9574.9 room 1050 850
+DBG 4267.3321 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9572 9580 newb None newa None pos -100 F 9574.9 room 1050 850
+DBG 4267.3353 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9572 9580 newb None newa None pos -100 F 9574.9 room 1050 850
+DBG 4267.338 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9572 9580 newb None newa None pos -100 F 9574.9 room 1050 850
+DBG 4267.3393 sg 4264.595 on 4264.291 win True dir 0 ssg False pb 9572 9580 newb None newa 9573 pos -100 F 9568.0 room 1050 850
+SHOT 4267.3393 Side.SELL 9564 0 ref 9572 edge 4.0
+DBG 4267.3426 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9572 9573 newb None newa 9573 pos -100 F 9567.6 room 1050 850
+DBG 4267.3428 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9572 9573 newb None newa 9573 pos -100 F 9567.3 room 1050 850
+DBG 4267.3502 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9572 9573 newb None newa None pos -100 F 9567.3 room 1050 850
+DBG 4267.3517 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9572 9573 newb None newa None pos -100 F 9567.3 room 1050 850
+DBG 4267.3521 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9572 9573 newb None newa None pos -100 F 9566.2 room 1050 850
+DBG 4267.353 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9572 9573 newb 9543 newa None pos -100 F 9566.2 room 1050 850
+DBG 4267.3539 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9573 newb 9542 newa None pos -100 F 9544.6 room 1050 850
+DBG 4267.3562 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9573 newb 9543 newa None pos -100 F 9544.6 room 1050 850
+SHOT 4267.3562 Side.SELL 9564 0 ref 9572 edge 27.4
+DBG 4267.3577 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9573 newb None newa None pos -100 F 9544.4 room 1050 850
+DBG 4267.3585 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9573 newb None newa 9546 pos -100 F 9544.3 room 1050 850
+DBG 4267.362 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9546 newb None newa None pos -100 F 9544.3 room 1050 850
+DBG 4267.3664 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9546 newb 9543 newa None pos -100 F 9544.4 room 1050 850
+DBG 4267.3685 sg 4264.595 on 4264.291 win True dir -1 ssg True pb 9543 9546 newb None newa 9546 pos -100 F 9544.4 room 1050 850
+SHOT 4267.3729 Side.SELL 9564 0 ref 9572 edge 28.0
+DBG 4414.3425 sg 4411.69 on 4411.333 win True dir 0 ssg False pb 9479 9483 newb 9482 newa None pos 100 F 9488.2 room 850 1050
+SHOT 4414.3425 Side.BUY 9491 0 ref 9483 edge 5.2
+DBG 4414.3428 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb None newa None pos 100 F 9488.2 room 850 1050
+DBG 4414.3466 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb None newa None pos 100 F 9488.2 room 850 1050
+DBG 4414.3483 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb 9482 newa None pos 100 F 9488.6 room 850 1050
+DBG 4414.3502 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb 9482 newa None pos 100 F 9488.8 room 850 1050
+DBG 4414.3512 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb None newa None pos 100 F 9488.8 room 850 1050
+DBG 4414.3513 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb None newa None pos 100 F 9488.8 room 850 1050
+DBG 4414.3561 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9483 newb None newa 9504 pos 100 F 9488.8 room 850 1050
+DBG 4414.3566 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9504 newb None newa 9504 pos 100 F 9502.2 room 850 1050
+DBG 4414.3586 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9504 newb None newa None pos 100 F 9502.2 room 850 1050
+SHOT 4414.3586 Side.BUY 9491 0 ref 9483 edge 19.2
+DBG 4414.3644 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9504 newb None newa 9504 pos 100 F 9502.3 room 850 1050
+DBG 4414.3654 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9482 9504 newb 9503 newa None pos 100 F 9509.1 room 850 1050
+DBG 4414.3842 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9503 9504 newb 9503 newa None pos 100 F 9510.3 room 850 1050
+SHOT 4414.3842 Side.BUY 9491 0 ref 9483 edge 27.3
+DBG 4414.3857 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9503 9504 newb 9501 newa None pos 100 F 9505.4 room 850 1050
+DBG 4414.3897 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9503 9504 newb None newa 9504 pos 100 F 9501.1 room 850 1050
+DBG 4414.3945 sg 4411.69 on 4411.333 win True dir 1 ssg True pb 9503 9504 newb 9502 newa None pos 100 F 9503.1 room 850 1050
+SHOT 4584.7571 Side.BUY 9481 0 ref 9473 edge 6.6
+SHOT 4584.7735 Side.BUY 9481 0 ref 9473 edge 14.3
+SHOT 4584.7986 Side.BUY 9481 0 ref 9473 edge 14.3
+DBG 4825.5987 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.6036 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.6044 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.6076 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.6101 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.612 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.612 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+DBG 4825.6179 sg 4822.978 on 4822.685 win False dir 0 ssg False pb 9487 9491 newb None newa None pos -100 F 9488.8 room 1050 850
+SHOT 4983.6532 Side.BUY 9575 88 ref 9567 edge 2.3
+SHOT 4983.6685 Side.BUY 9575 0 ref 9567 edge 3.0
+SHOT 4983.6847 Side.BUY 9575 0 ref 9567 edge 3.0
+SHOT 5192.5636 Side.BUY 9577 0 ref 9569 edge 4.7
+SHOT 5192.5825 Side.BUY 9577 0 ref 9569 edge 4.7
+SHOT 5192.5984 Side.BUY 9577 0 ref 9569 edge 4.7
+SHOT 5398.8496 Side.BUY 9574 1050 ref 9566 edge 5.1
+SHOT 5398.8696 Side.BUY 9574 0 ref 9566 edge 106.6
+SHOT 5398.8871 Side.BUY 9574 0 ref 9566 edge 111.2
+DBG 5569.8047 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa 9702 pos -100 F 9700.2 room 1050 850
+DBG 5569.8117 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.2 room 1050 850
+DBG 5569.8155 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb 9698 newa None pos -100 F 9700.2 room 1050 850
+DBG 5569.8383 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.8422 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.8481 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.8491 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.8523 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.8525 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9702 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.857 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9704 newb None newa None pos -100 F 9700.7 room 1050 850
+DBG 5569.8593 sg 5567.184 on 5566.788 win True dir 0 ssg False pb 9698 9704 newb None newa None pos -100 F 9700.7 room 1050 850
+SHOT 5845.7577 Side.SELL 9705 850 ref 9713 edge 4.9
+SHOT 5845.7744 Side.SELL 9705 813 ref 9713 edge 4.9
+SHOT 5845.7903 Side.SELL 9705 744 ref 9713 edge 4.9

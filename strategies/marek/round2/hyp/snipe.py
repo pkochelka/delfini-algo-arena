@@ -751,6 +751,10 @@ PARAMS.update({
     'xu_pass': 0,  # with xu_me: also rest the excess as a limit at the floor (passive exit into the taker burst)
     'xs_conf': 0,
     'xs_edge': None,  # excess over cap only if the filter mean at trigger is >= this many ticks through the stale touch
+    'xs_reval': 0,  # 1: re-check the edge at every shot (max so far) so later shots can carry the excess
+    'xs_late': 0,  # >0: no excess when the trigger is later than onset estimate + xs_late s (stale side gone)
+    'xs_nostk': 0,  # 1: no excess on triggers that only fired thanks to ss_sticky
+    'xs_m': None,  # excess IOC priced no worse than F -+ xs_m (None = same price as the cap shot)
     'xu_ts2': 0,  # >0: time stop (s after trigger) without floor: after it the exit IOCs go at F -+ xu_lim2
     'xs_k': 0,  # >0: excess size capped at xs_k * (edge - xs_edge) lots  # >0: shots after the first may exceed cap only if F moved >= xs_conf ticks past ss_ref
 })
@@ -779,6 +783,7 @@ class FVAShock(FVMM):
         self.xp_id = None
         self.ss_first = True
         self.ss_edge = 0.0
+        self.ss_stk = False
 
     def on_private_order_update(self, event) -> None:
         if event.order_id in self.ss_ids and event.filled_quantity and event.fill_price is not None:
@@ -968,6 +973,7 @@ class FVAShock(FVMM):
                 self.n_snipes += 1
                 self.ss_q, self.ss_c, self.ss_t, self.ss_first = 0, 0.0, t, True
                 self.ss_edge = (self.f.mean - self.ss_ref) * d
+                self.ss_stk = self.sg_t is None  # fired only thanks to ss_sticky
                 for oid, o in list(self.orders.items()):  # pull our own stale quotes on the losing side
                     if oid not in self.cancelling and o[0] is (SELL if d > 0 else BUY):
                         self.cancelling.add(oid)
@@ -981,14 +987,31 @@ class FVAShock(FVMM):
                     q -= p['xs_cap'] - p['cap']
             px = self.ss_ref + p['ss_lim'] if side is BUY else self.ss_ref - p['ss_lim']
             if p['xs_edge'] is not None and p['xs_cap']:
+                if p['xs_reval']:
+                    self.ss_edge = max(self.ss_edge, (self.f.mean - self.ss_ref) * self.ss_dir)
                 ex = p['xs_cap'] - p['cap']
-                if self.ss_edge < p['xs_edge']:
+                late = p['xs_late'] and (self.ss_onset is None or self.ss_t - self.ss_onset > p['xs_late'])
+                if p['xs_nostk'] and self.ss_stk:
+                    late = True
+                if self.ss_edge < p['xs_edge'] or late:
                     q -= ex
                 elif p['xs_k']:
                     q -= max(0, ex - int(p['xs_k'] * (self.ss_edge - p['xs_edge'])))
             if p['xs_conf'] and p['xs_cap'] and self.ss_first:
                 q -= p['xs_cap'] - p['cap']
             self.ss_first = False
+            if p['xs_m'] is not None and p['xs_cap']:
+                # the part of the shot beyond the normal cap only at prices >= xs_m ticks through F
+                qn = max(0, min(q, p['cap'] - (self.pos + sum(o[2] for o in self.orders.values() if o[0] is side))
+                                if side is BUY else
+                                p['cap'] + self.pos - sum(o[2] for o in self.orders.values() if o[0] is side)))
+                qx = q - qn
+                F = self.f.mean
+                pxx = min(px, math.floor(F - p['xs_m'])) if side is BUY else max(px, math.ceil(F + p['xs_m']))
+                if qx > 0 and pxx != px and pxx > 0:
+                    self._send(side, pxx, qx, OrderType.IOC)
+                    self.ss_ids.add(next(reversed(self.orders)))
+                    q = qn
             if q > 0 and px > 0:
                 self._send(side, px, q, OrderType.IOC)
                 self.ss_ids.add(next(reversed(self.orders)))

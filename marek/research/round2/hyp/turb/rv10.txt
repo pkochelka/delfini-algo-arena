@@ -1,0 +1,1 @@
+{"tag": "turb_rv10", "strategy": "strategies/marek/round2/hyp/turb.py", "set": {"vol_sep": 1, "passive_v": 0, "take_sd_t": 1.0, "red_v": 1, "theta_v": 1.0, "theta_keep_v": 0.7}, "pnl": {"r2": 556325.0, "s1": 669157.0}, "synth_mean": 669157.0, "breach": {}, "secs": 208}

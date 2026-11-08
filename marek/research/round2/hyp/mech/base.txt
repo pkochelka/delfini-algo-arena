@@ -1,0 +1,1 @@
+{"tag": "mech_base", "strategy": "strategies/marek/round2/hyp/mech.py", "set": {}, "pnl": {"r2": 591131.0, "s1": 646964.0, "s2": 657119.0}, "synth_mean": 652041.5, "breach": {}, "secs": 71}

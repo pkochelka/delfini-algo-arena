@@ -1,0 +1,1 @@
+{"tag": "filter_oracle_oracle_sd=-1.0", "strategy": "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/filter/oracle.py", "set": {"oracle_path": "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/filter/S_seed1.npy", "oracle_sd": -1.0}, "pnl": {"s1": 715134.0}, "synth_mean": 715134.0, "breach": {}, "secs": 290}

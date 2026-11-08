@@ -1,0 +1,126 @@
+TRIG 229.7813 dir 1 ref 9981 F 9982.5 pos 100 rest 0 edge 1.5 stk True inw True on 226.774619
+SHOT 229.7964 left 1 F 9982.6 pos 100 edge 1.6
+SHOT 229.8166 left 0 F 9984.1 pos 100 edge 3.1
+SEND 522.3938 Side.BUY px 9891 q 136 ref 9883 F 9881.8 pos -36 edge -1.2 stk True inw True
+TRIG 522.3938 dir 1 ref 9883 F 9881.8 pos -36 rest 136 edge -1.2 stk True inw True on 519.3542659999999
+SHOT 522.4144 left 1 F 9881.9 pos 100 edge -1.1
+SHOT 522.4310 left 0 F 9882.0 pos 100 edge -1.0
+SEND 693.9693 Side.SELL px 9806 q 850 ref 9814 F 9810.0 pos -100 edge 4.0 stk False inw True
+TRIG 693.9693 dir -1 ref 9814 F 9810.0 pos -100 rest 850 edge 4.0 stk False inw True on 690.9564349999999
+SEND 693.9857 Side.SELL px 9806 q 644 ref 9814 F 9762.4 pos -306 edge 51.6 stk False inw True
+SHOT 693.9857 left 1 F 9762.4 pos -306 edge 51.6
+SEND 694.0081 Side.SELL px 9806 q 644 ref 9814 F 9766.0 pos -306 edge 51.6 stk False inw True
+SHOT 694.0081 left 0 F 9766.0 pos -306 edge 51.6
+SEND 986.3538 Side.SELL px 9757 q 850 ref 9765 F 9759.3 pos -100 edge 5.7 stk True inw True
+TRIG 986.3538 dir -1 ref 9765 F 9759.3 pos -100 rest 850 edge 5.7 stk True inw True on 983.257668
+SEND 986.3773 Side.SELL px 9757 q 850 ref 9765 F 9696.3 pos -100 edge 68.7 stk True inw True
+SHOT 986.3773 left 1 F 9696.3 pos -100 edge 68.7
+SEND 986.3936 Side.SELL px 9757 q 850 ref 9765 F 9696.3 pos -100 edge 68.7 stk True inw True
+SHOT 986.3936 left 0 F 9696.3 pos -100 edge 68.7
+SEND 1183.0563 Side.SELL px 9652 q 949 ref 9660 F 9655.2 pos 1 edge 4.8 stk False inw True
+TRIG 1183.0563 dir -1 ref 9660 F 9655.2 pos 1 rest 951 edge 4.8 stk False inw True on 1180.027448
+SEND 1183.0727 Side.SELL px 9652 q 949 ref 9660 F 9553.4 pos -1 edge 106.6 stk False inw True
+SHOT 1183.0727 left 1 F 9553.4 pos -1 edge 106.6
+SEND 1183.0907 Side.SELL px 9652 q 949 ref 9660 F 9558.4 pos -1 edge 106.6 stk False inw True
+SHOT 1183.0907 left 0 F 9558.4 pos -1 edge 106.6
+SEND 1396.5447 Side.BUY px 9531 q 895 ref 9523 F 9530.6 pos 55 edge 7.6 stk False inw True
+TRIG 1396.5447 dir 1 ref 9523 F 9530.6 pos 55 rest 895 edge 7.6 stk False inw True on 1393.537766
+SHOT 1396.5620 left 1 F 9531.4 pos 950 edge 8.4
+SHOT 1396.5774 left 0 F 9533.0 pos 950 edge 10.0
+SEND 1670.6950 Side.BUY px 9536 q 850 ref 9528 F 9532.8 pos 100 edge 4.8 stk True inw True
+TRIG 1670.6950 dir 1 ref 9528 F 9532.8 pos 100 rest 850 edge 4.8 stk True inw True on 1667.698774
+SEND 1670.7107 Side.BUY px 9536 q 748 ref 9528 F 9534.9 pos 202 edge 6.9 stk True inw True
+SHOT 1670.7107 left 1 F 9534.9 pos 202 edge 6.9
+SEND 1670.7269 Side.BUY px 9536 q 748 ref 9528 F 9548.8 pos 202 edge 20.8 stk True inw True
+SHOT 1670.7269 left 0 F 9548.8 pos 202 edge 20.8
+TRIG 1882.1310 dir -1 ref 9537 F 9542.9 pos -100 rest 0 edge -5.9 stk True inw True on 1879.0832389999998
+SEND 1882.1463 Side.SELL px 9529 q 850 ref 9537 F 9453.4 pos -100 edge 83.6 stk True inw True
+SHOT 1882.1463 left 1 F 9453.4 pos -100 edge 83.6
+SEND 1882.1634 Side.SELL px 9529 q 850 ref 9537 F 9453.3 pos -100 edge 83.7 stk True inw True
+SHOT 1882.1634 left 0 F 9453.3 pos -100 edge 83.7
+SEND 2114.4943 Side.SELL px 9418 q 95 ref 9426 F 9425.6 pos -5 edge 0.4 stk False inw True
+TRIG 2114.4943 dir -1 ref 9426 F 9425.6 pos -5 rest 95 edge 0.4 stk False inw True on 2111.496938
+SHOT 2114.5127 left 1 F 9422.7 pos -100 edge 3.3
+SHOT 2114.5299 left 0 F 9424.6 pos -100 edge 3.3
+SEND 2268.6895 Side.BUY px 9441 q 850 ref 9433 F 9492.6 pos 100 edge 59.6 stk True inw True
+TRIG 2268.6895 dir 1 ref 9433 F 9492.6 pos 100 rest 850 edge 59.6 stk True inw True on 2265.641818
+SEND 2268.7056 Side.BUY px 9441 q 850 ref 9433 F 9494.4 pos 100 edge 61.4 stk True inw True
+SHOT 2268.7056 left 1 F 9494.4 pos 100 edge 61.4
+SEND 2268.7294 Side.BUY px 9441 q 850 ref 9433 F 9494.1 pos 100 edge 61.4 stk True inw True
+SHOT 2268.7294 left 0 F 9494.1 pos 100 edge 61.4
+SEND 2531.7394 Side.SELL px 9507 q 850 ref 9515 F 9428.6 pos -100 edge 86.4 stk True inw True
+TRIG 2531.7394 dir -1 ref 9515 F 9428.6 pos -100 rest 850 edge 86.4 stk True inw True on 2528.663878
+SEND 2531.7568 Side.SELL px 9507 q 850 ref 9515 F 9428.3 pos -100 edge 86.7 stk True inw True
+SHOT 2531.7568 left 1 F 9428.3 pos -100 edge 86.7
+SEND 2531.7832 Side.SELL px 9507 q 850 ref 9515 F 9428.3 pos -100 edge 86.7 stk True inw True
+SHOT 2531.7832 left 0 F 9428.3 pos -100 edge 86.7
+SEND 2762.4417 Side.BUY px 9410 q 850 ref 9402 F 9408.1 pos 100 edge 6.1 stk False inw True
+TRIG 2762.4417 dir 1 ref 9402 F 9408.1 pos 100 rest 850 edge 6.1 stk False inw True on 2759.414742
+SEND 2762.4638 Side.BUY px 9410 q 784 ref 9402 F 9464.5 pos 166 edge 62.5 stk False inw True
+SHOT 2762.4638 left 1 F 9464.5 pos 166 edge 62.5
+SEND 2762.4792 Side.BUY px 9410 q 784 ref 9402 F 9464.5 pos 166 edge 62.5 stk False inw True
+SHOT 2762.4792 left 0 F 9464.5 pos 166 edge 62.5
+SEND 3230.1250 Side.BUY px 9572 q 974 ref 9564 F 9569.2 pos -30 edge 5.2 stk False inw True
+TRIG 3230.1250 dir 1 ref 9564 F 9569.2 pos -30 rest 980 edge 5.2 stk False inw True on 3227.120673
+SEND 3230.1439 Side.BUY px 9572 q 980 ref 9564 F 9600.3 pos -30 edge 36.3 stk False inw True
+SHOT 3230.1439 left 1 F 9600.3 pos -30 edge 36.3
+SEND 3230.1606 Side.BUY px 9572 q 980 ref 9564 F 9600.3 pos -30 edge 36.3 stk False inw True
+SHOT 3230.1606 left 0 F 9600.3 pos -30 edge 36.3
+SEND 3425.6095 Side.BUY px 9665 q 956 ref 9657 F 9661.9 pos -6 edge 4.9 stk False inw True
+TRIG 3425.6095 dir 1 ref 9657 F 9661.9 pos -6 rest 956 edge 4.9 stk False inw True on 3422.57827
+SEND 3425.6283 Side.BUY px 9665 q 955 ref 9657 F 9678.6 pos -5 edge 21.6 stk False inw True
+SHOT 3425.6283 left 1 F 9678.6 pos -5 edge 21.6
+SEND 3425.6541 Side.BUY px 9665 q 955 ref 9657 F 9680.4 pos -5 edge 23.4 stk False inw True
+SHOT 3425.6541 left 0 F 9680.4 pos -5 edge 23.4
+SEND 3643.6456 Side.BUY px 9721 q 884 ref 9713 F 9733.6 pos 66 edge 20.6 stk True inw True
+TRIG 3643.6456 dir 1 ref 9713 F 9733.6 pos 66 rest 884 edge 20.6 stk True inw True on 3640.619772
+SEND 3643.6666 Side.BUY px 9721 q 884 ref 9713 F 9734.8 pos 66 edge 21.8 stk True inw True
+SHOT 3643.6666 left 1 F 9734.8 pos 66 edge 21.8
+SEND 3643.6829 Side.BUY px 9721 q 884 ref 9713 F 9734.6 pos 66 edge 21.8 stk True inw True
+SHOT 3643.6829 left 0 F 9734.6 pos 66 edge 21.8
+SEND 3813.7319 Side.BUY px 9772 q 850 ref 9764 F 9769.7 pos -100 edge 5.7 stk False inw True
+TRIG 3813.7319 dir 1 ref 9764 F 9769.7 pos -100 rest 1050 edge 5.7 stk False inw True on 3810.735922
+SEND 3813.7473 Side.BUY px 9772 q 833 ref 9764 F 9789.6 pos 117 edge 25.6 stk False inw True
+SHOT 3813.7473 left 1 F 9789.6 pos 117 edge 25.6
+SEND 3813.7627 Side.BUY px 9772 q 833 ref 9764 F 9798.0 pos 117 edge 34.0 stk False inw True
+SHOT 3813.7627 left 0 F 9798.0 pos 117 edge 34.0
+SEND 4024.2154 Side.BUY px 9809 q 850 ref 9801 F 9807.3 pos 0 edge 6.3 stk False inw True
+TRIG 4024.2154 dir 1 ref 9801 F 9807.3 pos 0 rest 950 edge 6.3 stk False inw True on 4021.220669
+SEND 4024.2326 Side.BUY px 9809 q 827 ref 9801 F 9803.9 pos 123 edge 6.3 stk False inw True
+SHOT 4024.2326 left 1 F 9803.9 pos 123 edge 6.3
+SEND 4024.2557 Side.BUY px 9809 q 827 ref 9801 F 9873.9 pos 123 edge 72.9 stk False inw True
+SHOT 4024.2557 left 0 F 9873.9 pos 123 edge 72.9
+SEND 4204.7100 Side.SELL px 9859 q 117 ref 9867 F 9868.1 pos 17 edge -1.1 stk True inw True
+TRIG 4204.7100 dir -1 ref 9867 F 9868.1 pos 17 rest 117 edge -1.1 stk True inw True on 4201.710137
+SHOT 4204.7277 left 1 F 9866.7 pos -100 edge 0.3
+SHOT 4204.7431 left 0 F 9863.5 pos -100 edge 3.5
+TRIG 4394.1834 dir -1 ref 9771 F 9773.1 pos -100 rest 0 edge -2.1 stk True inw True on 4391.111073
+SEND 4394.2004 Side.SELL px 9763 q 34 ref 9771 F 9773.0 pos -66 edge -2.0 stk True inw True
+SHOT 4394.2004 left 1 F 9773.0 pos -66 edge -2.0
+SEND 4394.2154 Side.SELL px 9763 q 20 ref 9771 F 9773.0 pos -80 edge -2.0 stk True inw True
+SHOT 4394.2154 left 0 F 9773.0 pos -80 edge -2.0
+SEND 4848.7568 Side.BUY px 9885 q 850 ref 9877 F 9882.5 pos 100 edge 5.5 stk True inw True
+TRIG 4848.7568 dir 1 ref 9877 F 9882.5 pos 100 rest 850 edge 5.5 stk True inw True on 4845.747085999999
+SEND 4848.7721 Side.BUY px 9885 q 493 ref 9877 F 9884.1 pos 457 edge 7.1 stk True inw True
+SHOT 4848.7721 left 1 F 9884.1 pos 457 edge 7.1
+SEND 4848.7935 Side.BUY px 9885 q 493 ref 9877 F 9884.6 pos 457 edge 7.6 stk True inw True
+SHOT 4848.7935 left 0 F 9884.6 pos 457 edge 7.6
+SEND 5071.4628 Side.BUY px 9911 q 850 ref 9903 F 9908.4 pos 91 edge 5.4 stk False inw True
+TRIG 5071.4628 dir 1 ref 9903 F 9908.4 pos 91 rest 859 edge 5.4 stk False inw True on 5068.434335999999
+SEND 5071.4798 Side.BUY px 9911 q 619 ref 9903 F 9907.4 pos 331 edge 5.4 stk False inw True
+SHOT 5071.4798 left 1 F 9907.4 pos 331 edge 5.4
+SEND 5071.4985 Side.BUY px 9911 q 619 ref 9903 F 9950.1 pos 331 edge 47.1 stk False inw True
+SHOT 5071.4985 left 0 F 9950.1 pos 331 edge 47.1
+SEND 5662.8242 Side.BUY px 9814 q 850 ref 9806 F 9811.5 pos 1 edge 5.5 stk True inw True
+TRIG 5662.8242 dir 1 ref 9806 F 9811.5 pos 1 rest 949 edge 5.5 stk True inw True on 5659.827329
+SEND 5662.8458 Side.BUY px 9814 q 658 ref 9806 F 9812.0 pos 292 edge 6.0 stk True inw True
+SHOT 5662.8458 left 1 F 9812.0 pos 292 edge 6.0
+SEND 5662.8633 Side.BUY px 9814 q 658 ref 9806 F 9807.9 pos 292 edge 6.0 stk True inw True
+SHOT 5662.8633 left 0 F 9807.9 pos 292 edge 6.0
+SEND 5921.5362 Side.BUY px 9800 q 87 ref 9792 F 9793.7 pos 13 edge 1.7 stk True inw True
+TRIG 5921.5362 dir 1 ref 9792 F 9793.7 pos 13 rest 87 edge 1.7 stk True inw True on 5918.544645
+SEND 5921.5537 Side.BUY px 9800 q 906 ref 9792 F 9796.1 pos 44 edge 4.1 stk True inw True
+SHOT 5921.5537 left 1 F 9796.1 pos 44 edge 4.1
+SEND 5921.5739 Side.BUY px 9800 q 906 ref 9792 F 9799.9 pos 44 edge 7.9 stk True inw True
+SHOT 5921.5739 left 0 F 9799.9 pos 44 edge 7.9
+PNL 767402.04

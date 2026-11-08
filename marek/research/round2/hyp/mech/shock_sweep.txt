@@ -1,0 +1,64 @@
+Traceback (most recent call last):
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 52, in <module>
+    main()
+    ~~~~^^
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 30, in main
+    over[k] = ast.literal_eval(v)
+              ~~~~~~~~~~~~~~~~^^^
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 64, in literal_eval
+    node_or_string = parse(node_or_string.lstrip(" \t"), mode='eval')
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+                   _feature_version=feature_version, optimize=optimize)
+  File "<unknown>", line 1
+    800 xu_lim=6.0
+        ^^^^^^
+SyntaxError: invalid syntax
+Traceback (most recent call last):
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 52, in <module>
+    main()
+    ~~~~^^
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 30, in main
+    over[k] = ast.literal_eval(v)
+              ~~~~~~~~~~~~~~~~^^^
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 64, in literal_eval
+    node_or_string = parse(node_or_string.lstrip(" \t"), mode='eval')
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+                   _feature_version=feature_version, optimize=optimize)
+  File "<unknown>", line 1
+    800 xu_lim=12.0
+        ^^^^^^
+SyntaxError: invalid syntax
+Traceback (most recent call last):
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 52, in <module>
+    main()
+    ~~~~^^
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 30, in main
+    over[k] = ast.literal_eval(v)
+              ~~~~~~~~~~~~~~~~^^^
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 64, in literal_eval
+    node_or_string = parse(node_or_string.lstrip(" \t"), mode='eval')
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+                   _feature_version=feature_version, optimize=optimize)
+  File "<unknown>", line 1
+    500 xu_lim=6.0
+        ^^^^^^
+SyntaxError: invalid syntax
+Traceback (most recent call last):
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 52, in <module>
+    main()
+    ~~~~^^
+  File "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/eval.py", line 30, in main
+    over[k] = ast.literal_eval(v)
+              ~~~~~~~~~~~~~~~~^^^
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 64, in literal_eval
+    node_or_string = parse(node_or_string.lstrip(" \t"), mode='eval')
+  File "/Users/marek/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/lib/python3.13/ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+                   _feature_version=feature_version, optimize=optimize)
+  File "<unknown>", line 1
+    900 xu_lim=6.0 ss_lim=12
+        ^^^^^^
+SyntaxError: invalid syntax

@@ -1,0 +1,1 @@
+{"tag": "mech fill_room=0", "strategy": "strategies/marek/round2/hyp/mech.py", "set": {"fill_room": 0}, "pnl": {"s5": 606725.0, "s6": 519213.0, "s7": 544898.0}, "synth_mean": 556945.3333333334, "breach": {}, "secs": 75}

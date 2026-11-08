@@ -1,0 +1,7 @@
+== s1 pnl 646964  shocks tot 81169  jmp 68849  fired 10/26  sum|J|*100 120770
+== s2 pnl 657119  shocks tot 22653  jmp 10011  fired 5/26  sum|J|*100 75410
+== s3 pnl 653801  shocks tot 21844  jmp 3950  fired 13/27  sum|J|*100 68070
+== s4 pnl 527090  shocks tot 23518  jmp 17315  fired 5/24  sum|J|*100 71500
+== s5 pnl 606725  shocks tot 44320  jmp 16015  fired 7/26  sum|J|*100 111460
+== s6 pnl 519213  shocks tot 28280  jmp 12083  fired 7/27  sum|J|*100 104210
+== s7 pnl 544898  shocks tot 33993  jmp 26144  fired 6/26  sum|J|*100 74770

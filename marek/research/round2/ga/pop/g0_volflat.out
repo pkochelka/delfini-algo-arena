@@ -1,0 +1,16 @@
+{
+ "id": "g0_volflat",
+ "parent": "",
+ "desc": "seed",
+ "set": "train",
+ "file": "marek/research/round2/ga/pop/g0_volflat.py",
+ "fitness": 155642,
+ "min": 139388,
+ "pnl": {
+  "round2": 151014.0,
+  "r2_v2_seed1": 166861.0,
+  "r2_v2_seed2": 162474.0,
+  "r2_v2_seed3": 139388.0,
+  "r2_v2_seed4": 158475.0
+ }
+}

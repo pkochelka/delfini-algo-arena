@@ -1,0 +1,9 @@
+stack_vs {'vol_sep': 1} r2=674867 r2:-48333 s1:-9962 s2:-10569 s3:-6123 tr=-35389 ho=-12944 t=-2.93
+stack_vsp0 {'vol_sep': 1, 'passive_v': 0} r2=723200 r2:+0 s1:+0 s2:+0 s3:+0 tr=+0 ho=+0 t=0.00
+stack_vsp0t1 {'vol_sep': 1, 'passive_v': 0, 'take_sd_t': 1.0} r2=721325 r2:-1875 s1:+24224 s2:+26034 s3:+23791 tr=-724 ho=-1151 t=2.47
+stack_cross {'ss_cross': 1} r2=723278 r2:+78 s1:+0 s2:+459 s3:-512 tr=+78 ho=+0 t=0.03
+stack_be2 {'burst_exc': 0.2} r2=729323 r2:+6123 s1:+5595 s2:+4317 s3:+4270 tr=+4033 ho=+2090 t=4.27
+stack_t15 {'vol_sep': 1, 'passive_v': 0, 'take_sd_t': 1.5} r2=714463 r2:-8737 s1:+23050 s2:+14278 s3:+25319 tr=+6712 ho=-15449 t=1.87
+stack_A {'burst_exc': 0.2, 'vol_sep': 1, 'passive_v': 0, 'take_sd_t': 1.0} r2=727276 r2:+4076 s1:+29376 s2:+29880 s3:+29197 tr=+1854 ho=+2222 t=3.22
+stack_Afr3 {'burst_exc': 0.2, 'vol_sep': 1, 'passive_v': 0, 'take_sd_t': 1.0, 'fill_room': 3} r2=728125 r2:+4925 s1:+27640 s2:+30747 s3:+29140 tr=+1873 ho=+3052 t=3.17
+stack_Afr8 {'burst_exc': 0.2, 'vol_sep': 1, 'passive_v': 0, 'take_sd_t': 1.0, 'fill_room': 8} r2=725104 r2:+1904 s1:+29038 s2:+33375 s3:+27606 tr=+155 ho=+1749 t=3.20

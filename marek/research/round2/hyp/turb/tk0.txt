@@ -1,0 +1,1 @@
+{"tag": "turb_tk0", "strategy": "strategies/marek/round2/hyp/turb.py", "set": {"take_t": 0.0}, "pnl": {"r2": 270130.0, "s1": 394376.0, "s2": 291269.0}, "synth_mean": 342822.5, "breach": {}, "secs": 213}

@@ -1,0 +1,2 @@
+s1 {'pnl': 767402.04, 'breach_penalty': 10565.96}
+uv run python marek/research/round2/hyp/snipe/probe.py  $t $D/b_$t.pkl  70.85s user 0.62s system 69% cpu 1:42.60 total

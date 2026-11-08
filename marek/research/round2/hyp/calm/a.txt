@@ -1,0 +1,13 @@
+th20|theta=0.2
+th40|theta=0.4
+th50|theta=0.5
+thk00|theta_keep=0.0
+thk20|theta_keep=0.2
+kd0|keep_depth=0
+kd2|keep_depth=2
+ro05|reach_off=0.5
+ro15|reach_off=1.5
+pj50s50|pj_size=50 size_top=50
+pj30s70|pj_size=30 size_top=70
+qsz600|qsz=600
+jq200|jq=200 jth=0.1

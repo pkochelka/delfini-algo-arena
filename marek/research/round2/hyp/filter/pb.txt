@@ -1,0 +1,1 @@
+{"tag": "probe_base", "strategy": "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/filter/probe.py", "set": {"probe_out": "/Users/marek/Documents/delfini-algo-arena/marek/research/round2/hyp/filter/fills_base_s1.npy"}, "pnl": {"s1": 646964.0}, "synth_mean": 646964.0, "breach": {}, "secs": 51}

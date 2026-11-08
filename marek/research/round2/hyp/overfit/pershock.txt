@@ -1,0 +1,29 @@
+PARAMS.update({'dr_on': 0}) {'big': -46244, 'small': -21738, 'other': -3712} n_big 35 n_small 147
+PARAMS.update({'xs_edge': 3.0}) {'big': 1170, 'small': -2247, 'other': 687} n_big 35 n_small 147
+PARAMS.update({'ss_lim': 5}) {'big': -331, 'small': 9717, 'other': -945} n_big 35 n_small 147
+PARAMS.update({'xu_lim': 2.0}) {'big': -66552, 'small': -19209, 'other': 3976} n_big 35 n_small 147
+PARAMS.update({'xs_edge': None}) {'big': -13441, 'small': -93273, 'other': -4760} n_big 35 n_small 147
+PARAMS.update({'xs_reval': 0}) {'big': 1314, 'small': -23153, 'other': -3965} n_big 35 n_small 147
+PARAMS.update({'xu_ts2': 0.04}) {'big': -66761, 'small': -20592, 'other': 1122} n_big 35 n_small 147
+PARAMS.update({'xs_cap': 400}) {'big': -20022, 'small': -21212, 'other': -1027} n_big 35 n_small 147
+PARAMS.update({'ps_on': 0}) {'big': 3549, 'small': 25576, 'other': 15124} n_big 35 n_small 147
+PARAMS.update({'xs_cap': 0}) {'big': -65454, 'small': -104093, 'other': -4139} n_big 35 n_small 147
+PARAMS.update({'xs_edge': 6.0}) {'big': -50764, 'small': -60370, 'other': -1857} n_big 35 n_small 147
+PARAMS.update({'ss_shots': 1}) {'big': 1988, 'small': -12166, 'other': -3445} n_big 35 n_small 147
+PARAMS.update({'xu_ts2': 0.2}) {'big': -759, 'small': -9985, 'other': -699} n_big 35 n_small 147
+PARAMS.update({'xu_lim2': 6.0}) {'big': 33, 'small': -5864, 'other': 1292} n_big 35 n_small 147
+r2 shocks 28
+r2 PARAMS.update({'dr_on': 0}) {'5398': -13643, 'other_shocks': -2912, 'nonshock': -6860}
+r2 PARAMS.update({'xs_edge': 3.0}) {'5398': 0, 'other_shocks': 8780, 'nonshock': -1043}
+r2 PARAMS.update({'ss_lim': 5}) {'5398': -85224, 'other_shocks': 2105, 'nonshock': -229}
+r2 PARAMS.update({'xu_lim': 2.0}) {'5398': -965, 'other_shocks': -5790, 'nonshock': 0}
+r2 PARAMS.update({'xs_edge': None}) {'5398': 0, 'other_shocks': -91, 'nonshock': -183}
+r2 PARAMS.update({'xs_reval': 0}) {'5398': 0, 'other_shocks': -1879, 'nonshock': -459}
+r2 PARAMS.update({'xu_ts2': 0.04}) {'5398': -2093, 'other_shocks': -5910, 'nonshock': 162}
+r2 PARAMS.update({'xs_cap': 400}) {'5398': -58300, 'other_shocks': -7635, 'nonshock': 83}
+r2 PARAMS.update({'ps_on': 0}) {'5398': -258, 'other_shocks': 4002, 'nonshock': -2208}
+r2 PARAMS.update({'xs_cap': 0}) {'5398': -89531, 'other_shocks': -17009, 'nonshock': -755}
+r2 PARAMS.update({'xs_edge': 6.0}) {'5398': -89531, 'other_shocks': -16339, 'nonshock': -476}
+r2 PARAMS.update({'ss_shots': 1}) {'5398': 0, 'other_shocks': 3801, 'nonshock': -576}
+r2 PARAMS.update({'xu_ts2': 0.2}) {'5398': -244, 'other_shocks': -2267, 'nonshock': -1866}
+r2 PARAMS.update({'xu_lim2': 6.0}) {'5398': 0, 'other_shocks': -356, 'nonshock': -462}

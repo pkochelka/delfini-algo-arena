@@ -1,0 +1,5 @@
+ro20|reach_off=2.0
+pj50s50|pj_size=50 size_top=50
+jq100t0|jq=100 jth=0.0
+qsz600|qsz=600
+tu30|topup=30

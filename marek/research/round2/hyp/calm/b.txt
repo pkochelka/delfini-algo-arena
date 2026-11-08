@@ -1,0 +1,13 @@
+tk05|take=0.05
+tk30|take=0.3
+tsd1|take_sd=1.0
+tsd3|take_sd=3.0
+msd04|max_sd=0.4
+msd10|max_sd=1.0
+thsd1|theta_sd=1.0
+sz50|size_top=50
+mp10|min_post=10
+pj100|pj_size=100
+qk1|qk=1.0
+qk1o2|qk=1.0 qk_off=0.2
+jq100t0|jq=100 jth=0.0

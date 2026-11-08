@@ -7,7 +7,7 @@ import csv, json, subprocess, sys, pathlib
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = pathlib.Path(__file__).resolve().parents[4]
-SRC = ROOT / 'strategies/marek/r2_ladder.py'
+SRC = ROOT / __import__('os').environ.get('STRAT', 'strategies/marek/round2/r2_ladder.py')
 R = ROOT / 'marek/research/round2/flow/'
 OUT = pathlib.Path(__file__).parent
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         for rec in recs:
             print(f"{rec['name']:<28} pnl={rec['pnl']:>11.0f} {rec['split']} invq50={rec['inv_q50']} fills={rec['fills']}")
     else:
-        short = [pathlib.Path(t).stem.replace('r2_v1_', '') for t in tapes]
+        short = [pathlib.Path(t).stem.replace('r2_v1_', 'v1').replace('r2_v2_', 'v2') for t in tapes]
         print(f"{'config':<22}" + ''.join(f'{s:>10}' for s in short) + f"{'mean':>10}{'min':>10}")
         for n, _ in jobs:
             v = [r['pnl'] for r in recs if r['name'] == n]

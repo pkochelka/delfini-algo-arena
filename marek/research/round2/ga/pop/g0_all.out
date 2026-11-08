@@ -1,0 +1,16 @@
+{
+ "id": "g0_all",
+ "parent": "",
+ "desc": "seed",
+ "set": "train",
+ "file": "marek/research/round2/ga/pop/g0_all.py",
+ "fitness": -75662,
+ "min": -193031,
+ "pnl": {
+  "round2": -93798.0,
+  "r2_v2_seed1": -65565.0,
+  "r2_v2_seed2": 10978.0,
+  "r2_v2_seed3": -36893.0,
+  "r2_v2_seed4": -193031.0
+ }
+}

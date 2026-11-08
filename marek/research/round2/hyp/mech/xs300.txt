@@ -1,0 +1,1 @@
+{"tag": "mech_xs300", "strategy": "strategies/marek/round2/hyp/mech.py", "set": {"xu_on": 1, "xs_cap": 300, "xu_lim": 6.0}, "pnl": {"r2": 596805.1799999999, "s1": 652283.3, "s2": 652768.46}, "synth_mean": 652525.88, "breach": {"r2": 5619.409999999996, "s1": 3548.850000000001, "s2": 1544.2700000000002}, "secs": 61}

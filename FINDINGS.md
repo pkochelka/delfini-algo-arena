@@ -212,3 +212,10 @@ All tested on the round1 folds; numbers are deltas against ladder unless noted.
 | `strategies/peter/round1_generator.md`, `r1_model.py`, `r1_synth.py` | The reverse-engineered generator: fit it on any tape, then generate synthetic tapes |
 | `strategies/peter/r1_structure.py` | Structure audit: anomalies, periodicity, trends, per-split stability, predictive-model comparison. Run it first on each new round |
 | `strategies/peter/tune.py` | `load_folds` / `run_fold` and the Optuna search; `marek/sweep_impact.py` shows a minimal fold A/B |
+
+## Round 2: liquidity drop = volatile regime (`marek/research/round2/liquidity/README.md`)
+
+- The depth collapse around minutes 60–67 (touch about 2,000 → 450 lots, spread about 1.07 → 2) is the tape's longest volatile stretch (3631–3736 and 3816–4033 s). Minutes 34–35, 71 and 94 look the same. Maker insert rate does not change; quotes are 2.6× wider and cancels faster.
+- `r2_ladder` `cf` already earns about 280/s there against about 35/s in calm, and minutes 60–67 give about 96k of its 398k. Nearly all of it is IOC sniping of stale quotes (+193k at the +1 s markout); passive volatile quoting is breakeven.
+- The limit is the ±100 cap: about 450 stale lots per event against at most 200 of room, and pinned 83 % of volatile time. Inventory rebalancing is EV-neutral there, so don't try it.
+- `s_take_max` 100 → 200 gives +3.6k to +5.0k on round2 and 3 synth seeds, with no breaches. Next: flatten-only passive side in volatile, ground-truth S on synth for the volatile S estimate, and a room-aware `vol_take`.

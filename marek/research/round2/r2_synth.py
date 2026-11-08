@@ -5,10 +5,13 @@ Usage:
 
 Writes data/synth/r2_<tag>_seed<k>.csv (+ .params.json and .truth.json with regime segments and shock onsets).
 
-Model (parameters from marek/research/round2/flow/README.md, makers/README.md, s_dynamics/params_v2.json):
+Model: the final fit in marek/research/round2/round2_generator.md and s_dynamics/params_v3.json.
     regime     2-state Markov chain, calm -> vol p_cv /s, vol -> calm p_vc /s (frozen during shock windows)
-    per regime c (impact), D = d_shift + Exp(d_scale) (maker offset), taker_off, taker_rate per side,
-               cancel alpha / beta, extra Brownian diffusion of S (sig, ticks/sqrt(s))
+    impact     each FILLED taker moves S by sign * c * filled**e + N(0, xi); unfilled IOCs move nothing
+    per regime c, e, xi, D = d_shift + Exp(d_scale) (maker offset), taker_rate per side, cancel alpha / beta,
+               taker limit round(S +- off), and with prob eps a further ceil(0.5 + Exp(tau)) ticks (aggressive tail);
+               volatile also has small Laplace(scale bj) jumps of S at rate lamj /s (fit, possibly a misfit);
+               optional Brownian diffusion sig (ticks/sqrt(s), 0 in the final fit)
     shocks     first onset U(gap_lo, gap_hi), then gaps U(gap_lo, gap_hi). Drought: maker rate x drought_mult and
                cancel alpha = drought_alpha, D = drought_d_shift + Exp(drought_d_scale) for drought_s seconds; then
                S jumps by N(0, jump_sd) and a symmetric taker burst follows (burst_rate total for burst_flat_s,
@@ -32,22 +35,23 @@ import numpy as np
 PARAMS: dict[str, float] = {
     'duration': 6000.0,
     's0': 10000.0,
-    'impact_exp': 0.5,
     'maker_rate': 180.0,
     'maker_mu': 2.657, 'maker_sd': 1.803,
     'taker_mu': 4.10, 'taker_sd': 1.40,
     'life_b': 50.0, 'dead': 0.005,
     # calm
-    'calm_c': 0.0278, 'calm_sig': 0.127, 'calm_d_shift': 0.05, 'calm_d_scale': 0.45, 'calm_off': 1.0,
-    'calm_taker_rate': 4.0, 'calm_alpha': 1.75, 'calm_beta': 6.1,
+    'calm_c': 0.0142, 'calm_e': 0.625, 'calm_xi': 0.124, 'calm_sig': 0.0,
+    'calm_d_shift': 0.05, 'calm_d_scale': 0.45, 'calm_off': 1.0, 'calm_eps': 0.022, 'calm_tau': 3.15,
+    'calm_taker_rate': 4.0, 'calm_alpha': 1.73, 'calm_beta': 6.1, 'calm_lamj': 0.0, 'calm_bj': 1.0,
     # volatile
-    'vol_c': 0.130, 'vol_sig': 0.80, 'vol_d_shift': 0.089, 'vol_d_scale': 1.224, 'vol_off': 2.57,
-    'vol_taker_rate': 6.0, 'vol_alpha': 1.87, 'vol_beta': 4.8,
+    'vol_c': 0.0741, 'vol_e': 0.61, 'vol_xi': 0.28, 'vol_sig': 0.0,
+    'vol_d_shift': 0.70, 'vol_d_scale': 0.90, 'vol_off': 2.55, 'vol_eps': 0.04, 'vol_tau': 6.27,
+    'vol_taker_rate': 6.0, 'vol_alpha': 1.9, 'vol_beta': 4.1, 'vol_lamj': 0.23, 'vol_bj': 0.84,
     'p_cv': 0.0040, 'p_vc': 0.023,
     # shocks
     'shocks': 1.0,
     'gap_lo': 150.0, 'gap_hi': 300.0,
-    'drought_s': 3.0, 'drought_mult': 0.30, 'drought_alpha': 6.6,
+    'drought_s': 3.0, 'drought_mult': 0.30, 'drought_alpha': 6.3,
     'drought_d_shift': 0.54, 'drought_d_scale': 1.33,
     'jump_sd': 43.0,
     'burst_rate': 35.0, 'burst_flat_s': 1.25, 'burst_end_s': 3.0,
@@ -95,8 +99,9 @@ def generate(p: dict[str, float], seed: int):
 
     # candidate arrivals at max rates, thinned below
     mr, tr_max = p['maker_rate'], max(p['calm_taker_rate'], p['vol_taker_rate']) + p['burst_rate'] / 2
+    lj_max = max(p['calm_lamj'], p['vol_lamj'])
     times, kinds = [], []
-    for kind, rate in ((0, mr), (1, tr_max), (2, tr_max)):
+    for kind, rate in ((0, mr), (1, tr_max), (2, tr_max), (3, lj_max)):
         n = rng.poisson(rate * T)
         times.append(np.sort(rng.uniform(0, T, n)))
         kinds.append(np.full(n, kind, dtype=np.int8))
@@ -111,9 +116,13 @@ def generate(p: dict[str, float], seed: int):
     m_delay = (p['dead'] + rng.exponential(1 / p['life_b'], n)).tolist()
     t_vol = np.maximum(1, np.rint(np.exp(rng.normal(p['taker_mu'], p['taker_sd'], n)))).astype(np.int64).tolist()
     s_noise = rng.normal(0, 1, n).tolist()
+    xi_noise = rng.normal(0, 1, n).tolist()
+    t_tail = rng.random(n).tolist()
+    t_extra = rng.exponential(1.0, n).tolist()
+    j_lap = rng.laplace(0, 1, n).tolist()
 
     st = {'vol': segs[0][2], 'drought': False, 'burst_t0': -1e9}
-    S = p['s0']; ex = p['impact_exp']
+    S = p['s0']
     levels = ({}, {}); qty = ({}, {}); prices = ([], [])
     live: dict[int, tuple] = {}
     cancels: list = []
@@ -194,12 +203,19 @@ def generate(p: dict[str, float], seed: int):
             rerate(tc)
         flush(t)
         sig = p[pref() + 'sig']
-        if sig > 0:
+        if sig > 0 and t > t_prev:
             S += sig * math.sqrt(t - t_prev) * s_noise[i]
             if i % 50 == 0:
                 rerate(t)
         t_prev = t
         kind = k_all[i]
+        if kind == 3:
+            lam = p[pref() + 'lamj']
+            if st['drought'] or u_thin[i] > lam / lj_max:
+                continue
+            S += p[pref() + 'bj'] * j_lap[i]
+            rerate(t)
+            continue
         if kind == 0:
             if st['drought'] and u_thin[i] > p['drought_mult']:
                 continue
@@ -242,6 +258,9 @@ def generate(p: dict[str, float], seed: int):
             buy = kind == 1; v = t_vol[i]
             off = p[pref() + 'off']
             px = round(S + off) if buy else round(S - off)
+            if t_tail[i] < p[pref() + 'eps']:
+                x = math.ceil(0.5 + p[pref() + 'tau'] * t_extra[i])
+                px += x if buy else -x
             if px <= 0:
                 continue
             rows.append(f'{stamp(t)},Insert,{oid},{"B" if buy else "A"},{v},{px},F')
@@ -269,7 +288,7 @@ def generate(p: dict[str, float], seed: int):
                         op.pop()
             if filled:
                 c = p[pref() + 'c']
-                S += (c if buy else -c) * filled ** ex
+                S += (c if buy else -c) * filled ** p[pref() + 'e'] + p[pref() + 'xi'] * xi_noise[i]
                 rerate(t)
     flush(T)
     truth = {'onsets': onsets, 'jumps': jumps, 'segs': segs}

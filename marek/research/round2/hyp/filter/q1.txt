@@ -1,0 +1,12 @@
+sigma=0.15 :: "pnl": {"r2": 572070.0}, "synth_mean": 
+sigma=0.5 :: "pnl": {"r2": 583093.0}, "synth_mean": 
+rho0=0.02 :: "pnl": {"r2": 572227.0}, "synth_mean": 
+rho0=0.15 :: "pnl": {"r2": 568956.0}, "synth_mean": 
+eta=0.02 :: "pnl": {"r2": 587830.0}, "synth_mean": 
+lap_j=1 :: "pnl": {"r2": 574068.0}, "synth_mean": 
+kick=2.0 :: "pnl": {"r2": 586120.0}, "synth_mean": 
+kick=0.5 :: "pnl": {"r2": 591673.0}, "synth_mean": 
+jump_det=1.5 :: "pnl": {"r2": 587963.0}, "synth_mean": 
+jump_det=3.0 :: "pnl": {"r2": 592794.0}, "synth_mean": 
+jv=0.025 :: "pnl": {"r2": 573989.0}, "synth_mean": 
+h=0.025 K=480 :: "pnl": {"r2": 575475.0}, "synth_mean": 

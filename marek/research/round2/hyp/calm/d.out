@@ -1,0 +1,16 @@
+calm_ro20 {'r2': 527267.0, 's1': 607622.0} 607622 {}
+calm_pj50s50 {'r2': 510652.0, 's1': 570707.0} 570707 {}
+calm_jq100t0 {'r2': 569865.0, 's1': 625153.0} 625153 {}
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json,sys; r=json.loads(sys.stdin.read()); print(r['tag'], r['pnl'], round(r['synth_mean']), r['breach'])
+                       ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/marek/.pyenv/versions/3.13.9/lib/python3.13/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Users/marek/.pyenv/versions/3.13.9/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/marek/.pyenv/versions/3.13.9/lib/python3.13/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
