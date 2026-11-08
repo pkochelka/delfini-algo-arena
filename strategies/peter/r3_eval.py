@@ -16,6 +16,15 @@ sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(HERE))
 R3 = ROOT / 'marek/research/round3/flow'
 
 
+def jumps_of(tape: str):
+    """(t_jump, J) of every shock: truth for synthetic tapes, marek's shock_events.csv for the real one."""
+    tj = (ROOT / tape).with_suffix('.truth.json')
+    if tj.exists():
+        tr = json.loads(tj.read_text())
+        return [(o + 3.0, J) for o, J in zip(tr['onsets'], tr['jumps'])]
+    return [(float(r['t_jump']), float(r['jump'])) for r in csv.DictReader(open(R3 / 'shock_events.csv'))]
+
+
 def ctx(tape: str):
     tj = (ROOT / tape).with_suffix('.truth.json')
     if tj.exists():
@@ -31,6 +40,15 @@ def run(strategy: str, over: dict, tape: str) -> dict:
     from simulator.main import MAX_POSITION, MAX_POTENTIAL_POSITION, ORDER_ACCEPT_DELAY_MS, POSITION_BREACH_PENALTY_PER_SECOND
     from simulator.simulator import ExchangeSimulator, SimulationConfig
     strat = load_agent(Path(strategy), over, 'r3eval')
+    # luck: position held into each shock jump times the jump (zero mean, sd ~25k over a tape); adj = pnl - luck
+    jl = jumps_of(tape)
+    jpos = []
+    onb0 = strat.on_order_book_change
+    def onb(snap, trades):
+        if len(jpos) < len(jl) and snap.timestamp_us >= (jl[len(jpos)][0] - 0.002) * 1e6:
+            jpos.append(strat.pos if hasattr(strat, 'pos') else 0)
+        onb0(snap, trades)
+    strat.on_order_book_change = onb
     cfg = SimulationConfig(max_position=MAX_POSITION, max_potential_position=MAX_POTENTIAL_POSITION,
                            position_breach_penalty_per_second=POSITION_BREACH_PENALTY_PER_SECOND,
                            order_accept_delay_ms=ORDER_ACCEPT_DELAY_MS)
@@ -57,7 +75,8 @@ def run(strategy: str, over: dict, tape: str) -> dict:
     tot_us = sum(inv.values()) or 1
     capf = sum(v for k, v in inv.items() if k >= 95) / tot_us
     flat = sum(v for k, v in inv.items() if k <= 20) / tot_us
-    return {'tape': Path(tape).stem, 'pnl': r.pnl, 'capf': capf, 'flat': flat, 'vol': r.traded_volume, 'breach': r.breach_penalty, 'fills': r.fills, 'parts': parts,
+    luck = sum(ps_ * J for ps_, (t_, J) in zip(jpos, jl))
+    return {'tape': Path(tape).stem, 'pnl': r.pnl, 'luck': luck, 'adj': r.pnl - luck, 'capf': capf, 'flat': flat, 'vol': r.traded_volume, 'breach': r.breach_penalty, 'fills': r.fills, 'parts': parts,
             'per_shock': per_shock, 'win': win, 'onsets': on, 'curve': (ts, ps)}
 
 
@@ -93,16 +112,18 @@ def main():
             res = [f.result() for f in fs]
             tot = {k: sum(r['parts'][k] for r in res) / len(res) for k in ('calm', 'volatile', 'shock')}
             pn = [r['pnl'] for r in res]
-            line = (f"{Path(s).stem[:10]} {json.dumps(v)[:70]:70} mean {statistics.fmean(pn)/1e3:7.1f}k  "
+            adj = [r['adj'] for r in res]
+            line = (f"{Path(s).stem[:10]} {json.dumps(v)[:70]:70} mean {statistics.fmean(pn)/1e3:7.1f}k adj {statistics.fmean(adj)/1e3:6.1f}k  "
                     f"calm {tot['calm']/1e3:6.1f} vol {tot['volatile']/1e3:6.1f} shock {tot['shock']/1e3:6.1f}  "
                     f"breach {statistics.fmean(r['breach'] for r in res)/1e3:5.1f}k "
                     f"atcap {statistics.fmean(r['capf'] for r in res):.2f} flat {statistics.fmean(r['flat'] for r in res):.2f} "
                     f"vol {statistics.fmean(r['vol'] for r in res)/1e3:.0f}k")
             if base is None:
-                base = pn
+                base, base_adj = pn, adj
             else:
                 d = [x - y for x, y in zip(pn, base)]
-                line += f"  d {statistics.fmean(d)/1e3:+6.1f}k ({sum(x > 0 for x in d)}/{len(d)})"
+                da = [x - y for x, y in zip(adj, base_adj)]
+                line += f"  d {statistics.fmean(d)/1e3:+6.1f}k dadj {statistics.fmean(da)/1e3:+6.1f}k"
             print(line, flush=True)
             if a.detail:
                 print('    ' + ' '.join(f"{r['tape'][-6:]}={r['pnl']/1e3:.0f}k" for r in res))

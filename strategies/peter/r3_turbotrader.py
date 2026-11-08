@@ -13,6 +13,18 @@ Selection protocol (strategies/peter/turbotrader_eval.py): a change is adopted o
 tapes it was never tuned on (r3_synth.py seeds 201-212 to select, 213-224 untouched to confirm) and does not lose on
 the real public tape. A filter change that encodes the synthetic generator's own model is suspect on synth.
 
+Findings (2026-11-08). Marek's r3_synth had two bugs that made every ladder-related filter change look huge on synth
+(r3_grandpa's features +594k non-shock on 12 tapes): a ladder's length shared its random draw with its start offset,
+and pending rungs were stamped after later cancels, which broke the exact 2000 us spacing of 37 % of volatile chains
+(so the strategy's chain filter missed them). strategies/peter/tt_synth.py fixes both and is calibrated to the real
+tape (tt_realsynth.py, tt_singles.py). On its fresh tapes, non-shock PnL vs this file's defaults:
+    lm_on 1 (ladder mixture)   select +43.1k (t 7.3, 12/12), confirm +42.3k (t 4.1, 11/12) = +1.6 %; real tape ~0
+    tk_on 1 (taker reach)      select +6.0k (t 2.1), confirm +3.0k (t 0.7); real +2.5k
+    eta 0.25 +16.7k, take_skew 0.2 +2.9k, Marek's selection block +5.9k (all ~0 on the real tape or worse)
+lm_on passes the protocol (wins both synth sets, does not lose on the real tape) and is ON by default (2026-11-08,
+user's call). It was part of r3_grandpa, which lost to this file on the test set, but on its own, recalibrated
+evidence, it is a small real gain (+1.6 % non-shock) rather than the synth artifact r3_grandpa's number was.
+
 ---- original r3_best / fv_mm docstring ----
 fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
 
@@ -1530,7 +1542,7 @@ PARAMS.update({'tr_on': 1, 'tr_p': 0.54, 'tr_T': 16.7, 'tr_p_v': 0.55, 'tr_T_v':
 # ======================================================================================================
 PARAMS.update({
     'ss_fast': 1,  # behaviour-identical fast path of the shock sniper outside shock windows (speed only)
-    'lm_on': 0, 'lm_w': 1.0, 'lm_rw': 0.0,
+    'lm_on': 1, 'lm_w': 1.0, 'lm_rw': 0.0,
     'lm_s_c': 5.5, 'lm_s_v': 8.2, 'lm_m_c': 1.1, 'lm_m_v': 11.2, 'lm_base': 180.0,
     'lm_mu_c': 5.02, 'lm_sd_c': 0.37, 'lm_mu_v': 3.52, 'lm_sd_v': 0.34, 'reg_mu': 2.657, 'reg_sd': 1.803,
     'lm_k0': 2, 'lm_k1': 6, 'lm_p2': 0.61,

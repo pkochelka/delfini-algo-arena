@@ -429,6 +429,8 @@ class FVMM(BaseStrategy):
         self.rv_F = None
         self.rv_next = 0.0
         self.lad_last = {True: None, False: None}  # side -> (t_us, price) of the last market insert
+        self.virt_a: list = []  # r3_man: (price, expiry) of market asks / bids our IOCs consumed
+        self.virt_b: list = []
         self.lad_pend: list = []  # deferred deep inserts [t, t_us, is_bid, price, opp]
         self.lad_rung = False  # the current event's insert is a ladder rung (or a deferred deep insert)
         self.n_lad = 0
@@ -500,6 +502,10 @@ class FVMM(BaseStrategy):
         if st is OrderStatus.PARTIALLY_FILLED or st is OrderStatus.FILLED:
             self.pos += event.filled_quantity if o[0] is BUY else -event.filled_quantity
             o[2] = event.remaining_quantity
+            if self.p['virt_life'] and event.fill_price is not None and o[3]:
+                # r3_man: our IOC consumed a market level that still exists in the generator's book (the tape's makers
+                # keep clamping to it until its cancel row comes); remember it as a virtual level
+                (self.virt_a if o[0] is BUY else self.virt_b).append((event.fill_price, self.now_t + self.p['virt_life']))
         if st is OrderStatus.FILLED or st is OrderStatus.CANCELED or st is OrderStatus.REJECTED:
             self.orders.pop(event.order_id, None)
             self.cancelling.discard(event.order_id)
@@ -561,6 +567,14 @@ class FVMM(BaseStrategy):
         scan_a = na > self.na or (na and asks[0].price != self.mba)
         self.nb, self.na = nb, na
         pbb, pba = self.mbb, self.mba
+        if p['virt_life'] and (self.virt_a or self.virt_b):
+            # the generator's touch = market-only touch plus the levels we consumed that it still holds
+            self.virt_a = [x for x in self.virt_a if x[1] > t]
+            self.virt_b = [x for x in self.virt_b if x[1] > t]
+            if self.virt_a and pba is not None:
+                pba = min(pba, min(x[0] for x in self.virt_a))
+            if self.virt_b and pbb is not None:
+                pbb = max(pbb, max(x[0] for x in self.virt_b))
         newb = newa = None
         if scan_b:
             self.mbb, newb = self._scan(bids)
@@ -602,7 +616,7 @@ class FVMM(BaseStrategy):
     # ---------------------------------------------------------------- trading
     def _send(self, side: Side, price: int, qty: int, kind: OrderType) -> None:
         oid = self.send_order(OrderRequest(side=side, price=price, quantity=qty, order_type=kind))
-        self.orders[oid] = [side, price, qty]
+        self.orders[oid] = [side, price, qty, kind is OrderType.IOC]
         if kind is OrderType.IOC:
             self.cancelling.add(oid)  # counts against the room until it is done, never "kept"
 
@@ -832,12 +846,29 @@ class FVMM(BaseStrategy):
                     self._send(SELL, ta + 1, q, OrderType.LIMIT)
                     rest_a += q
         pc = min(cap, p['pcap']) if p['pcap'] else cap  # r3_man: passive fills build |pos| only up to pcap
-        if not have_b or (p['fill_room'] and pc - pos - rest_b >= p['fill_room']):
-            q = min(pc - pos - rest_b, p['size_top'])
+        # r3_man sizing (r3_fillcarry.py): the filling taker's impact hits the whole position after the fill, so a passive
+        # fill that adds to |pos| loses net; add side quoted only while |pos| < add_max, the reducing order sized to
+        # end at most flip_cap past zero
+        rb_, ra_ = pc - pos - rest_b, pc + pos - rest_a
+        if p['flip_cap'] is not None:
+            if pos > 0:
+                ra_ = min(ra_, pos + p['flip_cap'] - rest_a)
+            elif pos < 0:
+                rb_ = min(rb_, -pos + p['flip_cap'] - rest_b)
+        if p['add_max'] is not None:
+            if pos >= p['add_max']:
+                rb_ = 0
+            elif -pos >= p['add_max']:
+                ra_ = 0
+            else:
+                rb_ = min(rb_, p['add_max'] - pos - rest_b) if pos >= 0 else rb_
+                ra_ = min(ra_, p['add_max'] + pos - rest_a) if pos <= 0 else ra_
+        if not have_b or (p['fill_room'] and rb_ >= p['fill_room']):
+            q = min(rb_, p['size_top'])
             if q >= p['min_post']:
                 self._send(BUY, tb, q, OrderType.LIMIT)
-        if not have_a or (p['fill_room'] and pc + pos - rest_a >= p['fill_room']):
-            q = min(pc + pos - rest_a, p['size_top'])
+        if not have_a or (p['fill_room'] and ra_ >= p['fill_room']):
+            q = min(ra_, p['size_top'])
             if q >= p['min_post']:
                 self._send(SELL, ta, q, OrderType.LIMIT)
 
@@ -1036,7 +1067,7 @@ class FVAShock(FVMM):
             if avail <= 0:
                 return
             oid = self.send_order(OrderRequest(side=SELL, price=lim, quantity=q, order_type=OrderType.IOC))
-            self.orders[oid] = [SELL, lim, q]
+            self.orders[oid] = [SELL, lim, q, True]
             self.cancelling.add(oid)
             self.xu_ids.add(oid)
             self.xu_next = t + p['xu_gap_ms'] * 1e-3
@@ -1060,7 +1091,7 @@ class FVAShock(FVMM):
             if avail <= 0:
                 return
             oid = self.send_order(OrderRequest(side=BUY, price=lim, quantity=q, order_type=OrderType.IOC))
-            self.orders[oid] = [BUY, lim, q]
+            self.orders[oid] = [BUY, lim, q, True]
             self.cancelling.add(oid)
             self.xu_ids.add(oid)
             self.xu_next = t + p['xu_gap_ms'] * 1e-3
@@ -1086,7 +1117,7 @@ class FVAShock(FVMM):
         if q <= 0:
             return
         oid = self.send_order(OrderRequest(side=side, price=px, quantity=q, order_type=OrderType.LIMIT))
-        self.orders[oid] = [side, px, q]
+        self.orders[oid] = [side, px, q, False]
         self.xp_id = oid
 
     def _lad_far(self, a: int, b: int) -> bool:
@@ -1427,6 +1458,8 @@ PARAMS.update({
     # ladder singles: deferred deep inserts (>= lad_deep behind the touch, no rung followed) enter the filter with a
     # ladder weight from their size (FVMM._lad_w); level probabilities of a single ladder order by depth behind the touch
     'lw_on': 0, 'lw_oc': 1.0, 'lw_ov': 0.3, 'lw_k': 1.0,
-    'kq': 0.0, 'kq_t': 0.0,  # passive quotes around F - kq * Y (calm) / F - kq_t * Y (turbulent); needs tr_on
+    'kq': 0.0, 'kq_t': 0.0,
+    'add_max': None, 'flip_cap': None,  # passive sizing (see the passive section of FVMM._quote)
+    'virt_life': 0.0,  # s a market level our IOC consumed stays in the generator's book (clamp reference); 0 = off  # passive quotes around F - kq * Y (calm) / F - kq_t * Y (turbulent); needs tr_on
     'lw_lev': {2: 0.61, 3: 0.10, 4: 0.09, 5: 0.10, 6: 0.10},
 })

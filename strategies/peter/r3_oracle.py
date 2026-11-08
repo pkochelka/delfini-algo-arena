@@ -27,8 +27,9 @@ class Oracle(M.FVAShock):
         a = np.load(p['or_path'])
         self.sp_t, self.sp_S, self.sp_F = a[:, 0].copy(), a[:, 1].copy(), a[:, 2].copy()
         tj = Path(p['or_path'].replace('.spath.npy', '.truth.json'))
-        tr = json.loads(tj.read_text())
-        self.seg_a = np.array([s[0] for s in tr['segs']]); self.seg_v = [s[2] for s in tr['segs']]
+        if tj.exists():
+            tr = json.loads(tj.read_text())
+            self.seg_a = np.array([s[0] for s in tr['segs']]); self.seg_v = [s[2] for s in tr['segs']]
         self.sp = True
 
     def _truth(self):

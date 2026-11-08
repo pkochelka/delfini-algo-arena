@@ -68,9 +68,9 @@ def windows(tier: str) -> list[dict]:
     if tier == 'conf':
         return fresh(range(213, 225))
     if tier == 'csel':  # calibrated generator (tt_synth.py): select
-        return fresh(range(301, 313), 'tt_cal')
+        return fresh(range(401, 413), 'tt_cal2')
     if tier == 'cconf':  # calibrated generator: confirm only
-        return fresh(range(313, 325), 'tt_cal')
+        return fresh(range(413, 425), 'tt_cal2')
     if tier == 'hold':  # round-3 holdout 4515-6000 s (never used for tuning): 4 windows
         d = ROOT / 'data/splits_r3/hold16'
         return [{'name': f'h_{f["name"]}', 'path': f'data/splits_r3/hold16/{f["file"]}', 'start': f['trade_start_us'],
