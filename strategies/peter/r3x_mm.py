@@ -1,4 +1,21 @@
-"""fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
+"""r3x_mm: fvs_mm (fv_mm + time-locked shock sniper) with the round-3 filter (round3_findings.md).
+
+Round-3 changes, all measured with paired.py on data/splits_r3/wf (base = fvs_mm with eta 0.05, +38.0k / fold):
+    deep ladder   lad_rate 0.027: each maker insert is a size-weighted mixture of the regular law and a ladder
+                  law D ~ U(3.5, 8.5) (log-size N(4.67, 1.08) vs N(2.7, 1.7)). ll -1.158 -> -1.080,
+                  false jump detections 168 -> 25 / window. +6.1k / fold, 12/12 won.            ADOPTED
+    lam_v 1.2     volatile maker law refit (ll -1.082 -> -1.072). +0.2k, neutral.               ADOPTED
+    transient     phi_c / phi_v / tau_x (impact share into a decaying X), phi_j / tau_j (jump share): ll flat,
+                  PnL within noise.                                                             off
+    fwd_x/fwd_j   trading against S minus (or plus) the transient parts: -4k to -20k / fold either sign; the
+                  filter's S is calibrated, the mid's reversion is just the book catching up.  off
+    red_t         reduce-only passive quotes in turbulence: -0.6k to -3.6k.                     off
+    trading keys  theta, take, take_sd, take_t, passive_t, ss_lim, max_sd, inv_skew, unwind: all flat or worse.
+Holdout 4500-6000 s: +174.8k vs fvs_mm(eta 0.05) +147.4k. Regime test: calm +35.5k vs +31.1k, turb +127.7k vs
++107.9k. Round 2 folds: +37.8k vs fvs_mm +37.9k (no ladder there; the mixture costs nothing).
+Offline filter fit: r3x_fit.py; attribution: r3x_attrib.py.
+
+fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
 
 Round 2 broke s_mm: S still drives the makers (bid = min(floor(S - D), ask - 1), ask mirrored, D = d0 + Exp(lam))
 and the takers' impact (c * sign * sqrt(filled)), but S now also diffuses and jumps (194 jumps > 5 ticks,
@@ -51,7 +68,7 @@ FV_PARAMS = {
     'jv': 0.0155,
     # volatile laws, plus residual Laplace(bj_v) jumps at lamj_v / s
     'd0_v': 0.699,
-    'lam_v': 0.907,
+    'lam_v': 1.2,  # round 3 refit (r3x_fit.py: ll -1.082 -> -1.072); round 2: 0.907
     'c_v': 0.0741,
     'e_v': 0.606,
     'jv_v': 0.076,
@@ -62,7 +79,7 @@ FV_PARAMS = {
     # maker law during a shock drought (both regimes)
     'd0_d': 0.54,
     'lam_d': 1.33,
-    'eta': 0.005,  # outlier share of maker inserts
+    'eta': 0.05,  # outlier share of maker inserts (round 3: 0.05, +27 % on the folds vs 0.005)
     'sigma': 0.3,  # extra diffusion, ticks / sqrt(s) (the generator has none; insurance against tapes that do)
     'rho0': 0.05,  # base rate of jumps flat over the grid (/s): robustness to unmodelled jumps
     'rho_shock': 30.0,  # the same inside an expected-shock window
@@ -78,7 +95,7 @@ FV_PARAMS = {
     # ---- round 3 (round3_findings.md)
     # deep-ladder maker: price = floor(S - D) (asks mirrored), D ~ U(lad_lo, lad_hi), log-size N(lad_mu, lad_sd),
     # lad_rate of all inserts; regular makers' log-size N(reg_mu, reg_sd). Each insert is a size-weighted mixture.
-    'lad_rate': 0.0,
+    'lad_rate': 0.027,  # 5.2 / 194 inserts per s
     'lad_lo': 3.5,
     'lad_hi': 8.5,
     'lad_mu': 4.67,
@@ -150,6 +167,13 @@ PARAMS = FV_PARAMS | {
     'shock_len': 2.5,
     'shock_cool': 20.0,  # s after a detection before the next can start
     'shock_flat': 0,  # 1: on detection, IOC the position flat at the touch
+    'fwd_x': 0.0,
+    # >= 0: in turbulence (outside a shock), quote passively on the side that reduces |pos| only, at F -+ red_t
+    # (kept while the edge >= red_t - red_keep), sized to pos above red_min: frees room for the next snipe
+    'red_t': -1.0,
+    'red_keep': 0.2,
+    'red_min': 0,
+    'fwd_j': 0.0,
 }
 
 BUY, SELL = Side.BUY, Side.SELL
@@ -618,7 +642,9 @@ class FVMM(BaseStrategy):
 
     def _quote(self, f: FV, bb: int, ba: int, bids, asks) -> None:
         p = self.p
-        F, sd = f.mean, f.sd
+        # forward value: the transient parts of S (impact X, reverting jumps Xj) are expected to decay, so trade
+        # against S minus the share fwd_x / fwd_j of them (round 3: impact and non-shock jumps revert)
+        F, sd = f.mean - p['fwd_x'] * f.x - p['fwd_j'] * f.xj, f.sd
         turb = self._turbulent(f)
         if p['shock'] and self._shock(f):
             turb = True
@@ -712,6 +738,13 @@ class FVMM(BaseStrategy):
         th_b, th_a = theta + wide + sk, theta + wide - sk
         kp_b, kp_a = keep + wide + sk, keep + wide - sk
         passive = not turb or p['passive_t']
+        allow_b = allow_a = True
+        red = p['red_t'] >= 0 and turb and self.sg_t is None and abs(pos) > p['red_min']
+        if red:
+            passive = True
+            allow_b, allow_a = pos < 0, pos > 0
+            th_b = th_a = p['red_t']
+            kp_b = kp_a = p['red_t'] - p['red_keep']
         tb = min(math.floor(F - th_b), ba - 1)
         ta = max(math.ceil(F + th_a), bb + 1)
         kd = p['keep_depth']
@@ -726,23 +759,23 @@ class FVMM(BaseStrategy):
             if not passive:
                 pass
             elif o[0] is BUY:
-                if F - px >= kp_b and tb - kd <= px < ba and px >= rb:
+                if allow_b and F - px >= kp_b and tb - kd <= px < ba and px >= rb:
                     have_b = have_b or px == tb
                     continue
             else:
-                if px - F >= kp_a and ta + kd >= px > bb and px <= ra:
+                if allow_a and px - F >= kp_a and ta + kd >= px > bb and px <= ra:
                     have_a = have_a or px == ta
                     continue
             self.cancelling.add(oid)
             self.cancel_order(oid)
         if sd > p['max_sd'] or not passive:
             return
-        if not have_b:
-            q = min(cap - pos - rest_b, p['size_top'])
+        if not have_b and allow_b:
+            q = min(cap - pos - rest_b, p['size_top'], -pos - rest_b - p['red_min'] if red else cap)
             if q >= p['min_post']:
                 self._send(BUY, tb, q, OrderType.LIMIT)
-        if not have_a:
-            q = min(cap + pos - rest_a, p['size_top'])
+        if not have_a and allow_a:
+            q = min(cap + pos - rest_a, p['size_top'], pos - rest_a - p['red_min'] if red else cap)
             if q >= p['min_post']:
                 self._send(SELL, ta, q, OrderType.LIMIT)
 

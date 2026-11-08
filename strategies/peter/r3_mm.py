@@ -1,4 +1,18 @@
-"""fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
+"""r3_mm: fvs_mm (below) + the round-3 mechanics of round3_findings.md. Built by build/patch_r3.py from fvs_mm.py.
+
+Round 3 additions (each behind a PARAMS key, so they can be ablated):
+    lad       deep-ladder maker in the FV likelihood: an insert is a ladder order with probability p_lad(size)
+              (lognormal sizes, 5.2/s against 194/s); a ladder order says only that S - price is in [3.5, 8.6].
+              Filter log-lik per insert -1.148 -> -1.097, false jump detections 41 -> 13 per 600 s.
+    tr_*      transient impact: S = L + X, tr_c (calm) / tr_v (volatile) of each taker's impact goes to X, which
+              decays with tr_tau = 10 s, and the filter's prior drifts S back with it.
+    eta 0.05  maker outlier share (round 2 neutral).
+Tried and kept off (no gain on the 12 round-3 folds): pricing takes / quotes against E[S] ahead (fwd_t, fwd_q:
+large losses), momentum extrapolation (mom_t, mom_q), attributing filter jumps to X (phi_c, phi_v), blocking
+trades against the snipe after a shock (ss_block), unwinding in turbulence.
+r3 folds +44.9k vs fvs_mm(eta 0.05) +38.0k; holdout 4500-6000 s +167k vs +147k; full tape +718k vs +616k.
+
+fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
 
 Round 2 broke s_mm: S still drives the makers (bid = min(floor(S - D), ask - 1), ask mirrored, D = d0 + Exp(lam))
 and the takers' impact (c * sign * sqrt(filled)), but S now also diffuses and jumps (194 jumps > 5 ticks,
@@ -62,7 +76,7 @@ FV_PARAMS = {
     # maker law during a shock drought (both regimes)
     'd0_d': 0.54,
     'lam_d': 1.33,
-    'eta': 0.005,  # outlier share of maker inserts
+    'eta': 0.05,  # outlier share of maker inserts (round 3: 0.05, neutral on round 2)
     'sigma': 0.3,  # extra diffusion, ticks / sqrt(s) (the generator has none; insurance against tapes that do)
     'rho0': 0.05,  # base rate of jumps flat over the grid (/s): robustness to unmodelled jumps
     'rho_shock': 30.0,  # the same inside an expected-shock window
@@ -84,10 +98,12 @@ FV_PARAMS = {
     'lad_lo': 3.5, 'lad_hi': 8.6,
     # transient impact: S = L + X, X decays with tr_tau; a share of each taker's impact goes to X
     # (calm tr_c, volatile tr_v); phi_v / phi_c: share of the filter's other mean moves (jumps) attributed to X
-    'tr_c': 0.0, 'tr_v': 0.0, 'tr_tau': 20.0, 'phi_v': 0.0, 'phi_c': 0.0,
+    'tr_c': 0.9, 'tr_v': 0.33, 'tr_tau': 10.0, 'phi_v': 0.0, 'phi_c': 0.0,
     'tr_filter': 1,  # 1: the filter's prior drifts S back as X decays
     'fwd_t': 0.0,  # s: takes price against E[S] fwd_t s ahead (the X decay), quotes against fwd_q s ahead
     'fwd_q': 0.0,
+    'mom_t': 0.0,  # takes price against F + mom_t * (F - mid) (the mid keeps moving ~1.4x (F - mid) over 2 s)
+    'mom_q': 0.0,  # quotes the same with mom_q
 }
 
 
@@ -470,6 +486,7 @@ class FVMM(BaseStrategy):
         self.rv = 0.0  # EWMA of squared 100 ms changes of F, scaled to ticks^2 / s
         self.rv_F = None
         self.rv_next = 0.0
+        self.block = 0
 
     # ---------------------------------------------------------------- private feed
     def on_private_order_update(self, event: PrivateOrderEvent) -> None:
@@ -633,6 +650,10 @@ class FVMM(BaseStrategy):
         X = f.X
         Ft = F0 - X * -math.expm1(-p['fwd_t'] / p['tr_tau']) if X and p['fwd_t'] else F0
         F = F0 - X * -math.expm1(-p['fwd_q'] / p['tr_tau']) if X and p['fwd_q'] else F0
+        if p['mom_t'] or p['mom_q']:
+            mid = (bb + ba) / 2
+            Ft += p['mom_t'] * (F0 - mid)
+            F += p['mom_q'] * (F0 - mid)
         turb = self._turbulent(f)
         if p['shock'] and self._shock(f):
             turb = True
@@ -669,7 +690,7 @@ class FVMM(BaseStrategy):
             sh = p['take_skew'] * pos / p['cap']
             lo_b -= sh
             hi_a -= sh
-        if take and ba <= lo_b:
+        if take and ba <= lo_b and self.block != 1:
             lim = math.floor(lo_b)
             q = 0
             for o in asks:
@@ -681,7 +702,7 @@ class FVMM(BaseStrategy):
             if q > 0:
                 self._send(BUY, lim, q, OrderType.IOC)
                 rest_b += q
-        if take and bb >= hi_a:
+        if take and bb >= hi_a and self.block != -1:
             lim = math.ceil(hi_a)
             q = 0
             for o in bids:
@@ -751,11 +772,11 @@ class FVMM(BaseStrategy):
             self.cancel_order(oid)
         if sd > p['max_sd'] or not passive:
             return
-        if not have_b:
+        if not have_b and self.block != 1:
             q = min(cap - pos - rest_b, p['size_top'])
             if q >= p['min_post']:
                 self._send(BUY, tb, q, OrderType.LIMIT)
-        if not have_a:
+        if not have_a and self.block != -1:
             q = min(cap + pos - rest_a, p['size_top'])
             if q >= p['min_post']:
                 self._send(SELL, ta, q, OrderType.LIMIT)
@@ -795,6 +816,9 @@ PARAMS.update({
     'ss_r1': 180.0,
     'ss_r2': 54.0,
     'ss_pre': 1,  # 1: the trigger also sees the shock window that closed on this event
+    # after a snipe in direction d: no takes / passive quotes in direction -d for ss_block s (the filter lags a big
+    # jump beyond the visible book, so the stale side would otherwise look cheap and get bought back)
+    'ss_block': 0.0,
 })
 
 
@@ -811,6 +835,9 @@ class FVAShock(FVMM):
         self.my_ins: deque = deque()
         self.ss_onset = None
         self.ss_onset_sg = None
+        self.ss_last_dir = 0
+        self.ss_block_until = -1.0
+        self.block = 0
 
     def _room_side(self, side: Side) -> int:
         rest = sum(o[2] for o in self.orders.values() if o[0] is side)
@@ -892,6 +919,8 @@ class FVAShock(FVMM):
                 self.ss_next = t
                 self.ss_hold_until = t + p['ss_hold']
                 self.n_snipes += 1
+                self.ss_last_dir = d
+                self.ss_block_until = t + p['ss_hold'] + p['ss_block']
                 for oid, o in list(self.orders.items()):  # pull our own stale quotes on the losing side
                     if oid not in self.cancelling and o[0] is (SELL if d > 0 else BUY):
                         self.cancelling.add(oid)
@@ -917,6 +946,9 @@ class FVAShock(FVMM):
             self.ss_dir = 0
 
     def _quote(self, f, bb, ba, bids, asks) -> None:
+        self.block = 0
+        if self.p['ss_block'] and self.ss_sg is not None and self.now_t < self.ss_block_until:
+            self.block = -self.ss_last_dir  # side we must not trade toward: +1 = no buys, -1 = no sells
         if self.p['ss_on'] and (self.ss_dir and (self.now_t < self.ss_hold_until or self.ss_left > 0)):
             return
         super()._quote(f, bb, ba, bids, asks)
