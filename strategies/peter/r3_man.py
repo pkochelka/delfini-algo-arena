@@ -180,6 +180,7 @@ class FV:
         self.two = p['regimes'] == 2
         self.pv = 0.0  # P(volatile)
         self.Y = 0.0  # round 3: transient part of the summed taker impact (decays to 0 with time constant T)
+        self.tr_no_revert_until = 0.0  # adam/r3_grandpa: no transient share for 3 s after a shock jump
         self.drought = False  # set by the strategy: maker inserts follow the drought law
         self.hot = False  # set by the strategy: inside an expected-shock window
         J = self.J = 2 * K + 4 * self.inv_h
@@ -306,12 +307,16 @@ class FV:
             return None
         return tab[i:i + 2 * K + 1]
 
-    def _observe(self, is_bid: bool, price: int, clamped: bool, count_ll: bool) -> None:
+    def _observe(self, is_bid: bool, price: int, clamped: bool, count_ll: bool, wl: float = 0.0, pl: float = 0.0) -> None:
+        """wl > 0 (r3_man): the insert is a touch-anchored ladder order with probability wl, whose price then has
+        probability pl whatever S is; the likelihood becomes (1 - wl) L(S) + wl pl."""
         w = self.w
         if self.drought or not self.two:
             L = self._slice(self.T_d if self.drought else self.T_c, is_bid, price, clamped)
             if L is None:
                 return
+            if wl:
+                L = (1 - wl) * L + wl * pl
             post = w * L
             self._post(post, float(post.sum()), count_ll)
             return
@@ -319,6 +324,9 @@ class FV:
         Lv = self._slice(self.T_v, is_bid, price, clamped)
         if Lc is None:
             return
+        if wl:
+            Lc = (1 - wl) * Lc + wl * pl
+            Lv = (1 - wl) * Lv + wl * pl
         pc_ = w * Lc
         pv_ = w * Lv
         zc = float(pc_.sum())
@@ -332,10 +340,15 @@ class FV:
         pc_ += pv_
         self._post(pc_, z, count_ll)
 
-    def maker(self, t: float, is_bid: bool, price: int, opp: int | None, count_ll: bool = True) -> None:
+    def maker(self, t: float, is_bid: bool, price: int, opp: int | None, count_ll: bool = True,
+              wl: float = 0.0, pl: float = 0.0) -> None:
         """A market limit insert at `price`; `opp` is the best market price on the other side before it."""
         self.predict(t)
         clamped = opp is not None and (price == opp - 1 if is_bid else price == opp + 1)
+        if not clamped and wl > 0.5:
+            imp = price + 0.55 if is_bid else price - 0.55
+            if abs(imp - self.mean) > self.K * self.h - 2:  # a likely ladder order far away: no restart evidence
+                return
         if not clamped:
             imp = price + 0.55 if is_bid else price - 0.55
             if abs(imp - self.mean) > self.K * self.h - 2:
@@ -354,7 +367,7 @@ class FV:
                 else:
                     self.far = (t, imp, is_bid, price)
                 return
-        self._observe(is_bid, price, clamped, count_ll)
+        self._observe(is_bid, price, clamped, count_ll, wl, pl)
 
     def taker(self, t: float, is_buy: bool, price, filled: int) -> None:
         self.predict(t)
@@ -370,7 +383,7 @@ class FV:
             pv = self.pv
             d = (1 - pv) * p['c'] * filled ** p['e'] + pv * p['c_v'] * filled ** p['e_v']
             self.shift(d if is_buy else -d)
-            if p['tr_on'] and not (p['tr_sr'] and (self.drought or self.hot)):
+            if p['tr_on'] and not (p['tr_sr'] and (self.drought or self.hot or t < self.tr_no_revert_until)):
                 fr = (1 - pv) * (1 - p['tr_p']) + pv * (1 - p['tr_p_v'])
                 self.Y += fr * d if is_buy else -fr * d
             var = (1 - pv) * p['jv'] + pv * p['jv_v']
@@ -431,13 +444,35 @@ class FVMM(BaseStrategy):
         keep = []
         for e in self.lad_pend:
             if t_us - e[1] > self.p['lad_wait']:
-                self.f.maker(e[0], e[2], e[3], e[4])
+                if self.p['lw_on'] and len(e) > 5:
+                    wl, pl = self._lad_w(e[5], e[6])
+                    self.f.maker(e[0], e[2], e[3], e[4], wl=wl, pl=pl)
+                else:
+                    self.f.maker(e[0], e[2], e[3], e[4])
                 self.ins_t.append(e[0])
             else:
                 keep.append(e)
         self.lad_pend = keep
 
-    def _lad_maker(self, t: float, t_us: int, is_bid: bool, price: int, own: int | None, opp: int | None) -> None:
+    def _lad_w(self, qty: int, depth: int) -> tuple:
+        """r3_man: P(ladder single | size, depth behind the same-side touch, regime) and P(this level | ladder single).
+        Sizes (makers/README.md): base round(LN(2.661, 1.8)); ladder calm LN(5.006, 0.317), vol LN(3.484, 0.351).
+        Prior ladder : base odds among inserts this deep: lw_oc (calm), lw_ov (vol), mixed by the filter's P(volatile)."""
+        p = self.p
+        pv = self.f.pv
+        z = math.log(max(qty, 1))
+        fb = math.exp(-0.5 * ((z - 2.661) / 1.8) ** 2) / 1.8
+        fc = math.exp(-0.5 * ((z - 5.006) / 0.317) ** 2) / 0.317
+        fv = math.exp(-0.5 * ((z - 3.484) / 0.351) ** 2) / 0.351
+        lo = (1 - pv) * p['lw_oc'] * fc + pv * p['lw_ov'] * fv
+        wl = lo / (lo + fb)
+        pl = p['lw_lev'].get(depth, 0.0)
+        if pl <= 0:
+            return 0.0, 0.0
+        return wl * p['lw_k'], pl
+
+    def _lad_maker(self, t: float, t_us: int, is_bid: bool, price: int, own: int | None, opp: int | None,
+                   qty: int = 0) -> None:
         p = self.p
         last = self.lad_last[is_bid]
         self.lad_last[is_bid] = (t_us, price)
@@ -451,7 +486,7 @@ class FVMM(BaseStrategy):
         if own is not None and (own - price if is_bid else price - own) >= p['lad_deep'] \
                 and not (p['lad_dr'] and self.sg_t is not None):
             self.lad_rung = True
-            self.lad_pend.append([t, t_us, is_bid, price, opp])
+            self.lad_pend.append([t, t_us, is_bid, price, opp, qty, (own - price) if is_bid else (price - own)])
             return
         self.f.maker(t, is_bid, price, opp)
         self.ins_t.append(t)
@@ -547,13 +582,13 @@ class FVMM(BaseStrategy):
                 f.taker(t, sgn > 0, None, q)
         elif newb is not None:
             if lad:
-                self._lad_maker(t, snapshot.timestamp_us, True, newb.price, pbb, pba)
+                self._lad_maker(t, snapshot.timestamp_us, True, newb.price, pbb, pba, newb.quantity)
             else:
                 f.maker(t, True, newb.price, pba)
                 self.ins_t.append(t)
         elif newa is not None:
             if lad:
-                self._lad_maker(t, snapshot.timestamp_us, False, newa.price, pba, pbb)
+                self._lad_maker(t, snapshot.timestamp_us, False, newa.price, pba, pbb, newa.quantity)
             else:
                 f.maker(t, False, newa.price, pbb)
                 self.ins_t.append(t)
@@ -596,6 +631,7 @@ class FVMM(BaseStrategy):
         if jumped or rel > p['shock_lead'] + p['shock_len']:
             if jumped:
                 self.ps_t = t
+                f.tr_no_revert_until = max(f.tr_no_revert_until, t + 3.0)
             self.sg_t = None
             f.drought = f.hot = False
             return False
@@ -728,11 +764,25 @@ class FVMM(BaseStrategy):
                     self._send(BUY, lim, q, OrderType.IOC)
                     rest_b += q
         # ---- passive quotes
+        if p['kq'] or p['kq_t']:  # r3_man: passive quotes lean against the transient part Y of S (takes stay on F)
+            F -= (p['kq_t'] if turb else p['kq']) * f.Y
         wide = p['theta_sd'] * sd
         sk = p['inv_skew'] * pos / p['cap']
         th_b, th_a = theta + wide + sk, theta + wide - sk
         kp_b, kp_a = keep + wide + sk, keep + wide - sk
+        if p['keep_red'] is not None and not turb:  # r3_man: keep threshold of the side that reduces |pos|
+            if pos < 0:
+                kp_b = p['keep_red'] + wide + sk
+            elif pos > 0:
+                kp_a = p['keep_red'] + wide - sk
         passive = not turb or p['passive_t']
+        pas_b = pas_a = passive
+        rq = turb and not passive and p['rq_on'] and pos and not drq and sd <= p['rq_maxsd']
+        if rq:  # r3_man: in turbulence rest only the order that reduces |pos|, at F -+ rq_theta
+            if pos > 0:
+                pas_a, th_a, kp_a = True, p['rq_theta'], p['rq_keep']
+            else:
+                pas_b, th_b, kp_b = True, p['rq_theta'], p['rq_keep']
         tb = min(math.floor(F - th_b), ba - 1)
         ta = max(math.ceil(F + th_a), bb + 1)
         kd = p['keep_depth']
@@ -745,7 +795,7 @@ class FVMM(BaseStrategy):
             if oid in self.cancelling:
                 continue
             px = o[1]
-            if not passive:
+            if not (pas_b if o[0] is BUY else pas_a):
                 pass
             elif o[0] is BUY:
                 if F - px >= kp_b and tb - kd <= px < ba and px >= rb - pjr:
@@ -757,6 +807,13 @@ class FVMM(BaseStrategy):
                     continue
             self.cancelling.add(oid)
             self.cancel_order(oid)
+        if rq:
+            q = min(abs(pos) + p['rq_flip'], (cap - pos - rest_b) if pos < 0 else (cap + pos - rest_a))
+            if pos < 0 and not have_b and q >= 1:
+                self._send(BUY, tb, q, OrderType.LIMIT)
+            elif pos > 0 and not have_a and q >= 1:
+                self._send(SELL, ta, q, OrderType.LIMIT)
+            return
         if sd > (p['dr_maxsd'] if drq else (p['ps_maxsd'] if ps else p['max_sd'])) or not passive:
             return
         pj = p['pj_q'] if not turb else 0
@@ -774,12 +831,13 @@ class FVMM(BaseStrategy):
                 if q >= p['min_post']:
                     self._send(SELL, ta + 1, q, OrderType.LIMIT)
                     rest_a += q
-        if not have_b or (p['fill_room'] and cap - pos - rest_b >= p['fill_room']):
-            q = min(cap - pos - rest_b, p['size_top'])
+        pc = min(cap, p['pcap']) if p['pcap'] else cap  # r3_man: passive fills build |pos| only up to pcap
+        if not have_b or (p['fill_room'] and pc - pos - rest_b >= p['fill_room']):
+            q = min(pc - pos - rest_b, p['size_top'])
             if q >= p['min_post']:
                 self._send(BUY, tb, q, OrderType.LIMIT)
-        if not have_a or (p['fill_room'] and cap + pos - rest_a >= p['fill_room']):
-            q = min(cap + pos - rest_a, p['size_top'])
+        if not have_a or (p['fill_room'] and pc + pos - rest_a >= p['fill_room']):
+            q = min(pc + pos - rest_a, p['size_top'])
             if q >= p['min_post']:
                 self._send(SELL, ta, q, OrderType.LIMIT)
 
@@ -1355,3 +1413,20 @@ PARAMS.update({'lad_on': 1, 'lad_tol': 3, 'lad_deep': 2, 'lad_wait': 2010, 'lad_
 PARAMS.update({'tr_on': 0, 'tr_p': 0.58, 'tr_T': 17.3, 'tr_p_v': 0.55, 'tr_T_v': 15.0, 'y_k': 0.0, 'lad_dr': 1})
 PARAMS.update({'c': 0.0171, 'e': 0.61, 'lam': 0.4756, 'lam_v': 1.06, 'tr_sr': 0})  # round-3 fit (s_dynamics v3)
 PARAMS.update({'eta': 0.1})  # round 3: absorbs hidden one-rung ladder orders (+60k synth, +40k r3)
+
+
+# ======================================================================================================
+# r3_man (peter, 2026-11-08): r3_lad + the changes below, each behind a key (0 / None = r3_lad behaviour).
+# Scored on the real round-3 tape only (strategies/peter/r3_eval.py --tapes real).
+# ======================================================================================================
+PARAMS.update({
+    'pcap': 0,  # passive orders may build |pos| only up to pcap (reducing orders and takes keep the full cap)
+    'keep_red': None,  # calm keep threshold for the passive order that reduces |pos| (None = theta_keep)
+    # turbulence: rest the |pos|-reducing order at F -+ rq_theta (kept while edge >= rq_keep), for |pos| + rq_flip lots
+    'rq_on': 0, 'rq_theta': 1.0, 'rq_keep': 0.8, 'rq_flip': 0, 'rq_maxsd': 1.0,
+    # ladder singles: deferred deep inserts (>= lad_deep behind the touch, no rung followed) enter the filter with a
+    # ladder weight from their size (FVMM._lad_w); level probabilities of a single ladder order by depth behind the touch
+    'lw_on': 0, 'lw_oc': 1.0, 'lw_ov': 0.3, 'lw_k': 1.0,
+    'kq': 0.0, 'kq_t': 0.0,  # passive quotes around F - kq * Y (calm) / F - kq_t * Y (turbulent); needs tr_on
+    'lw_lev': {2: 0.61, 3: 0.10, 4: 0.09, 5: 0.10, 6: 0.10},
+})
