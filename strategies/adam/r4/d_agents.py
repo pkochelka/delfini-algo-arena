@@ -768,18 +768,31 @@ class FVMM(BaseStrategy):
     def _ag(self, turb: bool) -> int:
         """Agent overlay target direction: +1 long, -1 short, 0 = r4_best decides."""
         p = self.p
-        if self.sg_t is not None or (turb and not p['ag_turb']):
+        if self.sg_t is not None:
             return 0
         t = self.now_t
-        if p['ag_tw'] and self.tw_n >= 2:
+        if p['ag_tw'] and p['ag_tw_ride'] and self.tw_n >= 2 and (not turb or p['ag_turb']):
             return self.tw_s
-        if p['ag_tw'] and t < self.ag_twf_until:
+        if p['ag_tw'] and t < self.ag_twf_until and (p['ag_twf_reg'] == 1 or (p['ag_twf_reg'] == 2) == turb):
             return -self.ag_twf_s
+        if turb and not p['ag_turb']:
+            return 0
         if p['ag_r15'] and self.r15_on and t - self.r15_last <= p['ag_r15_to']:
             return self.r15_s
         if p['ag_r15'] and t < self.ag_r15f_until:
             return -self.ag_r15f_s
         return 0
+
+    def _ioc_q(self, side) -> int:
+        return sum(o[2] for oid, o in self.orders.items() if oid in self.cancelling and o[0] is side)
+
+    def _ag_trim(self, oid, o, ag, pos) -> bool:
+        """pass 2: True = cancel this resting order (opposing side beyond what the band allows)."""
+        opp = (o[0] is SELL) == (ag > 0)
+        if not opp:
+            return False
+        allow = pos - (ag * self.p['ag_cap'] - self.p['ag_band']) if ag > 0 else (ag * self.p['ag_cap'] + self.p['ag_band']) - pos
+        return o[2] > max(allow, 0)
 
     def _newer_id(self, oid: str | None) -> bool:
         return oid is not None and _newer(oid, self.max_id)
@@ -983,19 +996,20 @@ class FVMM(BaseStrategy):
         # ---- agent overlay: IOC toward the target ag * ag_cap, no worse than F +- ag_edge
         if ag:
             tgt = ag * p['ag_cap']
-            if ag > 0 and pos + rest_b < tgt:
+            band = p['ag_band'] if p['ag_pass'] == 2 else 0
+            if ag > 0 and pos + (self._ioc_q(BUY) if band else rest_b) < tgt - band:
                 lim = min(ba + p['ag_slip'], math.floor(F + p['ag_edge']))
                 if ba <= lim:
                     q = min(sum(o.quantity for o in asks if o.price <= lim and o.owner == 'market'),
-                            tgt - pos - rest_b, cap - pos - rest_b)
+                            tgt - pos - (self._ioc_q(BUY) if band else rest_b), cap - pos - rest_b)
                     if q > 0:
                         self._send(BUY, lim, q, OrderType.IOC)
                         rest_b += q
-            elif ag < 0 and pos - rest_a > tgt:
+            elif ag < 0 and pos - (self._ioc_q(SELL) if band else rest_a) > tgt + band:
                 lim = max(bb - p['ag_slip'], math.ceil(F - p['ag_edge']))
                 if bb >= lim:
                     q = min(sum(o.quantity for o in bids if o.price >= lim and o.owner == 'market'),
-                            pos - rest_a - tgt, cap + pos - rest_a)
+                            pos - (self._ioc_q(SELL) if band else rest_a) - tgt, cap + pos - rest_a)
                     if q > 0:
                         self._send(SELL, lim, q, OrderType.IOC)
                         rest_a += q
@@ -1138,7 +1152,8 @@ class FVMM(BaseStrategy):
             if oid in self.cancelling or oid in self.lq_ids:
                 continue
             px = o[1]
-            if not passive or (ag and (not p['ag_pass'] or (o[0] is SELL) == (ag > 0))) or (vf and (vf_block or not ((o[0] is BUY and pos < 0) or (o[0] is SELL and pos > 0)))):
+            if not passive or (ag and p['ag_pass'] != 2 and (not p['ag_pass'] or (o[0] is SELL) == (ag > 0))) \
+                    or (ag and p['ag_pass'] == 2 and self._ag_trim(oid, o, ag, pos)) or (vf and (vf_block or not ((o[0] is BUY and pos < 0) or (o[0] is SELL and pos > 0)))):
                 pass
             elif o[0] is BUY:
                 if F - px >= kp_b and tb - kd <= px < ba and px >= rb - pjr \
@@ -1152,6 +1167,21 @@ class FVMM(BaseStrategy):
                     continue
             self.cancelling.add(oid)
             self.cancel_order(oid)
+        if ag and p['ag_pass'] == 2:  # ride while market making: opposing quote only down to the band
+            if sd > p['max_sd']:
+                return
+            tgt, band = ag * p['ag_cap'], p['ag_band']
+            room_b = cap - pos - rest_b if ag > 0 else min(cap - pos - rest_b, (tgt + band) - pos - rest_b)
+            room_a = cap + pos - rest_a if ag < 0 else min(cap + pos - rest_a, pos - rest_a - (tgt - band))
+            if not have_b:
+                q = min(room_b, p['size_top'])
+                if q >= p['min_post']:
+                    self._send(BUY, tb, q, OrderType.LIMIT)
+            if not have_a:
+                q = min(room_a, p['size_top'])
+                if q >= p['min_post']:
+                    self._send(SELL, ta, q, OrderType.LIMIT)
+            return
         if ag:  # agent overlay: at most the base quote on the target side (ag_pass), nothing against it
             if not p['ag_pass'] or sd > p['max_sd']:
                 return
@@ -1927,6 +1957,9 @@ PARAMS.update({'c_v': 0.05, 'e_v': 0.64, 'kv_on': 1})
 #   ag_r15_fade s of opposite-side target after it stops on a full fill
 #   ag_cap      target |position|; ag_edge: IOC no worse than F +- ag_edge; ag_slip: at most this past the touch
 #   ag_pass     0: no passive quotes during the overlay; 1: keep the base quote on the target side
-#   ag_turb     0: calm only; 1: also in turbulence
+#   ag_turb     0: rides calm only; 1: also in turbulence
+#   ag_tw_ride  0: TWAP fade only (no ride)
+#   ag_twf_reg  regime of the TWAP fade: 0 calm only, 1 both, 2 turbulent only (event study: the fade is all volatile)
 PARAMS.update({'ag_tw': 0, 'ag_tw_fade': 0.0, 'ag_tw_silent': 1, 'ag_r15': 0, 'ag_r15_to': 3.0, 'ag_r15_fade': 0.0,
-               'ag_cap': 100, 'ag_edge': 1.5, 'ag_slip': 1, 'ag_pass': 0, 'ag_turb': 0})
+               'ag_cap': 100, 'ag_edge': 1.5, 'ag_slip': 1, 'ag_pass': 0, 'ag_turb': 0, 'ag_tw_ride': 1,
+               'ag_twf_reg': 0, 'ag_band': 30})  # ag_pass 2: ride while market making within ag_band of the target
