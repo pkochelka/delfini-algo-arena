@@ -1,0 +1,68 @@
+{
+ "calm": {
+  "n_makers": 789467,
+  "maker_gap_below_d0_pointS": 93,
+  "maker_gap_below_0_pointS": 42,
+  "maker_inconsistent_with_99CI": 6,
+  "maker_gap_min": -1.5908504523376905,
+  "n_takers": 34904,
+  "taker_in_band_pointS": 0.9459660783864313,
+  "taker_in_band_99CI": 0.9511803804721521,
+  "taker_passive_side": 6,
+  "taker_aggr_tail": 0.04864771945908778,
+  "post_sd_median": 0.05916454277312212,
+  "post_sd_p90": 0.08765683796942461,
+  "ci99_width_median": 0.2999999999992724,
+  "maker_gap_q": [
+   0.04213125172716464,
+   0.11268689485569484,
+   0.19422716307290103,
+   1.0048198740805674
+  ],
+  "n_ladder_excluded": 12881
+ },
+ "vol": {
+  "n_makers": 315268,
+  "maker_gap_below_d0_pointS": 205,
+  "maker_gap_below_0_pointS": 77,
+  "maker_inconsistent_with_99CI": 86,
+  "maker_gap_min": -3.4370442812141846,
+  "n_takers": 20392,
+  "taker_in_band_pointS": 0.9056492742251864,
+  "taker_in_band_99CI": 0.9144272263632797,
+  "taker_passive_side": 21,
+  "taker_aggr_tail": 0.08454295802275402,
+  "post_sd_median": 0.10295001667850054,
+  "post_sd_p90": 0.14776811173102503,
+  "ci99_width_median": 0.5,
+  "maker_gap_q": [
+   -0.2016695917662746,
+   0.7290884479562992,
+   0.8539205846694494,
+   2.0740035275084665
+  ],
+  "n_ladder_excluded": 56002
+ },
+ "shock_window": {
+  "n_makers": 4434,
+  "maker_gap_below_d0_pointS": 5,
+  "maker_gap_below_0_pointS": 4,
+  "maker_inconsistent_with_99CI": 1,
+  "maker_gap_min": -10.500056703416703,
+  "n_takers": 978,
+  "taker_in_band_pointS": 0.7423312883435583,
+  "taker_in_band_99CI": 0.7770961145194274,
+  "taker_passive_side": 0,
+  "taker_aggr_tail": 0.2229038854805726,
+  "post_sd_median": 0.13667858041201925,
+  "post_sd_p90": 0.5769999074419763,
+  "ci99_width_median": 0.6000000000003638,
+  "maker_gap_q": [
+   -6.012282473948742,
+   0.05555376612166581,
+   0.23536463945692956,
+   1.2488014823675258
+  ],
+  "n_ladder_excluded": 270
+ }
+}

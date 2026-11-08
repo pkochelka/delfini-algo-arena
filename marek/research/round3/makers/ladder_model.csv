@@ -1,0 +1,17 @@
+component,parameter,calm,vol,note
+agents,count,4,4,max live ladder orders per (side, price level) = 4
+band,levels behind same-side touch,2..7,2..7,touch at insert time; never placed outside
+burst,rung spacing,2000 us,2000 us,exact; one agent fills its missing levels near->far; skipped (held) levels use no slot
+burst,multi-rung bursts per s (flow),1.06-1.2,11.3,both sides 50/50; zero in droughts
+burst,ladder inserts per s (incl. singles),8-10,42,flow singles.py + makers mixture
+burst,start level share (-2/-3/-4/-5/-6),.61/.10/.09/.10/.10,same,multi-rung bursts only
+burst,length share L=2..6,.51/.26/.12/.06/.05,same,multi-rung bursts only
+size,log B per burst mean,5.02,3.52,B lognormal; median 152 / 34
+size,log B per burst sd,0.34,0.31,
+size,rung size,round(B*U(0.75,1.25)),round(B*U(0.75,1.25)),
+cancel,hazard inside band (/s),0.02-0.2,0.06-0.8,rises toward -7 via touch flicker
+cancel,beyond touch-7,immediate decision,immediate decision,observed 44 /s = 1/delay
+cancel,near zone touch/touch-1 (/s),2.5-3,2.5-3,weak S dependence; no beta*mv
+cancel,delay decision->row,Exp(470)+Exp(52) mean 21 ms,same,exact event study (15.9k)
+lifetime,p50 / p90 (s),2.8 / 10.8,0.60 / 1.7,chain orders
+fill,share with any fill,0.06,0.24,
