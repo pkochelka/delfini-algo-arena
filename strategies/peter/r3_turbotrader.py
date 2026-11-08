@@ -1,26 +1,17 @@
-"""r3_grandpa: Marek's r3_best (strategies/marek/round3/r3_best.py) + four round-3 changes (Peter, 2026-11-08).
+"""r3_turbotrader (Peter, 2026-11-08): Adam's grandpa (strategies/adam/r3_grandpa.py) + optional round-3 features.
 
-Adopted (block at the end of the file; every change is a PARAMS key, so 0 / off restores r3_best exactly):
-    tk_on 1         taker reach: a market taker that filled up to price P had an IOC limit >= P; limits are
-                    round(S +- 1) calm / round(S +- 2.55) volatile plus a small tail, so this bounds S and is fast
-                    regime evidence (FV.taker_reach). Nearly all of its value is the regime part (tk_rw 0: ~0).
-    lm_on 1         touch-anchored ladder mixture for deep inserts that no rung follows (FV.lad_alt), with
-    eta 0.25        a higher outlier share (r3_best 0.15).
-    take_skew 0.2   inventory-aware take thresholds: long -> buying needs 0.2 * pos / 100 ticks more edge, selling
-                    less. The +-100 room is the scarce resource; this spends it on the better takes.
-Evidence on the real round-3 tape (strategies/peter/grandpa_eval.py; synthetic tapes not used for these choices:
-they come from our own generator model, so filter changes that encode it score well there by construction):
-    whole tape (one 6000 s run)     795.0k -> 821.4k (+26.4k, +3.3 %; 500 s pieces won 10/12, t 2.8; outside the
-                                    shock windows +16.9k, t 2.4)
-    tuning windows (12 x 370 s)     +21.1k (t 2.2), non-shock +15.0k
-    holdout 4515-6000 s (4 x 370 s) +3.3k, non-shock +0.2k: the gain does not show there (on the whole tape the
-                                    4500-6000 s pieces are +1.8k), so expect anywhere from ~0 to ~+3 % out of sample.
-Tested and left off (all relative to the adopted set or to r3_best, real tape): lm_rw (ladder regime evidence)
-0.5 / 1, lad_mem (chain matching across interleaved inserts), lm_w 0.3-2, eta 0.1, Marek's final impact refit and the
-round-3 regime switch rates (~0), take_skew_t 0.1 / 0.35 and take_skew_pow 2 (worse), inv_skew 0.1-0.2 (flat),
-pcap 50 / 75 (passive quoting is worth its room: -28k / -9k), pj_q 30 (-40k), xcap 250 (deliberate breaches on
-turbulent snipes: -417k, the turbulent book is too thin to unwind).
-Speed: ss_fast is a behaviour-identical fast path of the shock sniper outside shock windows (~8 %).
+Lineage: Marek's r3_lad / r3_best (strategies/marek/round3) -> Adam's grandpa, which drops Marek's final round-3
+selection block (eta 0.15, theta 0.25, take_t 0.3, pv_thr 0.7, ss_trade) for his transient-impact kernel fit
+(tr_p 0.54 / tr_T 16.7 calm, 0.55 / 13.6 volatile) and no transient accrual for 3 s after a shock jump. Adam's
+grandpa beat Peter's r3_grandpa (Marek's r3_best + four changes tuned on the public tape) on the test set, so the
+public-tape gains were overfit. With every key below at its default this file trades exactly like Adam's grandpa.
+
+Optional features (all off by default; see the PARAMS block "turbotrader features"): ladder mixture (lm_*),
+taker-reach observation (tk_*), inventory-aware takes (take_skew*), passive cap (pcap), chain matching (lad_mem),
+and ss_fast (a behaviour-identical fast path of the shock sniper, on).
+Selection protocol (strategies/peter/turbotrader_eval.py): a change is adopted only if it wins on FRESH synthetic
+tapes it was never tuned on (r3_synth.py seeds 201-212 to select, 213-224 untouched to confirm) and does not lose on
+the real public tape. A filter change that encodes the synthetic generator's own model is suspect on synth.
 
 ---- original r3_best / fv_mm docstring ----
 fv_mm: market maker + stale-quote taker around a Bayesian estimate of the generator's hidden price S.
@@ -205,6 +196,7 @@ class FV:
         self.two = p['regimes'] == 2
         self.pv = 0.0  # P(volatile)
         self.Y = 0.0  # round 3: transient part of the summed taker impact (decays to 0 with time constant T)
+        self.tr_no_revert_until = 0.0  # Adam: no transient accrual until then (3 s after a shock jump)
         self.drought = False  # set by the strategy: maker inserts follow the drought law
         self.hot = False  # set by the strategy: inside an expected-shock window
         J = self.J = 2 * K + 4 * self.inv_h
@@ -478,7 +470,7 @@ class FV:
             pv = self.pv
             d = (1 - pv) * p['c'] * filled ** p['e'] + pv * p['c_v'] * filled ** p['e_v']
             self.shift(d if is_buy else -d)
-            if p['tr_on'] and not (p['tr_sr'] and (self.drought or self.hot)):
+            if p['tr_on'] and not (p['tr_sr'] and (self.drought or self.hot or (p['tr_nr'] and t < self.tr_no_revert_until))):
                 fr = (1 - pv) * (1 - p['tr_p']) + pv * (1 - p['tr_p_v'])
                 self.Y += fr * d if is_buy else -fr * d
             var = (1 - pv) * p['jv'] + pv * p['jv_v']
@@ -731,6 +723,7 @@ class FVMM(BaseStrategy):
         jumped = f.jumps != self.sg_jumps and rel > p['shock_lead'] - 0.5
         if jumped or rel > p['shock_lead'] + p['shock_len']:
             if jumped:
+                f.tr_no_revert_until = max(f.tr_no_revert_until, t + 3.0)
                 self.ps_t = t
             self.sg_t = None
             f.drought = f.hot = False
@@ -1517,14 +1510,15 @@ PARAMS.update({'lad_on': 1, 'lad_tol': 3, 'lad_deep': 2, 'lad_wait': 2010, 'lad_
 PARAMS.update({'tr_on': 0, 'tr_p': 0.58, 'tr_T': 17.3, 'tr_p_v': 0.55, 'tr_T_v': 15.0, 'y_k': 0.0, 'lad_dr': 1})
 PARAMS.update({'c': 0.0171, 'e': 0.61, 'lam': 0.4756, 'lam_v': 1.06, 'tr_sr': 0})  # round-3 fit (s_dynamics v3)
 PARAMS.update({'eta': 0.1})  # round 3: absorbs hidden one-rung ladder orders (+60k synth, +40k r3)
-# ---- round 3 selection (marek/research/round3/FINDINGS.md): each kept change is positive on round3 AND the synth mean
-PARAMS.update({'eta': 0.15, 'tr_on': 1, 'tr_sr': 1, 'theta': 0.25, 'take_t': 0.3, 'pv_thr': 0.7,
-               'ss_trade': 1, 'ss_trade_lv': 2})
+# ---- Adam's grandpa: R3 kernel fit (transient share 1 - permanent share, separate calm / volatile decay constants).
+# Replaces Marek's final selection block (eta 0.15, theta 0.25, take_t 0.3, pv_thr 0.7, ss_trade 1 / lv 2).
+PARAMS.update({'tr_on': 1, 'tr_p': 0.54, 'tr_T': 16.7, 'tr_p_v': 0.55, 'tr_T_v': 13.6, 'tr_sr': 1,
+               'tr_nr': 1})  # tr_nr 0: no 3 s no-revert window after a shock jump (Marek's r3_best)
 
 
 # ======================================================================================================
-# r3_grandpa (Peter, 2026-11-08): r3_best + a Bayesian ladder model in the S filter. New keys default off here;
-# the adopted values are set in the last block of the file.
+# turbotrader features (Peter, 2026-11-08), all off by default except ss_fast (speed only, behaviour-identical).
+# Adopted values, if any, are set in the last block of the file.
 #   lm_on     deep inserts (lm_k0..lm_k1 behind the same-side touch, deferred by the ladder filter, no rung followed)
 #             are a mixture of the base maker (S law) and a single-order ladder (flat in S, touch-anchored), weighted
 #             by regime-specific ladder rates (lm_s_c / lm_s_v per s vs lm_base base inserts), size laws
@@ -1552,5 +1546,4 @@ PARAMS.update({
     'take_skew_pow': 1.0,  # skew shape: 1 linear in pos, > 1 flatter near 0 and steeper near the cap
 })
 
-# ---- r3_grandpa adopted defaults (2026-11-08; evidence in the module docstring) ----
-PARAMS.update({'tk_on': 1, 'lm_on': 1, 'eta': 0.25, 'take_skew': 0.2})
+# ---- turbotrader adopted changes (none yet: the file trades like Adam's grandpa) ----
