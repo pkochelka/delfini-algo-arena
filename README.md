@@ -1,180 +1,37 @@
-# Qminers trading hackathon starter
+# How we won an Algo Trade Hackathon in 2026
 
-```
-strategies/   template_strategy.py, an empty strategy to copy and fill in; trend_follower.py, a simple working one
-data/         sample.csv.gz, a synthetic hour of trending prices to start on; the rounds downloaded from the website go here too (git-ignored)
-logs/         simulator output (git-ignored)
-simulator/    the exchange simulator package
-explorer/     the backtest explorer package
-```
+**Who:** Peter Kochelka, Marek Hubař, Adam Vinklárek
 
-## Setup
+**When:** 9th Nov 2026
 
-[uv](https://docs.astral.sh/uv/) is a fast Python package and project manager; install it with `curl -LsSf https://astral.sh/uv/install.sh | sh` (or `pip install uv`).
+**Goal:** Develop an automatic trading strategy against a synthetic, simplified market. It is then evaluated against a different, but similar market. 4 progressively more complex rounds of 5 hours, competing against ~60 teams.
 
-```bash
-uv sync                                        # Python 3.13 and everything else, into .venv
-uv run python -m gzip -d data/sample.csv.gz    # the simulator reads plain CSV only; one file at a time, the same for each downloaded round
-```
+**Secondary goal:** Have fun.
 
-`data/sample.csv.gz` is synthetic and its price trends: one resting order per side, and every few seconds an aggressive order takes part of the touch, after which the quotes keep moving in that direction tick by tick for a few seconds and then give part of the move back. `strategies/trend_follower.py` is a simple trend-following strategy: it sends a one-lot IOC order at the touch in the direction of the trades it has just seen. The rounds are recorded market data and look nothing like the sample.
+**Our results:** We messed up the first (easiest) round, but in the remaining three rounds, we always won by a large margin, despite all teams having the same access to AI assistants.
 
-## Writing a strategy
+## Building a strategy
 
-A strategy is one `.py` file defining one subclass of `BaseStrategy` (with several, the alphabetically first is used), constructible with no arguments:
+Our team had a strong background in ML, probability and statistics. However, no member had prior experience with algo trading (we learned what bid and ask mean just a few hours prior to the competition). We were therefore heavily relying on AI assistance in that domain and focused our attention on getting the more high-level approach right.
 
-```python
-from simulator.models import OrderBookSnapshot, OrderRequest, OrderType, PrivateOrderEvent, Side, Trade
-from simulator.strategy import BaseStrategy
+In every round, we were trying to maximize our PnL (make the most money). To make money, a strategy has to rely on its information advantage over the market. Therefore, we focused on gaining as much information about the market as possible within the 5 hours available.
 
+Despite their optimization capabilities, current AI agents tend to fixate on one single thing and often end up in local optima. After one to two hours, most teams would report that their agent has reached a plateau and is not improving the solution anymore. We therefore decided to use a more systematic approach. As soon as the public data for a new round were published, we let our agents generate a detailed analysis of trends, anomalies, periodicities and anything else that might be useful (see [round 1](strategies/peter/round1_generator.md), round 2 [a)](strategies/peter/round2_findings.md) [b)](marek/research/round2/round2_generator.md), round 3 [a)](strategies/peter/round3_findings.md) [b)](marek/research/round3/round3_generator.md), round 4 [a)](strategies/peter/round4_findings.md) [b)](marek/research/round4/round4_generator.md)). As a control, we read the analysis carefully and asked the agents to clarify and justify every weak or confusing claim. Afterwards, we were able to let our agents systematically generate well-motivated hypotheses grounded in the analysis and check whether we would be able to actually profit from them, updating our strategy along the way. That alone got us to a score that would place in the top 5 in most of the rounds.
 
-class MyStrategy(BaseStrategy):
-    def on_order_book_change(self, snapshot: OrderBookSnapshot, trades: list[Trade]) -> None:
-        """After every market event: the public book and all trades since the previous call."""
+To gain an edge over other teams, we made sure that we understood the data and the (generated) strategy ourselves so that we could identify and address any overlooked weaknesses. We paired the textual data analysis with a vibe-coded visual [data explorer](data_explorer/). The most important gain came from us noticing as early as in the second round that we could increase our PnL meaningfully by trading more boldly against sudden price jumps (despite a high penalty for holding too many positions at once) and convincing the very hesitant AI agent to really do it.
 
-    def on_private_order_update(self, event: PrivateOrderEvent) -> None:
-        """Every state change of your own orders."""
-```
+### Unnecessary but interesting details
 
-| Call                                                   | Effect                                                         |
-| ------------------------------------------------------ | -------------------------------------------------------------- |
-| `self.send_order(OrderRequest(side, price, quantity, order_type, client_order_id=None))` | submit; returns the order id (`u000000001`, ...) immediately |
-| `self.cancel_order(order_id)`                          | cancel your resting order                                      |
-| `self.modify_order(order_id, new_quantity)`            | shrink your resting order                                      |
-| `self.now_us()`                                        | simulation time in µs                                          |
+We also tried to generate hypotheses top-down by solving simpler variants of the problem, such as giving our strategy an oracle for fair value of the stock (or for predicting the upcoming price jump, predicting the current market volatility etc.) and observing whether and how much that would help. That allowed us to see how much room for improvement there was in individual directions. By overfitting heavily, we also learned how close we were to the "theoretical maximum" of the training market, which also improved our estimate of whether we were stuck in a local optimum or not.
 
-`Side.BUY` / `Side.SELL`, `OrderType.LIMIT` / `OrderType.IOC`; prices and quantities are positive integers (prices in ticks).
+We tried to profile and optimize our algorithms to run hypothesis testing faster, but it did not matter as we never used up the full 5 hour limit.
 
-Submissions run on Python 3.13 with numpy 2.5.4, pandas 3.0.6, scipy 1.18.1 and scikit-learn 1.9.1 available, and are statically checked first: besides the standard library and those packages, import only `simulator.models` and `simulator.strategy.BaseStrategy`. Modules giving system, network, file, threading or introspection access (`os`, `sys`, `io`, `socket`, `subprocess`, `threading`, `importlib`, `inspect`, `gc`, ...), builtins like `open`/`eval`/`exec`/`getattr`/`type`, dunder attributes and `str.format` are rejected.
+## Our secrets (having fun)
 
-## Running a backtest
+Several people were curious about what made our strategy work so well (and perhaps how we steered our agents to come up with it). Although the above approach is the most likely cause, we tried several more things that, despite not directly improving the performance, deserve a mention:
 
-```bash
-uv run exchange-simulator --strategy strategies/trend_follower.py --backtest data/sample.csv --log-dir logs/sample --progress
-```
+- **Politeness:** We tried to be [polite](https://aclanthology.org/2024.sicon-1.2/), ranging from using "please" and "thank you" to prompts like "Dear Claude, I hope this prompt finds you well...".
+- **Cool names:** We experimented with prompts like "change the name of this strategy from r3_grandpa to r3_turbotrader and proceed accordingly". Our last "fighter" was named "r4_spartacus_terminus" after the famous gladiator.
+- **Chill:** We went for a nice golden-hour walk to explore the surroundings of the venue.
 
-`logs/sample/result.json` holds the outcome (`pnl`, `cash`, `inventory`, `mark_price`, `breach_penalty`, `traded_volume`, `fills`, `pnl_se`, time-weighted quantiles of `|inventory|`) and `pnl.csv` the PnL sampled every second. Without `--no-logs` the directory also gets `run.jsonl`, `events.csv`, `book_deltas.csv` and `trades.csv`, several hundred MB per full round. Use `--no-logs` when you only need the result and the PnL curve; it is much faster. `--public-depth N` (default 20) sets how many ticks of the book you see.
-
-## Fast backtests (dev only)
-
-```bash
-uv run fast-sim --strategy S.py --backtest data/round3.csv --log-dir logs/x [--set k=v ...] [--jit]
-uv run python -m fastsim.tape data/round3.csv data/synth/*.csv [--verify]   # pre-build parquet caches
-uv run python -m fastsim.parity [--record]                                   # fast vs reference, byte for byte
-uv run python -m fastsim.bench --backtest data/round3.csv --strategy S.py --repeat 2
-```
-
-`fastsim/` runs the reference engine (subclassed, matching logic inherited unchanged) from a parquet cache of the tape (`<csv dir>/.cache/<stem>-<size>-<mtime>-v1.parquet`, built on first use) with a leaner replay loop. It writes the same `result.json` and `pnl.csv` as `exchange-simulator --no-logs`, checked byte for byte by `fastsim.parity` on four strategies × two tapes and by `tests/test_fastsim.py`. `fastsim.pool.run_many` runs many (strategy, tape, PARAMS) jobs in worker processes; `marek/research/round3/strategy/eval3.py` uses it. `--jit` numba-compiles the functions a strategy lists in a module-level `JIT_KERNELS` tuple; the strategy file itself never imports numba, so it is submitted unchanged. Use `exchange-simulator` for full logs and as the final check before submitting.
-
-## Walk-forward evaluation
-
-```bash
-uv run walk-forward --strategy strategies/peter/arb_mm.py --backtest data/round1.csv --folds 10 --warmup-s 60
-uv run walk-forward-report --run-dir logs/wf/arb_mm-round1 --open    # rebuild / open the HTML report
-```
-
-The tape is cut into `--folds` consecutive eval windows (`--end-frac 0.75` keeps the last quarter held out). Each fold is a fresh, independent replay (in parallel, `--jobs`) of a file starting `--warmup-s` before its window, with the resting book seeded; fold files are cached in `data/.cache/walkforward/`. A fold scores the PnL earned inside its window. Strategies with a `trade_start_us` key in `PARAMS` are told not to trade during the warmup; others trade through it and carry that inventory in (shown as `warmup_pnl`). `--params tuned.json` applies `PARAMS` overrides (flat, or `tune.py`'s `{"params": ...}`).
-
-`logs/wf/<strategy>-<tape>/` (or `--out-dir`) gets `config.json`, `summary.json` (total/mean/median/std of fold PnL, fold Sharpe, t-stat, win rate, worst fold, PnL/hour, stitched max drawdown, breaches, inventory), `folds.csv`, `pnl/<fold>.csv` and `report.html`: KPI tiles, the stitched out-of-sample equity curve, PnL / drawdown / inventory quantiles / fills per fold, each fold's PnL curve, and the fold table.
-
-## Exploring a backtest
-
-```bash
-uv run backtest-explorer --log-dir logs/sample     # http://127.0.0.1:8050, --port to change
-```
-
-A Dash app over a full-logs run (not `--no-logs`): best bid/ask with your fills marked, your PnL over time, the reconstructed order book at any clicked time, and the event log.
-
-## Strategy results report
-
-```bash
-uv run results-explorer logs/r1_ladder_mm --open                       # -> logs/r1_ladder_mm/report.html
-uv run results-explorer logs/a logs/b --out logs/a-vs-b.html --open    # comparison tab + one tab per run
-uv run results-explorer --all                                          # every run under logs/ -> logs/results-report.html
-```
-
-A self-contained interactive HTML report per run, plus `results_summary.json` (every metric) in each run directory. It reads only what the simulator wrote, plus the cached tape replay from `analysis/` for the market mid.
-
-- **Tiles:** PnL, PnL/hour, max drawdown, per-minute Sharpe and t-stat, winning minutes; inventory (mean |inv|, q95, time at limit / flat, breach time); execution (fills, maker share, edge and markouts per unit, PnL/unit); orders (fill ratios, orders per fill, cancels that lost the latency race, order lifetime, two-sided presence, time at the touch). Hover a tile for its definition.
-- **Timeline** (one shared zoom): PnL split into *spread edge* (side·(mid just before the fill − price)·qty) and *inventory PnL* (mark-to-mid minus edge, which is where adverse selection shows up), inventory against ±limit, market bid/ask with your fills and quotes, and drawdown.
-- **Charts:** PnL per bucket, per-minute PnL distribution, markout curve by horizon (maker/taker/buys/sells), time-weighted inventory distribution, fill edge and sizes, volume bought/sold, order outcomes, lifetimes and placement, and quote distance from the touch.
-
-Runs made with `--no-logs` get only the PnL-based metrics and charts; re-run without it to get the rest.
-
-## Exploring the market data
-
-```bash
-uv run data-explorer --data data/round1.csv [data/round2.csv ...]   # http://127.0.0.1:8051, --port to change
-uv run data-explorer --data data/round1.csv --export                 # every tab to data_explorer/round1/, no server
-uv run python -m analysis.fit data/round1.csv [--window 0 1800]      # fitted strategy parameters, also written to data/.cache/
-uv run pytest                                                        # replay parity with the simulator
-```
-
-`--export` (optionally `--window T0 T1`, `--dt 0.1`) writes `data_explorer/<tape>/README.md` with every tile, fitted parameter, table, note and a numeric digest of each chart, `summary.json`, the data behind each chart in `csv/<tab>/`, and the interactive `report.html` (git-ignored); with several tapes also `data_explorer/compare-<a>-<b>/`. Re-run it after adding a chart or a round, and read the README there before re-deriving a statistic.
-
-Unlike `backtest-explorer`, this reads the raw tapes, not a simulator run. `analysis/` replays a tape with the simulator's matching rules (inferring the trades, which the CSV doesn't contain) and caches the result in `data/.cache/`, so only the first load of a round is slow. Drag across the timeline to analyse a window; `?tab=<name>` links a tab.
-
-| Tab | What it answers |
-| --- | --- |
-| Overview | Headline stats, fitted A-S parameters ready to paste (`SIGMA_INIT`, `K_INIT`, A, OFI beta), activity per bin |
-| Price & spread | Bid/ask/microprice with aggressive orders, spread over time and distribution, depth heatmap |
-| Volatility | Rolling σ, volatility signature, return distribution, return ACF, variance ratio, mid-change timing |
-| Liquidity & book | Depth profile, touch sizes, queue imbalance, order sizes, order lifetimes, where orders are placed |
-| Trades & flow | Aggressive order rate, inter-arrival times, sizes, sweep depth (k), fill intensity λ(δ) = A·e^(−kδ), net flow, sign ACF |
-| Predictability | Imbalance → future mid, the same with 5 ms latency, post-trade markouts (adverse selection), OFI regressions |
-| Queue fills | Historical passive-order partial/full fill rates by volume ahead in the FIFO queue, with horizon, side, size and placement filters |
-| Maker markouts | Volume-weighted maker markouts and outcome percentiles, conditional on pre-fill spread, maker-side imbalance, trailing volatility and aggressor size |
-| Latency & cancels | Adverse midpoint moves and stale quote marketability during a delay; fills before hypothetical cancel activation at a selected order age |
-| Compare tapes | Every loaded tape side by side |
-
-The same functions are importable for notebooks and fitting scripts: `from analysis import load_tape, features`.
-
-Execution diagnostics are also importable from `analysis.execution`. The new tabs use the
-selected timeline window and expose additional controls above the charts. Queue fills
-are observed outcomes of actual historical orders, including actual cancellations;
-they are not counterfactual fill forecasts for our own quotes. Maker conditions use
-the book before each specific taker event, and markouts are signed for the maker
-(positive is favorable), weighted by executed quantity. Outcome percentiles are not
-confidence intervals. Volatility regimes are descriptive cutoffs within the selected
-window, using trailing rather than future price changes.
-
-Orders/fills without enough follow-up before the window ends are excluded. Cancel
-experiments count subsequent actual maker fills strictly before a hypothetical
-cancel takes effect; a fill at exactly that time is excluded, matching simulator
-ordering. They preserve existing historical cancellations and are separate per-order
-experiments, not a simultaneous strategy backtest. Price-delay charts use the sampling
-selector (capped at 50,000 decision times), independently of order size/placement
-filters. Raw tapes do not contain our own cancel requests. Replay cache version 3
-adds starting queue volume and resting quantities; old caches rebuild automatically.
-
-## How the exchange works
-
-**One instrument, replayed.** Each CSV row is a market participant's action:
-
-```
-Time,Operation,OrderId,Side,Volume,Price,Lifespan
-0.003823,Insert,1000001,B,43,9999,G
-```
-
-`Time` in seconds; `Operation` is `Insert` or `Cancel` (of `OrderId`); `Side` `B`/`A`; `Lifespan` `G` = resting limit order, `F` = immediate-or-cancel. The tape is fixed and does not react to you; your orders only add to and take from the book it builds.
-
-**Matching.** Price-time priority. An incoming order (market or yours) matches against the opposite side while prices cross, each fill at the resting (maker) order's price; a LIMIT residual rests at the back of its price level, an IOC residual is cancelled. Market orders can trade with yours; your orders never trade with each other. No fees.
-
-**Latency.** Every `send_order`, `cancel_order` and `modify_order` takes effect at $t + 5\text{ms}$, where $t$ is the simulation time at which you call it: it is applied just before the first market event with timestamp $\ge t + 5\text{ms}$, so the book may have moved by then. An order you place is therefore never filled within 5 ms, and a cancel can lose the race against a fill.
-
-**Feeds.**
-- `on_order_book_change` fires after every market event, with a snapshot of every individual order (id, side, price, quantity, `owner` `"market"`/`"user"`) within `public_depth` ticks of the best price on each side, and the list of trades (market-vs-market included) since the previous call. Fills caused by your own order activating appear in the next call's `trades`.
-- `on_private_order_update` fires synchronously for your orders: `ACCEPTED`, then one `PARTIALLY_FILLED`/`FILLED` per match (`fill_price`, `filled_quantity`, `remaining_quantity`), `CANCELED` (your cancel, or an IOC residual), `MODIFIED`, or `REJECTED`. Cancelling anything but your own resting order, or a modify that doesn't shrink it, is `REJECTED`; a modify of an unknown id is silently ignored.
-
-**Limits and scoring.** With inventory $I$ (signed), resting same-side quantity $R$ and order quantity $q$ ($s = \pm 1$ for buy/sell):
-
-$$|I + s (R + q)| > 1000 \Rightarrow \text{order REJECTED at acceptance}$$
-
-$$\text{penalty} = 10{,}000 \cdot \int \mathbb{1}\big[|I(t)| > 100\big] dt \quad (\$ \text{ per second})$$
-
-$$\text{PnL} = \text{cash} + \text{markout}(I) - \text{penalty}$$
-
-$\text{markout}(I)$ is the cash from liquidating $I$ against the resting *market* orders on the opposite side, best price outwards (volume beyond the book at the last swept price, or at the last traded price if that side is empty). It is computed at the end and every second for `pnl.csv` and `pnl_se`.
-
-# Fotka
-![Fotka](fotecka.jpeg)
+![Photo](fotecka.jpeg)
