@@ -194,3 +194,10 @@
   r4 1,391.0k (r3_hmm 1,371.5k; calm +1.2k, vol +23.5k, shock −5.3k lottery; calm+vol up in 9/12 windows); r3 848.8k
   (−8.8k, mostly c_v). Dead on r4: every F lean (velocity, S−mid, TWAP), vol exits, TWAP quote pull, side-law
   likelihood, 15-lot filter, post-shock quotes, retunes. All knobs in `strategies/marek/round4/r4_dev.py` (off = r3_hmm).
+- [strategy_v2 2026-11-08] **Final: `strategy_v2/README.md`, `strategies/marek/round4/r4_v2.py` = r4_best + ladder chain
+  linking fix (`lad_hist`, `lad_step 8`: link rungs to any same-side insert exactly 2000 us earlier, 1-8 ticks further in).
+  The old filter let 14 % (vol) / 20 % (calm) of ladder inserts into the S likelihood; now 0.7 % / 3.5 %. r4 1,403.7k (+12.7k;
+  calm+vol +1.9k, noise-sized, shock +10.8k lottery); r3 848.1k (calm+vol +3.8k, 9/12 windows). Dead under the 100 cap: the
+  15-lot joiner (detector 99 % precise, 31/31 episodes, +4.8 ticks in 5 s, but leaning/pulling loses the calm spread capture,
+  ≈ 70-85 /s ≈ 100 lots x 0.8 tick/s), calm side-law pulls (−8..−55k), queue cap, spec constants, kv gain/variance inflation
+  (kv measured 1.4x too timid, fixing it is flat), taker-limit bound on S, shock sniper size/limits. Knobs in `r4_v2_dev.py`.

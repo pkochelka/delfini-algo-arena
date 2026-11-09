@@ -1,0 +1,9 @@
+{"lad_hist": 1, "lad_step": 8, "ss_lim": 16}
+{"lad_hist": 1, "lad_step": 8, "ss_lim": 30}
+{"lad_hist": 1, "lad_step": 8, "st_pm": 2.0}
+{"lad_hist": 1, "lad_step": 8, "st_pm": 4.0}
+{"lad_hist": 1, "lad_step": 8, "st_pm": 2.0, "st_pe": 6.0}
+{"lad_hist": 1, "lad_step": 8, "xs_cap": 1500}
+{"lad_hist": 1, "lad_step": 8, "xs_cap": 1500, "ss_lim": 16}
+{"lad_hist": 1, "lad_step": 8, "ss_shots": 5}
+{"lad_hist": 1, "lad_step": 8, "xu_lim": 2.0}

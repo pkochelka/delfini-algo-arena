@@ -1,0 +1,8 @@
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_w": 0.1, "tl_w_v": 0.25}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_eps": 0.05}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_a_v": 3.0}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_a": 1.5, "tl_a_v": 3.5}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_w": 1.0}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_w_v": 1.0}
+{"lad_hist": 1, "lad_step": 8, "tl_on": 1, "tl_m": 1.5, "tl_m_v": 3.0}

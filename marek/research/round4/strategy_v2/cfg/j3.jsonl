@@ -1,0 +1,9 @@
+{"jl_on": 1, "jl_fk": 0.5, "jl_fw": 5.0}
+{"jl_on": 1, "jl_fk": 1.0, "jl_fw": 5.0}
+{"jl_on": 1, "jl_fk": 0.5, "jl_fw": 10.0}
+{"jl_on": 1, "jl_k": 0.5, "jl_fk": 0.5, "jl_fw": 8.0}
+{"jl_on": 1, "jl_pull": 1, "jl_tx": 3.0}
+{"jl_on": 1, "jl_k": 0.3}
+{"jl_on": 1, "jl_k": 0.5, "jl_hold": 0.8}
+{"jl_on": 1, "jl_k": 0.5, "jl_max": 5.0}
+{"j15_on": 1, "j15_q": [15]}

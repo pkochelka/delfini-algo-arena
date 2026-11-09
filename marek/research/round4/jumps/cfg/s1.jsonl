@@ -1,0 +1,16 @@
+{}
+{"jp_kvc": 0.1}
+{"jp_kvc": 0.2}
+{"jp_kvc": 0.4}
+{"jp_k2": 0.1, "jp_kv0": 3.0}
+{"jp_k2": 0.25, "jp_kv0": 3.0}
+{"jp_k2": 0.5, "jp_kv0": 3.0}
+{"jp_k2": 0.25, "jp_kv0": 5.0}
+{"jp_k2": 0.5, "jp_kv0": 5.0}
+{"jp_k2": 0.25, "jp_kv0": 2.0, "jp_all": 1}
+{"jb_on": 1, "jb_thr": 7.0, "jb_tau": 1.0}
+{"jb_on": 1, "jb_thr": 8.2, "jb_tau": 1.0}
+{"jb_on": 1, "jb_thr": 10.0, "jb_tau": 1.0}
+{"jb_on": 1, "jb_thr": 8.2, "jb_tau": 0.5}
+{"jb_on": 1, "jb_thr": 8.2, "jb_tau": 2.0}
+{"jb_on": 1, "jb_thr": 10.0, "jb_tau": 2.0}

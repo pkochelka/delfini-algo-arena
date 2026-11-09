@@ -1,0 +1,5 @@
+round4.csv {"ip_on": 1, "ip_mode": 2, "ip_kfv": 0.05, "ip_ksv": -0.01} 1365857
+round4.csv {"ip_on": 1, "ip_mode": 2, "ip_kfv": 0.05} 1370454
+round4.csv {"ip_on": 1, "ip_mode": 2, "ip_yv": 0.02} 1374684
+round4.csv {"ip_on": 1, "ip_mode": 2, "ip_ksv": -0.01} 1388291
+done 4 jobs 94 s

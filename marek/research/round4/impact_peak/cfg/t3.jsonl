@@ -1,0 +1,12 @@
+{"ip_on": 1, "ip_mode": 1, "ip_kfc": 0.1}
+{"ip_on": 1, "ip_mode": 1, "ip_kfc": 0.05}
+{"ip_on": 1, "ip_mode": 1, "ip_ksc": -0.02}
+{"ip_on": 1, "ip_mode": 2, "ip_kfc": 0.1}
+{"ip_on": 1, "ip_mode": 1, "ip_ksv": -0.03}
+{"ip_on": 1, "ip_mode": 1, "ip_kfv": 0.1}
+{"ip_on": 1, "fp_on": 1, "fp_y": 3.0, "fp_xf": 1.0}
+{"ip_on": 1, "fp_on": 1, "fp_y": 8.0, "fp_xf": 0.0}
+{"ip_on": 1, "fp_on": 1, "fp_y": 3.0, "fp_xf": 1.0, "fp_th": 1.0, "fp_keep": 0.5}
+{"ip_on": 1, "fp_on": 1, "fp_y": 15.0, "fp_xf": -2.0}
+{"ip_on": 1, "vx_u": 0.0, "vx_age": 5.0, "vx_y": 5.0, "vx_xf": 0.0}
+{"cu_u": 0.0, "cu_t0": 3.0, "cu_t1": 10.0}

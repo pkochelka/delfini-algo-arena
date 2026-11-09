@@ -1,0 +1,24 @@
+{"take": 0.05}
+{"take": 0.15}
+{"take": 0.2}
+{"take_sd": 0.5}
+{"take_sd": 1.5}
+{"tr_take_sd": 0.5}
+{"tr_take_sd": 1.5}
+{"theta": 0.2}
+{"theta": 0.3}
+{"theta": 0.35}
+{"inv_skew": 0.1}
+{"inv_skew": 0.2}
+{"inv_skew": 0.3}
+{"reach_off": 1.5}
+{"size_top": 50}
+{"size_top": 100}
+{"theta_keep": 0.05}
+{"theta_keep": 0.1}
+{"max_sd": 0.4}
+{"max_sd": 0.8}
+{"keep_depth": 2}
+{"tk_free": 1}
+{"tk_free": 2}
+{"tk_free": 1, "tk_free_max": 100}

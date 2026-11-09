@@ -1,0 +1,13 @@
+round4.csv {"ip_on": 1, "ip_mode": 1, "ip_ksc": -0.02} 1365363
+round4.csv {"ip_on": 1, "ip_mode": 1, "ip_kfc": 0.1} 1368668
+round4.csv {"ip_on": 1, "ip_mode": 2, "ip_kfc": 0.1} 1369586
+round4.csv {"ip_on": 1, "ip_mode": 1, "ip_kfc": 0.05} 1359722
+round4.csv {"ip_on": 1, "ip_mode": 1, "ip_ksv": -0.03} 1374131
+round4.csv {"ip_on": 1, "ip_mode": 1, "ip_kfv": 0.1} 1384969
+round4.csv {"ip_on": 1, "fp_on": 1, "fp_y": 3.0, "fp_xf": 1.0} 1382584
+round4.csv {"ip_on": 1, "fp_on": 1, "fp_y": 8.0, "fp_xf": 0.0} 1395727
+round4.csv {"cu_u": 0.0, "cu_t0": 3.0, "cu_t1": 10.0} 1390862
+round4.csv {"ip_on": 1, "fp_on": 1, "fp_y": 3.0, "fp_xf": 1.0, "fp_th": 1.0, "fp_keep": 0.5} 1385714
+round4.csv {"ip_on": 1, "fp_on": 1, "fp_y": 15.0, "fp_xf": -2.0} 1391276
+round4.csv {"ip_on": 1, "vx_u": 0.0, "vx_age": 5.0, "vx_y": 5.0, "vx_xf": 0.0} 1391057
+done 12 jobs 406 s

@@ -1,0 +1,8 @@
+{"vs_kv": 0.1}
+{"vs_kv": 0.15}
+{"vs_kv": 0.25}
+{"vs_kv": 0.3}
+{"vs_kv": 0.2, "vs_kvmax": 2.0}
+{"vs_kv": 0.2, "vs_kvmax": 4.0}
+{"vs_kv": 0.3, "vs_kvmax": 3.0}
+{"vs_kv": 0.2, "vs_agt": 8.0, "vs_agd": 0.5}

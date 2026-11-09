@@ -1,0 +1,10 @@
+round4.csv {"tr_T_v": 8.0} 1367894
+round4.csv {"tr_T_v": 11.0} 1378717
+round4.csv {} 1390969
+round4.csv {"tr_p_v": 0.45} 1392492
+round4.csv {"tr_p_v": 0.35} 1379205
+round4.csv {"tr_T_v": 11.0, "tr_p_v": 0.45} 1373756
+round4.csv {"y_k": 0.2} 761776
+round4.csv {"y_k": -0.2} 945888
+done 8 jobs 226 s
+uv run python marek/research/round4/impact_peak/sweep.py  --tag t1 --cfgfile   663.98s user 4.28s system 295% cpu 3:46.03 total

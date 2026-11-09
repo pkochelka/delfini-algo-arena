@@ -1,0 +1,9 @@
+{"jl_on": 1}
+{"jl_on": 1, "jl_k": 0.5}
+{"jl_on": 1, "jl_k": 1.0}
+{"jl_on": 1, "jl_k": 1.5}
+{"jl_on": 1, "jl_k": 2.0}
+{"jl_on": 1, "jl_k": 3.0}
+{"jl_on": 1, "jl_k": 2.0, "jl_hold": 1.0}
+{"jl_on": 1, "jl_k": 2.0, "jl_hold": 2.5}
+{"jl_on": 1, "jl_k": 2.0, "jl_min": 2}

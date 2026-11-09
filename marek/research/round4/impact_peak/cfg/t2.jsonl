@@ -1,0 +1,12 @@
+{}
+{"ip_on": 1}
+{"ip_on": 1, "ip_kfc": 0.1}
+{"ip_on": 1, "ip_kfc": 0.2}
+{"ip_on": 1, "ip_kfc": 0.1, "ip_ksc": -0.03}
+{"ip_on": 1, "ip_ksc": -0.05}
+{"ip_on": 1, "ip_kfv": 0.05}
+{"ip_on": 1, "ip_kfv": 0.1}
+{"ip_on": 1, "ip_kfv": 0.2}
+{"ip_on": 1, "ip_ksv": -0.02}
+{"ip_on": 1, "ip_ksv": -0.05}
+{"ip_on": 1, "ip_yv": 0.05}

@@ -1,0 +1,18 @@
+{"lad_on": 0}
+{"k_now": 0.0}
+{"bound": 0}
+{"tail_k": 1.0}
+{"gate": 100.0}
+{"far": 1000.0}
+{"v_sd_v": 0.0, "v_sd_c": 0.0, "k_now": 0.0}
+{"w_lo": 100.0, "w_hi": 101.0, "jump_hold": 0.0}
+{"w_lo": -2.0, "w_hi": -1.0}
+{"tau_sd": 0.0}
+{"tau_c": 100.0}
+{"tau_t": 100.0}
+{"max_sd": 0.0}
+{"flat_pos": 1000}
+{"dr_n": 0}
+{"ss_shots": 0}
+{"xs_cap": 0}
+{"sw_edge": 0.0, "clip_edge": 0.0}

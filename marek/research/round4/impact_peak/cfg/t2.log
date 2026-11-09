@@ -1,0 +1,13 @@
+round4.csv {} 1390969
+round4.csv {"ip_on": 1, "ip_kfc": 0.1} 1355231
+round4.csv {"ip_on": 1, "ip_kfc": 0.2} 1325514
+round4.csv {"ip_on": 1} 1390969
+round4.csv {"ip_on": 1, "ip_kfc": 0.1, "ip_ksc": -0.03} 1363284
+round4.csv {"ip_on": 1, "ip_ksc": -0.05} 1317833
+round4.csv {"ip_on": 1, "ip_kfv": 0.05} 1378397
+round4.csv {"ip_on": 1, "ip_kfv": 0.1} 1333074
+round4.csv {"ip_on": 1, "ip_kfv": 0.2} 1306335
+round4.csv {"ip_on": 1, "ip_ksv": -0.02} 1359479
+round4.csv {"ip_on": 1, "ip_ksv": -0.05} 1185991
+round4.csv {"ip_on": 1, "ip_yv": 0.05} 1345097
+done 12 jobs 413 s

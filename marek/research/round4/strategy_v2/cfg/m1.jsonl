@@ -1,0 +1,8 @@
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.2}
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.4}
+{"lad_hist": 1, "lad_step": 8, "kv_inf": 1.0, "kv_shr": 1}
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.2, "kv_inf": 1.0, "kv_shr": 1}
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.2, "tl_on": 1, "tl_w_v": 1.0}
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.2, "kv_inf": 1.0, "kv_shr": 1, "tl_on": 1, "tl_w_v": 1.0}
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.2, "kv_tau_v": 2.6}
+{"lad_hist": 1, "lad_step": 8, "kv_g": 1.3}

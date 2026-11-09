@@ -1,0 +1,9 @@
+{"sl_g": 0.25}
+{"sl_g": 0.5}
+{"sl_g": 0.75}
+{"sl_g": 1.0}
+{"sl_g": 0.5, "sl_red": 1}
+{"theta_keep": 0.1}
+{"theta_keep": 0.2}
+{"qa_max": 200}
+{"qa_max": 500}

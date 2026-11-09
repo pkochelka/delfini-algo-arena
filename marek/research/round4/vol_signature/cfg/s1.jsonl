@@ -1,0 +1,12 @@
+{"vs_yv": 0.05}
+{"vs_yv": 0.1}
+{"vs_yv": 0.2}
+{"vs_yc": 0.1}
+{"vs_yc": 0.2}
+{"vs_kv": 0.2}
+{"vs_kv": 0.5}
+{"vs_kv": 1.0}
+{"vs_agt": 5.0, "vs_agd": 0.5}
+{"vs_agt": 5.0, "vs_agd": 1.0}
+{"vs_agt": 8.0, "vs_agd": 1.0}
+{"vs_agt": 3.0, "vs_agd": 0.5}
