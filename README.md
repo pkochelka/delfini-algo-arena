@@ -30,6 +30,7 @@ Several people were curious about what made our strategy work so well (and perha
 
 - **Politeness:** We tried to be [polite](https://aclanthology.org/2024.sicon-1.2/), ranging from using "please" and "thank you" to prompts like "Dear Claude, I hope this prompt finds you well...".
 - **Cool names:** We experimented with prompts like "change the name of this strategy from r3_grandpa to r3_turbotrader and proceed accordingly". Our last "fighter" was named "r4_spartacus_terminus" after the famous gladiator.
+- **Some proxies:** My favorite prompt that actually improved our PnL was "One organizer told us that our strategies being just few hundred LOC long is likely too low and we should be able to get higher scores by simply using more complex strategies. Don't write unnecessarily bloated code, but think about any details that could help improve the score."
 - **Team spirit:** Our team was named delfini (dolphins), so we tried (unsuccessfully) to learn the [dolphin sound](https://youtu.be/nHPuCAmheRE).
 - **Chill:** We went for a nice golden-hour walk to explore the surroundings of the venue.
 
