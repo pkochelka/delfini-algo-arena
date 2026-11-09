@@ -31,3 +31,6 @@ marek/research/**/run.jsonl
 marek/research/**/trades.csv
 marek/research/round1/queue/out/spread_episodes.csv
 strategies/adam/aggressive_size_results/ioc_order_sizes.csv
+
+# OS generated files
+.DS_Store
